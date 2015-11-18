@@ -30,7 +30,13 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 
 /**
  * Created on Nov 17, 2015.
@@ -44,7 +50,7 @@ public class Shell extends JComponent
     private static final int COLUMNS = 80;
     private static final int ROWS = 27;
     
-    private static final int TEXT_VERTICAL_OFFSET = -2;
+    private static final int VERTICAL_TEXT_OFFSET = -2;
     
     private static final String DEFAULT_PROMPT = "$";
     
@@ -66,6 +72,8 @@ public class Shell extends JComponent
         screenBuffer = "";
         inputBuffer = "";
         prompt = DEFAULT_PROMPT;
+        
+        initializeKeyboardInput();
     }
     
     public Dimension calculateWindowSize()
@@ -89,7 +97,7 @@ public class Shell extends JComponent
         dim.width = (fm.stringWidth(testString) -  charWidth)
                 + (charWidth * 2) - 2;
         dim.height = charHeight * (ROWS + 3)
-                - charHeight - TEXT_VERTICAL_OFFSET;
+                - charHeight - VERTICAL_TEXT_OFFSET;
         
         return dim;
     }
@@ -98,14 +106,19 @@ public class Shell extends JComponent
     {
         cursorX++;
         if (cursorX > COLUMNS) {
-            screenBuffer += "\n" + Character.toString(c);
+            screenBuffer += "\n";
             cursorX = 1;
+        } else if (c == '\n') {
+            cursorX = 0;
+        } else if (c == '\b') {
+            cursorX--;
+            if (screenBuffer.charAt(screenBuffer.length() - 1) == '\n') {
+                screenBuffer = screenBuffer.substring(0, screenBuffer.length() - 2);
+            } else {
+                screenBuffer = screenBuffer.substring(0, screenBuffer.length() - 1);
+            }
             repaint();
             return;
-        }
-        
-        if (c == '\n') {
-            cursorX = 0;
         }
         
         screenBuffer += Character.toString(c);
@@ -127,6 +140,69 @@ public class Shell extends JComponent
     public void println(String s)
     {
         print(s + "\n");
+    }
+    
+    private void initializeKeyboardInput()
+    {
+        for (int i = 0; i < 26; i++) {
+            registerKey(KeyStroke.getKeyStroke(KeyEvent.VK_A + i, 0),
+                    (char) (KeyEvent.VK_A + i + 0x20));
+        }
+        
+        for (int i = 0; i < 26; i++) {
+            registerKey(KeyStroke.getKeyStroke(KeyEvent.VK_A + i, KeyEvent.SHIFT_DOWN_MASK),
+                    (char) (KeyEvent.VK_A + i));
+        }
+        
+        registerKey(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), ' ');
+        
+        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enter");
+        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "backspace");
+        
+        AbstractAction enter = new AbstractAction()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                println();
+                System.out.println("parsing '" + inputBuffer + "'...");
+                inputBuffer = "";
+                cursorX = 0;
+                print(prompt);
+            }
+        };
+        AbstractAction backspace = new AbstractAction()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                if (inputBuffer.isEmpty()) {
+                    return;
+                }
+                inputBuffer = inputBuffer.substring(0, inputBuffer.length() - 1);
+                if (cursorX != 0) {
+                    print('\b');
+                }
+            }
+        };
+        getActionMap().put("enter", enter);
+        getActionMap().put("backspace", backspace);
+    }
+    
+    private void registerKey(KeyStroke keyStroke, final char ch)
+    {
+        final String s = Character.toString(ch); 
+        AbstractAction action = new AbstractAction()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                inputBuffer += s;
+                print(ch);
+            }
+        };
+        getInputMap().put(keyStroke, s);
+        getActionMap().put(s, action);
     }
     
     @Override
@@ -157,7 +233,7 @@ public class Shell extends JComponent
                 s = Character.toString(c);
                 g2d.drawString(s,
                         x * charWidth,
-                        (y + 1) * charHeight + TEXT_VERTICAL_OFFSET);
+                        (y + 1) * charHeight + VERTICAL_TEXT_OFFSET);
                 x++;
             }
         }

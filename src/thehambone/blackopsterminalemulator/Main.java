@@ -38,7 +38,8 @@ public class Main
 {
     public static final String PROGRAM_TITLE
             = "Call of Duty: Black Ops Terminal Emulator";
-    public static final String PROGRAM_VERSION = "0.1-alpha";
+    public static final String PROGRAM_VERSION
+            = "1.0-alpha (dev build)";
     
     /**
      * Program entry point.
@@ -59,9 +60,14 @@ public class Main
             }
         });
         
-        shell.println("The quick brown fox jumps over the lazy dog and didn't quite make it so he hit the dog and broke his leg.");
+        shell.print("$");
     }
     
+    /**
+     * 
+     * @param title
+     * @param shell 
+     */
     private static void createAndShowGUI(String title, Shell shell)
     {
         JFrame frame = new JFrame(title);
