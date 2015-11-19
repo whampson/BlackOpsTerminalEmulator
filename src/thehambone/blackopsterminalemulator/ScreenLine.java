@@ -25,47 +25,65 @@
 package thehambone.blackopsterminalemulator;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 
 /**
- * This class handles program initialization.
- * <p>
- * Created on Nov 17, 2015.
+ * Created on Nov 18, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class Main
+public final class ScreenLine
 {
-    public static final String PROGRAM_TITLE
-            = "Call of Duty: Black Ops Terminal Emulator";
-    public static final String PROGRAM_VERSION
-            = "1.0-alpha (dev build)";
+    private final char[] textData;
+    private BufferedImage imageData;
     
-    /**
-     * Program entry point.
-     * 
-     * @param args command-line arguments
-     */
-    public static void main(String[] args)
+    public ScreenLine(int length)
     {
-        Terminal terminal = Terminal.newTerminal();
-        terminal.show(PROGRAM_TITLE + " - " + PROGRAM_VERSION);
-        
-        try {
-            BufferedImage img = ImageIO.read(new File("res/reznov1.png"));
-            Terminal.println("$");
-            Terminal.println("$");
-            Terminal.println("$");
-            Terminal.println(img);
-            Terminal.print("$");
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
+        textData = new char[length];
+    }
+    
+    public int getLength()
+    {
+        return textData.length;
+    }
+    
+    public boolean hasImageData()
+    {
+        return imageData != null;
+    }
+    
+    public BufferedImage getImageData()
+    {
+        return imageData;
+    }
+    
+    public void setImageData(BufferedImage imageData)
+    {
+        this.imageData = imageData;
+    }
+    
+//    public String getTextData()
+//    {
+//        return new String(textData);
+//    }
+//    
+//    public void setTextData(String s)
+//    {
+//        for (int i = 0; i < textData.length; i++) {
+//            if (i > s.length() - 1) {
+//                textData[i] = 0;
+//            } else {
+//                textData[i] = s.charAt(i);
+//            }
+//        }
+//    }
+    
+    public char charAt(int index)
+    {
+        return textData[index];     // Potentially unsafe
+    }
+    
+    public void putChar(int index, char c)
+    {
+        textData[index] = c;        // Potentially unsafe
     }
 }

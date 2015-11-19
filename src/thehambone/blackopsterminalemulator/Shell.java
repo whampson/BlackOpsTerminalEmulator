@@ -31,12 +31,12 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
+import javax.swing.Timer;
 
 /**
  * Created on Nov 17, 2015.
@@ -49,14 +49,19 @@ public class Shell extends JComponent
     
     private static final int COLUMNS = 80;
     private static final int ROWS = 27;
-    
+    private static final int CURSOR_BLINK_RATE = 275;
+    private static final int MAX_INPUT_BUFFER_LENGTH = 81;
     private static final int VERTICAL_TEXT_OFFSET = -2;
-    
     private static final String DEFAULT_PROMPT = "$";
+    
+    private final Dimension windowSize;
+    
+    private volatile boolean isCursorVisible;
     
     private int charWidth;
     private int charHeight;
     private int cursorX;
+    private int cursorY;
     
     private String screenBuffer;
     private String inputBuffer;
@@ -66,17 +71,27 @@ public class Shell extends JComponent
     {
         super();
         
+        isCursorVisible = false;
         charWidth = 0;
         charHeight = 0;
         cursorX = 0;
+        cursorY = 1;
         screenBuffer = "";
         inputBuffer = "";
         prompt = DEFAULT_PROMPT;
         
+        windowSize = calculateWindowSize();
+        
         initializeKeyboardInput();
+        blinkCursor();
     }
     
-    public Dimension calculateWindowSize()
+    public Dimension getWindowSize()
+    {
+        return windowSize;
+    }
+    
+    private Dimension calculateWindowSize()
     {
         Dimension dim = new Dimension();
         FontMetrics fm = getFontMetrics(FONT);
@@ -104,14 +119,38 @@ public class Shell extends JComponent
     
     public void print(char c)
     {
-        cursorX++;
-        if (cursorX > COLUMNS) {
-            screenBuffer += "\n";
-            cursorX = 1;
-        } else if (c == '\n') {
+//        cursorX++;
+//        if (cursorX > COLUMNS) {
+//            screenBuffer += "\n";
+//            cursorX = 1;
+//            cursorY++;
+//        } else if (c == '\n') {
+//            cursorX = 0;
+//            cursorY++;
+//        } else if (c == '\b') {
+//            cursorX -= 2;
+//            if (screenBuffer.charAt(screenBuffer.length() - 1) == '\n') {
+//                screenBuffer = screenBuffer.substring(0, screenBuffer.length() - 2);
+//            } else {
+//                screenBuffer = screenBuffer.substring(0, screenBuffer.length() - 1);
+//            }
+//            repaint();
+//            return;
+//        }
+//        
+//        screenBuffer += Character.toString(c);
+//        repaint();
+        
+        if (c == '\n') {
             cursorX = 0;
-        } else if (c == '\b') {
-            cursorX--;
+            cursorY++;
+            print0(c);
+            return;
+        }
+        if (c == '\b') {
+            if (cursorX > 0) {
+                cursorX--;
+            }
             if (screenBuffer.charAt(screenBuffer.length() - 1) == '\n') {
                 screenBuffer = screenBuffer.substring(0, screenBuffer.length() - 2);
             } else {
@@ -121,6 +160,17 @@ public class Shell extends JComponent
             return;
         }
         
+        cursorX++;
+        if (cursorX > COLUMNS) {
+            screenBuffer += "\n";
+            cursorX = 1;
+            cursorY++;
+        }
+        print0(c);
+    }
+    
+    private void print0(char c)
+    {
         screenBuffer += Character.toString(c);
         repaint();
     }
@@ -167,7 +217,6 @@ public class Shell extends JComponent
                 println();
                 System.out.println("parsing '" + inputBuffer + "'...");
                 inputBuffer = "";
-                cursorX = 0;
                 print(prompt);
             }
         };
@@ -180,9 +229,7 @@ public class Shell extends JComponent
                     return;
                 }
                 inputBuffer = inputBuffer.substring(0, inputBuffer.length() - 1);
-                if (cursorX != 0) {
-                    print('\b');
-                }
+                print('\b');
             }
         };
         getActionMap().put("enter", enter);
@@ -197,12 +244,30 @@ public class Shell extends JComponent
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                inputBuffer += s;
-                print(ch);
+                if (inputBuffer.length() < MAX_INPUT_BUFFER_LENGTH) {
+                    inputBuffer += s;
+                    print(ch);
+                }
             }
         };
         getInputMap().put(keyStroke, s);
         getActionMap().put(s, action);
+    }
+    
+    private void blinkCursor()
+    {
+        ActionListener cursorBlink = new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                isCursorVisible = !isCursorVisible;
+                repaint();
+            }
+        };
+        
+        Timer blinkTimer = new Timer(CURSOR_BLINK_RATE, cursorBlink);
+        blinkTimer.start();
     }
     
     @Override
@@ -219,7 +284,7 @@ public class Shell extends JComponent
         g2d.setFont(FONT);
         g2d.setColor(Color.WHITE);
         int x = 0;
-        int y = 0;
+        int y = 1;
         String s;
         char c;
         
@@ -233,9 +298,15 @@ public class Shell extends JComponent
                 s = Character.toString(c);
                 g2d.drawString(s,
                         x * charWidth,
-                        (y + 1) * charHeight + VERTICAL_TEXT_OFFSET);
+                        y * charHeight + VERTICAL_TEXT_OFFSET);
                 x++;
             }
+        }
+        
+        // Draw cursor
+        if (isCursorVisible) {
+            g2d.drawLine(cursorX * charWidth, cursorY * charHeight,
+                    (cursorX + 1) * charWidth, cursorY * charHeight);
         }
     }
 }
