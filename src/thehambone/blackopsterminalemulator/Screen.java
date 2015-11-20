@@ -90,6 +90,11 @@ public final class Screen
         blinkCursor();
     }
     
+    public ScreenBuffer getScreenBuffer()
+    {
+        return screenBuffer;
+    }
+    
     public JComponent getComponent()
     {
         return component;
@@ -123,13 +128,13 @@ public final class Screen
     
     public void print(char c)
     {
-        screenBuffer.putChar(c);
+        screenBuffer.printChar(c);
         component.repaint();
     }
     
     public void printImage(BufferedImage image)
     {
-        screenBuffer.putImage(image);
+        screenBuffer.printImage(image);
     }
     
     private void blinkCursor()
@@ -173,11 +178,14 @@ public final class Screen
                 g2d.setColor(foreground);
                 g2d.setFont(font);
                 
-                // Draw row by row
+                // Draw screen line by line
                 for (y = 0; y < rows; y++) {
                     line = screenBuffer.getLine(y);
+                    if (line == null) {
+                        continue;
+                    }
                     
-                    // Draw image section
+                    // Draw image slice if line contains image data
                     if (line.hasImageData()) {
                         g2d.drawImage(line.getImageData(), null,
                                 0 * charWidth + IMAGE_HORIZONTAL_OFFSET,

@@ -40,9 +40,10 @@ public final class ScreenBuffer
     private static final float IMAGE_SCALE_FACTOR = 0.65f;
     
     private final int columns;
+    private final int rows;
     private final int charWidth;
     private final int charHeight;
-    private final ScreenLine[] screenLines;
+    private final ScreenLine[] lines;
     
     private int cursorX;
     private int cursorY;
@@ -50,12 +51,13 @@ public final class ScreenBuffer
     public ScreenBuffer(int columns, int rows, int charWidth, int charHeight)
     {
         this.columns = columns;
+        this.rows = rows;
         this.charWidth = charWidth;
         this.charHeight = charHeight;
         
-        screenLines = new ScreenLine[rows];
+        lines = new ScreenLine[rows];
         for (int i = 0; i < rows; i++) {
-            screenLines[i] = new ScreenLine(columns);
+            lines[i] = new ScreenLine(columns);
         }
         
         cursorX = 0;
@@ -64,7 +66,7 @@ public final class ScreenBuffer
     
     public ScreenLine getLine(int line)
     {
-        return screenLines[line];
+        return lines[line];
     }
     
     public int getCursorX()
@@ -83,27 +85,28 @@ public final class ScreenBuffer
         cursorY = y;
     }
     
-    public void putChar(char c)
+    public void printChar(char c)
     {
         if (c == '\n') {
             cursorX = 0;
             cursorY++;
+            appendLine(new ScreenLine(columns));
             return;
-        }
-        if (cursorX >= columns) {
+        } else if (cursorX >= columns) {
             cursorX = 0;
             cursorY++;
+            appendLine(new ScreenLine(columns));
         }
-        screenLines[cursorY].putChar(cursorX++, c);        
+        lines[cursorY].putChar(cursorX++, c);
     }
     
-    public void putImage(BufferedImage image)
+    public void printImage(BufferedImage image)
     {
         int x;
         int y;
         int width;
         int height;
-        int lines;
+        int nLines;
         BufferedImage scaledImage;
         BufferedImage section;
         
@@ -113,12 +116,15 @@ public final class ScreenBuffer
         // Divide image into horizontal strips, each as tall as a character
         x = 0;
         width = scaledImage.getWidth();
-        lines = (int)Math.ceil((double)scaledImage.getHeight() / charHeight);
-        for (int i = 0; i < lines; i++) {
+        nLines = (int)Math.ceil((double)scaledImage.getHeight() / charHeight);
+        for (int i = 0; i < nLines; i++) {
             y = i * charHeight;
             height = Math.min(charHeight, scaledImage.getHeight() - y);
             section = scaledImage.getSubimage(x, y, width, height);
-            screenLines[cursorY++].setImageData(section);
+            lines[cursorY].setImageData(section);
+            if (cursorY < rows - 1) {
+                cursorY++;
+            }
         }
     }
     
@@ -151,5 +157,18 @@ public final class ScreenBuffer
         scaledImageGraphics.drawImage(image, transformOp, 0, 0);
         
         return scaledImage;
+    }
+    
+    private void appendLine(ScreenLine line)
+    {
+        // Shift lines upwards if the cursor is at the bottom of the screen
+        if (cursorY > rows - 1) {
+            for (int i = 1; i < lines.length; i++) {
+                lines[i - 1] = lines[i];
+            }
+            cursorY = rows - 1;
+        }
+        
+        lines[cursorY] = line;
     }
 }

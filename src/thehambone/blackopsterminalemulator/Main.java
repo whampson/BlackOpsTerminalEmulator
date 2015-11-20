@@ -27,11 +27,7 @@ package thehambone.blackopsterminalemulator;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 
 /**
  * This class handles program initialization.
@@ -58,13 +54,26 @@ public class Main
         terminal.show(PROGRAM_TITLE + " - " + PROGRAM_VERSION);
         
         try {
-            BufferedImage img = ImageIO.read(new File("res/reznov1.png"));
-            Terminal.println("$");
-            Terminal.println("$");
-            Terminal.println("$");
+            Terminal.print("***** Line scrolling demo *****");
+            terminal.getScreen().setCursorPosition(0, 26);
+            Terminal.print("$cat wolfinchains.pic");
+            BufferedImage img = ImageIO.read(new File("res/reznov2.png"));
+            Thread.sleep(2500);
+            for (int i = 0; i < 20; i++) {
+                Terminal.println();
+            }
+            terminal.getScreen().setCursorPosition(0, 7);
             Terminal.println(img);
+            Thread.sleep(250);
+            for (int i = 0; i < 27; i++) {
+                Terminal.println(Integer.toString(i));
+                Thread.sleep(250);
+            }
+            Terminal.println("This is some long text to test how the screen "
+                    + "handles text that extends beyond the number of "
+                    + "available columns.");
             Terminal.print("$");
-        } catch (IOException ex) {
+        } catch (IOException | InterruptedException ex) {
             throw new RuntimeException(ex);
         }
     }

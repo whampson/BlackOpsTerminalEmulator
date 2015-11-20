@@ -77,6 +77,7 @@ public final class Terminal
     public static void println(BufferedImage img)
     {
         instance.printImage(img);
+        println();
     }
     
     private final Screen screen;
