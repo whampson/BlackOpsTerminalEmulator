@@ -66,12 +66,13 @@ public final class Terminal
     
     public static void println()
     {
-        print("\n");
+        println("");
     }
     
     public static void println(String s)
     {
         print(s + "\n");
+//        instance.screen.setForeground(FOREGROUND_DEFAULT);
     }
     
     public static void println(BufferedImage img)

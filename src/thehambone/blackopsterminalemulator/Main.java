@@ -25,7 +25,9 @@
 package thehambone.blackopsterminalemulator;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
@@ -53,28 +55,28 @@ public class Main
         Terminal terminal = Terminal.newTerminal();
         terminal.show(PROGRAM_TITLE + " - " + PROGRAM_VERSION);
         
-        try {
-            Terminal.print("***** Line scrolling demo *****");
-            terminal.getScreen().setCursorPosition(0, 26);
-            Terminal.print("$cat wolfinchains.pic");
-            BufferedImage img = ImageIO.read(new File("res/reznov2.png"));
-            Thread.sleep(2500);
-            for (int i = 0; i < 20; i++) {
-                Terminal.println();
-            }
-            terminal.getScreen().setCursorPosition(0, 7);
-            Terminal.println(img);
-            Thread.sleep(250);
-            for (int i = 0; i < 27; i++) {
-                Terminal.println(Integer.toString(i));
-                Thread.sleep(250);
-            }
-            Terminal.println("This is some long text to test how the screen "
-                    + "handles text that extends beyond the number of "
-                    + "available columns.");
-            Terminal.print("$");
-        } catch (IOException | InterruptedException ex) {
-            throw new RuntimeException(ex);
-        }
+//        try {
+//            Terminal.print("***** Line scrolling demo *****");
+//            terminal.getScreen().setCursorPosition(0, 26);
+//            Terminal.print("$cat wolfinchains.pic");
+//            BufferedImage img = ImageIO.read(new File("res/reznov2.png"));
+//            Thread.sleep(2500);
+//            for (int i = 0; i < 20; i++) {
+//                Terminal.println();
+//            }
+//            terminal.getScreen().setCursorPosition(0, 7);
+//            Terminal.println(img);
+//            Thread.sleep(1000);
+//            for (int i = 0; i < 27; i++) {
+//                Terminal.println(Integer.toString(i));
+//                Thread.sleep(250);
+//            }
+//            Terminal.println("This is some long text to test how the screen "
+//                    + "handles text that extends beyond the number of "
+//                    + "available columns.");
+//            Terminal.print("$^1");
+//        } catch (IOException | InterruptedException ex) {
+//            throw new RuntimeException(ex);
+//        }
     }
 }

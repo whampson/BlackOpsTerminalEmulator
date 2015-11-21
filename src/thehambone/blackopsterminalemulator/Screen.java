@@ -128,13 +128,13 @@ public final class Screen
     
     public void print(char c)
     {
-        screenBuffer.printChar(c);
+        screenBuffer.putChar(c);
         component.repaint();
     }
     
     public void printImage(BufferedImage image)
     {
-        screenBuffer.printImage(image);
+        screenBuffer.putImage(image);
     }
     
     private void blinkCursor()
@@ -169,17 +169,18 @@ public final class Screen
                 ScreenLine line;
                 int x;
                 int y;
+                int colorID;
                 
                 // Draw background
                 g2d.setColor(background);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
                 
                 // Draw foreground
-                g2d.setColor(foreground);
                 g2d.setFont(font);
                 
                 // Draw screen line by line
                 for (y = 0; y < rows; y++) {
+                    g2d.setColor(foreground);
                     line = screenBuffer.getLine(y);
                     if (line == null) {
                         continue;
@@ -194,11 +195,48 @@ public final class Screen
                     }
                     
                     // Draw text
+                    char c;
+                    char c1;
                     for (x = 0; x < line.getLength(); x++) {
-                        if (line.charAt(x) == 0) {
+                        c = line.charAt(x);
+                        if (c == 0) {
                             continue;
                         }
-                        g2d.drawString(Character.toString(line.charAt(x)),
+                        if (c == '^' && x != line.getLength() - 1) {
+                            c1 = line.charAt(x + 1);
+                            colorID = c1 - 0x30; // Integer value of ASCII char
+
+                            if (colorID >= 0 && colorID <= 9) {
+                                for (ScreenColor sc : ScreenColor.values()) {
+                                    if (colorID == sc.getID()) {
+                                        g2d.setColor(sc.getColor());
+                                        break;
+                                    }
+                                }
+//                                line.removeChar(x);
+//                                line.removeChar(x + 1);
+                                x++;
+                                continue;
+                            }
+
+                            
+                        }
+//                        if (c == '^' && x != line.getLength() - 1) {
+//                            c1 = line.charAt(x + 1);
+//                            if (c1 - 0x30 < 10) {
+//                                for (ScreenColor color : ScreenColor.values()) {
+//                                    if (color.getID() == c1 - 0x30) {
+//                                        g2d.setColor(color.getColor());
+//                                        x++;
+//                                        break;
+//                                    }
+//                                }
+//                                continue;
+//                            } else {
+//                                System.out.println(c1);
+//                            }
+//                        }
+                        g2d.drawString(Character.toString(c),
                                 x * charWidth + TEXT_HORIZONTAL_OFFSET,
                                 (y + 1) * charHeight + TEXT_VERTICAL_OFFSET);
                     }
@@ -213,6 +251,7 @@ public final class Screen
                 }
             }
         };
+        
         component.setPreferredSize(calculateComponentSize());
     }
     
@@ -251,26 +290,33 @@ public final class Screen
      */
     public static enum ScreenColor
     {
-        BLACK(0, 0, 0),
-        RED(255, 0, 0),
-        GREEN(0, 255, 0),
-        YELLOW(255, 255, 0),
-        BLUE(0, 0, 255),
-        CYAN(0, 255, 255),
-        MAGENTA(255, 0, 255),
-        WHITE(255, 255, 255),
-        DARK_CYAN_GRAY(95, 127, 127),
-        DARK_YELLOW(127, 127, 0);
+        BLACK(0, 0, 0, 0),
+        RED(1, 255, 0, 0),
+        GREEN(2, 0, 255, 0),
+        YELLOW(3, 255, 255, 0),
+        BLUE(4, 0, 0, 255),
+        CYAN(5, 0, 255, 255),
+        MAGENTA(6, 255, 0, 255),
+        WHITE(7, 255, 255, 255),
+        DARK_CYAN_GRAY(8, 95, 127, 127),
+        DARK_YELLOW(9, 127, 127, 0);
         
+        private final int id;
         private final int r;
         private final int g;
         private final int b;
         
-        private ScreenColor(int r, int g, int b)
+        private ScreenColor(int id, int r, int g, int b)
         {
+            this.id = id;
             this.r = r;
             this.g = g;
             this.b = b;
+        }
+        
+        public int getID()
+        {
+            return id;
         }
         
         public Color getColor()

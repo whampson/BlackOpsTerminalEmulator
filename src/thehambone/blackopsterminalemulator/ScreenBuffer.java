@@ -85,7 +85,7 @@ public final class ScreenBuffer
         cursorY = y;
     }
     
-    public void printChar(char c)
+    public void putChar(char c)
     {
         if (c == '\n') {
             cursorX = 0;
@@ -100,7 +100,7 @@ public final class ScreenBuffer
         lines[cursorY].putChar(cursorX++, c);
     }
     
-    public void printImage(BufferedImage image)
+    public void putImage(BufferedImage image)
     {
         int x;
         int y;
@@ -122,9 +122,14 @@ public final class ScreenBuffer
             height = Math.min(charHeight, scaledImage.getHeight() - y);
             section = scaledImage.getSubimage(x, y, width, height);
             lines[cursorY].setImageData(section);
-            if (cursorY < rows - 1) {
+            if (cursorY >= rows -1) {
+                break;
+            } else {
                 cursorY++;
             }
+//            if (cursorY < rows - 1) {
+//                cursorY++;
+//            }
         }
     }
     

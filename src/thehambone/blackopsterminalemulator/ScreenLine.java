@@ -86,4 +86,14 @@ public final class ScreenLine
     {
         textData[index] = c;        // Potentially unsafe
     }
+    
+    public char removeChar(int index)
+    {
+        char c = textData[index];   // Potentially unsafe
+        for (int i = 1; i < textData.length - index; i++) {
+            textData[index + i - 1] = textData[index + i];
+        }
+//        textData[textData.length - index] = 0;
+        return c;
+    }
 }
