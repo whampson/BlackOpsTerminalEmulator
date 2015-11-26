@@ -43,10 +43,10 @@ public final class Terminal
     private static final Screen.ScreenColor FOREGROUND_DEFAULT
             = Screen.ScreenColor.WHITE;
     
-    private static final Font FONT_DEFAULT = new Font("Monospaced", 0, 13);
+    private static final Font FONT_DEFAULT = new Font("Courier New", 0, 13);
     
     private static final int COLUMNS_DEFAULT = 80;
-    private static final int ROWS_DEFAULT = 27;
+    private static final int LINES_DEFAULT = 27;
     private static final int CURSOR_BLINK_RATE = 300;
     
     private static Terminal instance;
@@ -72,7 +72,6 @@ public final class Terminal
     public static void println(String s)
     {
         print(s + "\n");
-//        instance.screen.setForeground(FOREGROUND_DEFAULT);
     }
     
     public static void println(BufferedImage img)
@@ -85,7 +84,7 @@ public final class Terminal
     
     private Terminal()
     {
-        screen = new Screen(COLUMNS_DEFAULT, ROWS_DEFAULT,
+        screen = new Screen(COLUMNS_DEFAULT, LINES_DEFAULT,
                 BACKGROUND_DEFAULT, FOREGROUND_DEFAULT,
                 FONT_DEFAULT, CURSOR_BLINK_RATE);
     }

@@ -43,16 +43,21 @@ import javax.swing.Timer;
  */
 public final class Screen
 {
-    private static final int TEXT_HORIZONTAL_OFFSET = 0;
+    private static final int TEXT_HORIZONTAL_OFFSET = 2;
     private static final int TEXT_VERTICAL_OFFSET = -2;
     
-    private static final int IMAGE_HORIZONTAL_OFFSET = 0;
-    private static final int IMAGE_VERTICAL_OFFSET = 2;
+    private static final int IMAGE_HORIZONTAL_OFFSET = 3;
+    private static final int IMAGE_VERTICAL_OFFSET = 5;
+    
+    private static final int PADDING_X = 2;
+    private static final int PADDING_Y = 2;
+    
+    private final Object syncLock = new Object();
     
     private final ScreenBuffer screenBuffer;
     
     private final int columns;
-    private final int rows;
+    private final int lines;
     
     private Color background;
     private Color foreground;
@@ -66,12 +71,12 @@ public final class Screen
     
     private JComponent component;
     
-    public Screen(int columns, int rows,
+    public Screen(int columns, int lines,
             ScreenColor background, ScreenColor foreground,
             Font font, int cursorBlinkRate)
     {
         this.columns = columns;
-        this.rows = rows;
+        this.lines = lines;
         
         this.background = background.getColor();
         this.foreground = foreground.getColor();
@@ -85,7 +90,7 @@ public final class Screen
         
         initComponent();
         
-        screenBuffer = new ScreenBuffer(columns, rows, charWidth, charHeight);
+        screenBuffer = new ScreenBuffer(columns, lines, charWidth, charHeight);
         
         blinkCursor();
     }
@@ -120,12 +125,6 @@ public final class Screen
         this.foreground = foreground.getColor();
     }
     
-    public void setCursorPosition(int x, int y)
-    {
-        screenBuffer.setCursorPosition(x, y);
-        component.repaint();
-    }
-    
     public void print(char c)
     {
         screenBuffer.putChar(c);
@@ -135,6 +134,7 @@ public final class Screen
     public void printImage(BufferedImage image)
     {
         screenBuffer.putImage(image);
+        component.repaint();
     }
     
     private void blinkCursor()
@@ -144,8 +144,10 @@ public final class Screen
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                isCursorVisible = !isCursorVisible;
-                component.repaint();
+                synchronized (syncLock) {
+                    isCursorVisible = !isCursorVisible;
+                    component.repaint();
+                }
             }
         };
         
@@ -166,44 +168,59 @@ public final class Screen
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D)g;
                 
-                ScreenLine line;
-                int x;
-                int y;
-                int colorID;
-                
                 // Draw background
                 g2d.setColor(background);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
                 
                 // Draw foreground
+                g2d.setColor(foreground);
                 g2d.setFont(font);
                 
-                // Draw screen line by line
-                for (y = 0; y < rows; y++) {
-                    g2d.setColor(foreground);
-                    line = screenBuffer.getLine(y);
-                    if (line == null) {
-                        continue;
-                    }
-                    
-                    // Draw image slice if line contains image data
-                    if (line.hasImageData()) {
-                        g2d.drawImage(line.getImageData(), null,
-                                0 * charWidth + IMAGE_HORIZONTAL_OFFSET,
-                                y * charHeight + IMAGE_VERTICAL_OFFSET);
-                        continue;
-                    }
-                    
-                    // Draw text
-                    char c;
-                    char c1;
-                    for (x = 0; x < line.getLength(); x++) {
-                        c = line.charAt(x);
-                        if (c == 0) {
+                ScreenItem item;
+                BufferedImage img;
+                char c;
+                char c1;                
+                int x;
+                int y;
+                int colorID;
+                int colorCharOffset;
+                
+                x = 0;
+                y = 0;
+                colorCharOffset = 0;
+                
+                synchronized (syncLock) {
+                    for (int i = 0; i < screenBuffer.getLength(); i++) {
+                        item = screenBuffer.itemAt(i);
+                        
+                        // Draw image
+                        if (item.hasImage()) {
+                            img = item.getImage();
+                            g2d.drawImage(img, null,
+                                    0 * charWidth + IMAGE_HORIZONTAL_OFFSET,
+                                    y * charHeight + IMAGE_VERTICAL_OFFSET);
+                            y += screenBuffer.countImageLines(img);
                             continue;
                         }
-                        if (c == '^' && x != line.getLength() - 1) {
-                            c1 = line.charAt(x + 1);
+                        
+                        // Handle newlines
+                        c = item.getCharacter();
+                        if (c == '\n') {
+                            x = 0;
+                            y++;
+                            g2d.setColor(foreground);
+                            colorCharOffset = 0;
+                            continue;
+                        }
+                        if (x > columns - 1) {
+                            x = 0;
+                            y++;
+                            g2d.setColor(foreground);
+                        }
+                        
+                        // Handle color
+                        if (c == '^' && i != screenBuffer.getLength() - 1) {
+                            c1 = screenBuffer.itemAt(i + 1).getCharacter();
                             colorID = c1 - 0x30; // Integer value of ASCII char
 
                             if (colorID >= 0 && colorID <= 9) {
@@ -213,41 +230,29 @@ public final class Screen
                                         break;
                                     }
                                 }
-//                                line.removeChar(x);
-//                                line.removeChar(x + 1);
-                                x++;
+                                colorCharOffset += 2;
+                                i++;
                                 continue;
                             }
-
-                            
                         }
-//                        if (c == '^' && x != line.getLength() - 1) {
-//                            c1 = line.charAt(x + 1);
-//                            if (c1 - 0x30 < 10) {
-//                                for (ScreenColor color : ScreenColor.values()) {
-//                                    if (color.getID() == c1 - 0x30) {
-//                                        g2d.setColor(color.getColor());
-//                                        x++;
-//                                        break;
-//                                    }
-//                                }
-//                                continue;
-//                            } else {
-//                                System.out.println(c1);
-//                            }
-//                        }
+                        
+                        // Draw character
                         g2d.drawString(Character.toString(c),
                                 x * charWidth + TEXT_HORIZONTAL_OFFSET,
                                 (y + 1) * charHeight + TEXT_VERTICAL_OFFSET);
+                        x++;
                     }
                 }
                 
                 // Draw cursor
                 if (isCursorVisible) {
-                    x = screenBuffer.getCursorX();
+                    g2d.setColor(foreground);
+                    x = screenBuffer.getCursorX() - colorCharOffset;
                     y = screenBuffer.getCursorY();
-                    g2d.drawLine(x * charWidth, (y + 1) * charHeight,
-                            (x + 1) * charWidth - 1, (y + 1) * charHeight);
+                    g2d.drawLine(x * charWidth + TEXT_HORIZONTAL_OFFSET + 1,
+                            (y + 1) * charHeight - TEXT_VERTICAL_OFFSET,
+                            (x + 1) * charWidth + TEXT_HORIZONTAL_OFFSET,
+                            (y + 1) * charHeight - TEXT_VERTICAL_OFFSET);
                 }
             }
         };
@@ -267,7 +272,7 @@ public final class Screen
         
         // Set character dimensions
         charWidth = fm.getWidths()[1];
-        charHeight = fm.getAscent();
+        charHeight = fm.getHeight();
         
         /* Fill test string with as many spaces as the screen will show in one
            line. We want 1 extra space to accomodate for the cursor. */
@@ -276,11 +281,12 @@ public final class Screen
         }
         
         // TODO: develop a way to accurately measure height from text
-        // As of now, height is only accurate for Monospaced 13pt font
+        // As of now, height is only accurate for Courier New 13pt font
         dim.width = (fm.stringWidth(testString) - charWidth)
-                + (charWidth * 2) - 2;
-        dim.height = charHeight * (rows + 3)
-                - charHeight - TEXT_VERTICAL_OFFSET;
+                + (charWidth * 2) - 2 + (TEXT_HORIZONTAL_OFFSET * 2)
+                + PADDING_X;
+        dim.height = charHeight * (lines + 3)
+                - charHeight - TEXT_VERTICAL_OFFSET + PADDING_Y;
         
         return dim;
     }

@@ -55,28 +55,49 @@ public class Main
         Terminal terminal = Terminal.newTerminal();
         terminal.show(PROGRAM_TITLE + " - " + PROGRAM_VERSION);
         
-//        try {
-//            Terminal.print("***** Line scrolling demo *****");
-//            terminal.getScreen().setCursorPosition(0, 26);
-//            Terminal.print("$cat wolfinchains.pic");
-//            BufferedImage img = ImageIO.read(new File("res/reznov2.png"));
-//            Thread.sleep(2500);
-//            for (int i = 0; i < 20; i++) {
-//                Terminal.println();
-//            }
-//            terminal.getScreen().setCursorPosition(0, 7);
-//            Terminal.println(img);
-//            Thread.sleep(1000);
-//            for (int i = 0; i < 27; i++) {
-//                Terminal.println(Integer.toString(i));
-//                Thread.sleep(250);
-//            }
-//            Terminal.println("This is some long text to test how the screen "
-//                    + "handles text that extends beyond the number of "
-//                    + "available columns.");
-//            Terminal.print("$^1");
-//        } catch (IOException | InterruptedException ex) {
-//            throw new RuntimeException(ex);
-//        }
+        int millis = 1000;
+        
+        while (true) {
+            Terminal.println("The ^1quirky ^0quick ^7light ^5brown-colored ^4fox "
+                    + "^3hops ^8gracefully ^9over ^7the lazy, tired, ^2old ^6canine.");
+            sleep(millis);
+            Terminal.print("^1ABC");
+            sleep(millis);
+            try {
+                BufferedImage img = ImageIO.read(new File("res/reznov1.png"));
+                Terminal.println(img);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            sleep(millis);
+            Terminal.println("01");
+            sleep(millis);
+            Terminal.println("02");
+            sleep(millis);
+            Terminal.println("03");
+            sleep(millis);
+            Terminal.println("04");
+            sleep(millis);
+            Terminal.println("05");
+            sleep(millis);
+            try {
+                BufferedImage img = ImageIO.read(new File("res/sp_bop1.png"));
+                Terminal.println(img);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            sleep(millis);
+            Terminal.print("$");
+            sleep(millis);
+        }
+    }
+    
+    private static void sleep(int ms)
+    {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

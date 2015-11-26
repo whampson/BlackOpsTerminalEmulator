@@ -27,73 +27,51 @@ package thehambone.blackopsterminalemulator;
 import java.awt.image.BufferedImage;
 
 /**
- * Created on Nov 18, 2015.
+ * Created on Nov 21, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public final class ScreenLine
+public class ScreenItem
 {
-    private final char[] textData;
-    private BufferedImage imageData;
+    private char ch;
+    private BufferedImage image;
     
-    public ScreenLine(int length)
+    public ScreenItem(char ch)
     {
-        textData = new char[length];
+        this.ch = ch;
+        image = null;
     }
     
-    public int getLength()
+    public ScreenItem(BufferedImage image)
     {
-        return textData.length;
+        this.image = image;
+        ch = 0;
     }
     
-    public boolean hasImageData()
+    public char getCharacter()
     {
-        return imageData != null;
+        return ch;
     }
     
-    public BufferedImage getImageData()
+    public boolean hasImage()
     {
-        return imageData;
+        return image != null;
     }
     
-    public void setImageData(BufferedImage imageData)
+    public BufferedImage getImage()
     {
-        this.imageData = imageData;
+        return image;
     }
     
-//    public String getTextData()
-//    {
-//        return new String(textData);
-//    }
-//    
-//    public void setTextData(String s)
-//    {
-//        for (int i = 0; i < textData.length; i++) {
-//            if (i > s.length() - 1) {
-//                textData[i] = 0;
-//            } else {
-//                textData[i] = s.charAt(i);
-//            }
-//        }
-//    }
-    
-    public char charAt(int index)
+    public void setCharacter(char ch)
     {
-        return textData[index];     // Potentially unsafe
+        this.ch = ch;
+        image = null;
     }
     
-    public void putChar(int index, char c)
+    public void setImage(BufferedImage image)
     {
-        textData[index] = c;        // Potentially unsafe
-    }
-    
-    public char removeChar(int index)
-    {
-        char c = textData[index];   // Potentially unsafe
-        for (int i = 1; i < textData.length - index; i++) {
-            textData[index + i - 1] = textData[index + i];
-        }
-//        textData[textData.length - index] = 0;
-        return c;
+        this.image = image;
+        ch = 0;
     }
 }

@@ -29,6 +29,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Created on Nov 18, 2015.
@@ -37,36 +40,69 @@ import java.awt.image.BufferedImage;
  */
 public final class ScreenBuffer
 {
-    private static final float IMAGE_SCALE_FACTOR = 0.65f;
+    private static final float IMAGE_SCALE_FACTOR = 0.66f;
     
     private final int columns;
-    private final int rows;
+    private final int lines;
     private final int charWidth;
     private final int charHeight;
-    private final ScreenLine[] lines;
+    private final List<ScreenItem> buf;
     
     private int cursorX;
     private int cursorY;
     
-    public ScreenBuffer(int columns, int rows, int charWidth, int charHeight)
+    public ScreenBuffer(int columns, int lines, int charWidth, int charHeight)
     {
         this.columns = columns;
-        this.rows = rows;
+        this.lines = lines;
         this.charWidth = charWidth;
         this.charHeight = charHeight;
         
-        lines = new ScreenLine[rows];
-        for (int i = 0; i < rows; i++) {
-            lines[i] = new ScreenLine(columns);
-        }
+        buf = new ArrayList<>();
         
         cursorX = 0;
         cursorY = 0;
     }
     
-    public ScreenLine getLine(int line)
+    public ScreenItem itemAt(int index)
     {
-        return lines[line];
+        return buf.get(index);
+    }
+    
+    public int countImageLines(BufferedImage image)
+    {
+        return (int)Math.ceil((double)image.getHeight() / charHeight) - 1;
+    }
+    
+    public int countImageColumns(BufferedImage image)
+    {
+        return (int)Math.ceil((double)image.getWidth() / charWidth);
+    }
+    
+    public int getLineCount()
+    {
+        if (buf.isEmpty()) {
+            return 0;
+        }
+        
+        int lineCount = 1;
+        int x = 0;
+        for (ScreenItem i : buf) {
+            x++;
+            if (i.hasImage()) {
+                lineCount += countImageLines(i.getImage());
+                x = 0;
+            } else if (i.getCharacter() == '\n' || x > columns) {
+                lineCount++;
+                x = 0;
+            }
+        }
+        return lineCount;
+    }
+    
+    public int getLength()
+    {
+        return buf.size();
     }
     
     public int getCursorX()
@@ -79,57 +115,40 @@ public final class ScreenBuffer
         return cursorY;
     }
     
-    public void setCursorPosition(int x, int y)
-    {
-        cursorX = x;
-        cursorY = y;
-    }
-    
     public void putChar(char c)
     {
         if (c == '\n') {
-            cursorX = 0;
-            cursorY++;
-            appendLine(new ScreenLine(columns));
-            return;
+            cursorX = -1;
+            if (cursorY < lines - 1) {
+                cursorY++;
+            }
         } else if (cursorX >= columns) {
             cursorX = 0;
-            cursorY++;
-            appendLine(new ScreenLine(columns));
+            if (cursorY < lines - 1) {
+                cursorY++;
+            }
         }
-        lines[cursorY].putChar(cursorX++, c);
+        buf.add(new ScreenItem(c));
+        
+        if (getLineCount() > lines) {
+            trimLine();
+        }
+        
+        cursorX++;
     }
     
     public void putImage(BufferedImage image)
     {
-        int x;
-        int y;
-        int width;
-        int height;
-        int nLines;
-        BufferedImage scaledImage;
-        BufferedImage section;
-        
-        // Scale image
-        scaledImage = scaleImage(image);
-        
-        // Divide image into horizontal strips, each as tall as a character
-        x = 0;
-        width = scaledImage.getWidth();
-        nLines = (int)Math.ceil((double)scaledImage.getHeight() / charHeight);
-        for (int i = 0; i < nLines; i++) {
-            y = i * charHeight;
-            height = Math.min(charHeight, scaledImage.getHeight() - y);
-            section = scaledImage.getSubimage(x, y, width, height);
-            lines[cursorY].setImageData(section);
-            if (cursorY >= rows -1) {
-                break;
-            } else {
-                cursorY++;
-            }
-//            if (cursorY < rows - 1) {
-//                cursorY++;
-//            }
+        BufferedImage scaledImage = scaleImage(image);
+        cursorX += countImageColumns(scaledImage);
+        cursorY += countImageLines(scaledImage);
+        buf.add(new ScreenItem(scaledImage));
+        for (int i = 0; i < countImageColumns(scaledImage); i++) {
+            buf.add(new ScreenItem(' '));
+        }
+        while (cursorY > lines - 1) {
+            trimLine();
+            cursorY--;
         }
     }
     
@@ -164,16 +183,34 @@ public final class ScreenBuffer
         return scaledImage;
     }
     
-    private void appendLine(ScreenLine line)
+    private void trimLine()
     {
-        // Shift lines upwards if the cursor is at the bottom of the screen
-        if (cursorY > rows - 1) {
-            for (int i = 1; i < lines.length; i++) {
-                lines[i - 1] = lines[i];
-            }
-            cursorY = rows - 1;
-        }
+        int x = 0;
+        ScreenItem item;
+        ListIterator<ScreenItem> it;
         
-        lines[cursorY] = line;
+        for (it = buf.listIterator(); it.hasNext(); x++) {
+            item = it.next();
+            if (item.hasImage()) {
+                BufferedImage img = item.getImage();
+                int y = charHeight;
+                int width = img.getWidth();
+                int height = img.getHeight() - charHeight;
+                if (height <= 0) {
+                    it.remove();
+                    continue;
+                }
+                BufferedImage chopped = img.getSubimage(0, y, width, height);
+                it.set(new ScreenItem(chopped));
+                break;
+            }
+            if (x > columns - 1) {
+                break;
+            }
+            it.remove();
+            if (item.getCharacter() == '\n') {
+                break;
+            }
+        }
     }
 }
