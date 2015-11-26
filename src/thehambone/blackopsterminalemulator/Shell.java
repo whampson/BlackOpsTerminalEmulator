@@ -42,6 +42,8 @@ import javax.swing.Timer;
  * Created on Nov 17, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
+ * 
+ * @deprecated this class will soon be removed
  */
 public class Shell extends JComponent
 {

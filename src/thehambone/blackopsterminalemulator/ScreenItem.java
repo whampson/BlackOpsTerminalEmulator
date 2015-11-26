@@ -27,48 +27,94 @@ package thehambone.blackopsterminalemulator;
 import java.awt.image.BufferedImage;
 
 /**
+ * A {@code ScreenItem} is an item that can be displayed on the screen.
+ * <p>
+ * A {@code ScreenItem} can either be an image or a character, but not both.
+ * <p>
  * Created on Nov 21, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class ScreenItem
+public final class ScreenItem
 {
     private char ch;
     private BufferedImage image;
     
+    /**
+     * Creates a new character {@code ScreenItem}.
+     * 
+     * @param ch the character to be added
+     */
     public ScreenItem(char ch)
     {
         this.ch = ch;
         image = null;
     }
     
+    /**
+     * Creates a new image {@code ScreenItem}.
+     * 
+     * @param image the image to be added
+     */
     public ScreenItem(BufferedImage image)
     {
         this.image = image;
         ch = 0;
     }
     
+    /**
+     * Returns the character represented by this item.
+     * 
+     * @return the character represented by this item; 0 (NUL) is returned if
+     *         this item represents an image and not a character
+     */
     public char getCharacter()
     {
         return ch;
     }
     
+    /**
+     * Indicates whether this item represents an image.
+     * 
+     * @return {@code true} if this item represents an image, {@code false}
+     *         otherwise
+     */
     public boolean hasImage()
     {
         return image != null;
     }
     
+    /**
+     * Gets the image represented by this item. {@link #hasImage()} should be
+     * used before calling this method to check whether this item contains an
+     * image.
+     * 
+     * @return the image represented by this item; {@code null} if the item
+     *         represents a character
+     */
     public BufferedImage getImage()
     {
         return image;
     }
     
+    /**
+     * Sets the character represented by this item. If the item previously
+     * represented an image, the image will be replaced by the character.
+     * 
+     * @param ch the character to add
+     */
     public void setCharacter(char ch)
     {
         this.ch = ch;
         image = null;
     }
     
+    /**
+     * Sets the image represented by this item. If the item previously
+     * represented a character, the character will be replaced by the image.
+     * 
+     * @param image the image to add
+     */
     public void setImage(BufferedImage image)
     {
         this.image = image;

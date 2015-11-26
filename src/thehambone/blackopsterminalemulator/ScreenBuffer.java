@@ -51,6 +51,14 @@ public final class ScreenBuffer
     private int cursorX;
     private int cursorY;
     
+    /**
+     * Creates a new {@code ScreenBuffer}.
+     * 
+     * @param columns the number of columns that are visible on the screen
+     * @param lines the number of lines that are visible on the screen
+     * @param charWidth the height of a character on the screen
+     * @param charHeight the width of a character on the screen
+     */
     public ScreenBuffer(int columns, int lines, int charWidth, int charHeight)
     {
         this.columns = columns;
@@ -64,94 +72,167 @@ public final class ScreenBuffer
         cursorY = 0;
     }
     
+    /**
+     * Returns the item at the specified index.
+     * 
+     * @param index the index of the desired item
+     * @return the item at the specified index
+     * @throws IndexOutOfBoundsException if the specified index is out of bounds
+     */
     public ScreenItem itemAt(int index)
     {
+        if (index < 0 || index > buf.size() - 1) {
+            throw new IndexOutOfBoundsException(
+                    "Index: " + index + ", Size" + buf.size());
+        }
+        
         return buf.get(index);
     }
     
+    /**
+     * Calculates the number of lines occupied by an image.
+     * 
+     * @param image the image to analyze
+     * @return the number of lines occupied by the image
+     */
     public int countImageLines(BufferedImage image)
     {
         return (int)Math.ceil((double)image.getHeight() / charHeight) - 1;
     }
     
+    /**
+     * Calculates the number of columns occupied by an image.
+     * 
+     * @param image the image to analyze
+     * @return the number of columns occupied by the image
+     */
     public int countImageColumns(BufferedImage image)
     {
         return (int)Math.ceil((double)image.getWidth() / charWidth);
     }
     
-    public int getLineCount()
-    {
-        if (buf.isEmpty()) {
-            return 0;
-        }
-        
-        int lineCount = 1;
-        int x = 0;
-        for (ScreenItem i : buf) {
-            x++;
-            if (i.hasImage()) {
-                lineCount += countImageLines(i.getImage());
-                x = 0;
-            } else if (i.getCharacter() == '\n' || x > columns) {
-                lineCount++;
-                x = 0;
-            }
-        }
-        return lineCount;
-    }
-    
+    /**
+     * Returns the number of items currently in the buffer.
+     * 
+     * @return the buffer item count
+     */
     public int getLength()
     {
         return buf.size();
     }
     
+//    /**
+//     * Calculates the number of lines filled by items in the buffer.
+//     * 
+//     * @return the number of lines 
+//     */
+//    public int getNumberOfLinesFilled()
+//    {
+//        if (buf.isEmpty()) {
+//            return 0;
+//        }
+//        
+//        int linesFilled = 1;
+//        int x = 0;
+//        
+//        for (ScreenItem i : buf) {
+//            x++;
+//            if (i.hasImage()) {
+//                linesFilled += countImageLines(i.getImage());
+//                x = 0;
+//            } else if (i.getCharacter() == '\n' || x > columns) {
+//                linesFilled++;
+//                x = 0;
+//            }
+//        }
+//        
+//        return linesFilled;
+//    }
+    
+    /**
+     * Gets the current x-coordinate of the cursor in terms of columns.
+     * 
+     * @return the x-coordinate of the cursor
+     */
     public int getCursorX()
     {
         return cursorX;
     }
     
+    /**
+     * Gets the current y-coordinate of the cursor in terms of lines.
+     * 
+     * @return the y-coordinate of the cursor
+     */
     public int getCursorY()
     {
         return cursorY;
     }
     
+    /**
+     * Adds a character to the end of the buffer and moves the cursor
+     * accordingly.
+     * 
+     * @param c the character to add to the buffer
+     */
     public void putChar(char c)
     {
+        // Handle newlines and line wrapping
         if (c == '\n') {
             cursorX = -1;
-            if (cursorY < lines - 1) {
-                cursorY++;
-            }
-        } else if (cursorX >= columns) {
+            cursorY++;
+        } else if (cursorX > columns - 1) {
             cursorX = 0;
-            if (cursorY < lines - 1) {
-                cursorY++;
-            }
+            cursorY++;
         }
+        
+        // Add character to buffer
         buf.add(new ScreenItem(c));
         
-        if (getLineCount() > lines) {
+        // Trim line from the top if character will be drawn off screen (scroll)
+        while (cursorY > lines - 1) {
             trimLine();
+            cursorY--;
         }
         
+        // Move cursor forward 1 character
         cursorX++;
     }
     
+    /**
+     * Adds an image to the end of the buffer and moves the cursor accordingly.
+     * 
+     * @param image the image to be added to the buffer
+     */
     public void putImage(BufferedImage image)
     {
+        // Scale image
         BufferedImage scaledImage = scaleImage(image);
-        cursorX += countImageColumns(scaledImage);
-        cursorY += countImageLines(scaledImage);
+        
+        // Calculate dimensions of scaled image and move cursor
+        int width = countImageColumns(scaledImage);
+        int height = countImageLines(scaledImage);
+        cursorX += width;
+        cursorY += height;
+        
+        // Add image to buffer
         buf.add(new ScreenItem(scaledImage));
-        for (int i = 0; i < countImageColumns(scaledImage); i++) {
+        
+        // Add horizontal padding so image doesn't overlap next print
+        for (int i = 0; i < width; i++) {
             buf.add(new ScreenItem(' '));
         }
+        
+        // Trim lines from the top if image will be drawn off screen (scroll)
         while (cursorY > lines - 1) {
             trimLine();
             cursorY--;
         }
     }
     
+    /*
+     * Scales an image according to the value of IMAGE_SCALE_FACTOR.
+     */
     private BufferedImage scaleImage(BufferedImage image)
     {
         AffineTransform transform;
@@ -162,53 +243,79 @@ public final class ScreenBuffer
         int scaledWidth;
         int scaledHeight;
         
-        // Create transformation 
+        // Create scale transformation 
         transform = AffineTransform.getScaleInstance(IMAGE_SCALE_FACTOR,
                 IMAGE_SCALE_FACTOR);
         transformOp = new AffineTransformOp(transform,
                 AffineTransformOp.TYPE_BILINEAR);
         
-        /* Get bounds of transformed image and make a new empty image with the
-          scaled bounds */
+        // Get bounds of transformed image
         scaledBounds = transformOp.getBounds2D(image);
         scaledWidth = (int)Math.ceil(scaledBounds.getWidth());
         scaledHeight = (int)Math.ceil(scaledBounds.getHeight());
+        
+        // Make a new blank image with the scaled bounds
         scaledImage = new BufferedImage(scaledWidth, scaledHeight,
                 image.getType());
         
-        // Draw scaled image on blank image
+        // Draw scaled image data on blank image
         scaledImageGraphics = scaledImage.createGraphics();
         scaledImageGraphics.drawImage(image, transformOp, 0, 0);
         
         return scaledImage;
     }
     
+    /*
+     * Removes a line from the start of the buffer.
+     * Use this to create a scrolling effect.
+     */
     private void trimLine()
     {
-        int x = 0;
+        int x;
+        int y;
+        int width;
+        int height;
         ScreenItem item;
+        BufferedImage image;
+        BufferedImage trimmedImage;
         ListIterator<ScreenItem> it;
         
+        x = 0;
+        
+        /* Iterate through all screen items and remove items until an entire
+           line has been removed */
         for (it = buf.listIterator(); it.hasNext(); x++) {
+            
+            // Get next screen item
             item = it.next();
+            
+            // Trim image
             if (item.hasImage()) {
-                BufferedImage img = item.getImage();
-                int y = charHeight;
-                int width = img.getWidth();
-                int height = img.getHeight() - charHeight;
+                
+                // Get image and calculate dimensions of trimmed image
+                image = item.getImage();
+                y = charHeight;
+                width = image.getWidth();
+                height = image.getHeight() - charHeight;
+                
+                // Remove image completely if there is no more left to trim
                 if (height <= 0) {
                     it.remove();
                     continue;
                 }
-                BufferedImage chopped = img.getSubimage(0, y, width, height);
-                it.set(new ScreenItem(chopped));
+                
+                // Trim image from top; replace current image with trimmed image
+                trimmedImage = image.getSubimage(0, y, width, height);
+                it.set(new ScreenItem(trimmedImage));
                 break;
             }
-            if (x > columns - 1) {
-                break;
-            }
+            
+            // Remove character
             it.remove();
-            if (item.getCharacter() == '\n') {
+            
+            /*  End if a newline character is reached or if we've hit the edge
+                of the screen */
+            if (item.getCharacter() == '\n' || x > columns) {
                 break;
             }
         }

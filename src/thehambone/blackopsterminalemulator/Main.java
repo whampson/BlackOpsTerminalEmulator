@@ -80,6 +80,10 @@ public class Main
             sleep(millis);
             Terminal.println("05");
             sleep(millis);
+            Terminal.println("06");
+            sleep(millis);
+            Terminal.println("07");
+            sleep(millis);
             try {
                 BufferedImage img = ImageIO.read(new File("res/sp_bop1.png"));
                 Terminal.println(img);

@@ -37,6 +37,8 @@ import javax.swing.JComponent;
 import javax.swing.Timer;
 
 /**
+ * This class represents the terminal screen.
+ * <p>
  * Created on Nov 18, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
@@ -47,7 +49,7 @@ public final class Screen
     private static final int TEXT_VERTICAL_OFFSET = -2;
     
     private static final int IMAGE_HORIZONTAL_OFFSET = 3;
-    private static final int IMAGE_VERTICAL_OFFSET = 5;
+    private static final int IMAGE_VERTICAL_OFFSET = 4;
     
     private static final int PADDING_X = 2;
     private static final int PADDING_Y = 2;
@@ -71,6 +73,19 @@ public final class Screen
     
     private JComponent component;
     
+    /**
+     * Creates a new {@code Screen}.
+     * 
+     * @param columns the number of columns to be displayed by the screen;
+     *                measured in characters
+     * @param lines the number of lines to be displayed by the screen; measured
+     *              in characters
+     * @param background the background color
+     * @param foreground the foreground (text) color
+     * @param font the text font
+     * @param cursorBlinkRate the rate at which the cursor will blink; measured
+     *                        in milliseconds; 0 for no blinking
+     */
     public Screen(int columns, int lines,
             ScreenColor background, ScreenColor foreground,
             Font font, int cursorBlinkRate)
@@ -95,21 +110,43 @@ public final class Screen
         blinkCursor();
     }
     
+    /**
+     * Gets the {@code ScreenBuffer} that contains all of the items displayed on
+     * the screen.
+     * 
+     * @return the {@code ScreenBuffer} object associated with this screen
+     */
     public ScreenBuffer getScreenBuffer()
     {
         return screenBuffer;
     }
     
+    /**
+     * Returns the {@code JComponent} on which the screen data is drawn.
+     * 
+     * @return the {@code JComponent} containing the screen data
+     */
     public JComponent getComponent()
     {
         return component;
     }
     
+    /**
+     * Gets the background color.
+     * 
+     * @return the background color
+     */
     public Color getBackground()
     {
         return background;
     }
     
+    /**
+     * Sets the background color. The color must be one of the predefined
+     * {@code ScreenColor} constants.
+     * 
+     * @param background the color to be used as the background
+     */
     public void setBackground(ScreenColor background)
     {
         this.background = background.getColor();
@@ -120,30 +157,56 @@ public final class Screen
         return foreground;
     }
     
+    /**
+     * Sets the foreground color. The color must be one of the predefined
+     * {@code ScreenColor} constants.
+     * 
+     * @param foreground the color to be used as the foreground
+     */
     public void setForeground(ScreenColor foreground)
     {
         this.foreground = foreground.getColor();
     }
     
+    /**
+     * Draws a character on the screen after the previous screen item.
+     * 
+     * @param c the character to be drawn
+     */
     public void print(char c)
     {
         screenBuffer.putChar(c);
         component.repaint();
     }
     
+    /**
+     * Draws an image on the screen after the previous screen item.
+     * 
+     * @param image the image to be drawn
+     */
     public void printImage(BufferedImage image)
     {
         screenBuffer.putImage(image);
         component.repaint();
     }
     
+    /*
+     * Starts a timer thread that blinks the cursor at the specified rate.
+     */
     private void blinkCursor()
     {
-        ActionListener cursorBlink = new ActionListener()
+        // Don't blink if blink rate is 0
+        if (cursorBlinkRate == 0) {
+            return;
+        }
+        
+        // Create an ActionListener that runs each time the blink timer is fired
+        ActionListener cursorBlinkAction = new ActionListener()
         {
             @Override
             public void actionPerformed(ActionEvent e)
             {
+                // Toggle isVisible boolean and repaint screen
                 synchronized (syncLock) {
                     isCursorVisible = !isCursorVisible;
                     component.repaint();
@@ -151,7 +214,11 @@ public final class Screen
             }
         };
         
-        Timer blinkTimer = new Timer(cursorBlinkRate, cursorBlink);
+        /* Create a timer thread that fires the blink action at the rate of the
+           cursor blink */
+        Timer blinkTimer = new Timer(cursorBlinkRate, cursorBlinkAction);
+        
+        // Start timer
         blinkTimer.start();
     }
     
@@ -312,6 +379,14 @@ public final class Screen
         private final int g;
         private final int b;
         
+        /**
+         * Creates a new {@code ScreenColor} constant.
+         * 
+         * @param id the color ID
+         * @param r red value
+         * @param g green value
+         * @param b blue value
+         */
         private ScreenColor(int id, int r, int g, int b)
         {
             this.id = id;
@@ -320,11 +395,22 @@ public final class Screen
             this.b = b;
         }
         
+        /**
+         * Gets the color ID.
+         * 
+         * @return the color ID
+         */
         public int getID()
         {
             return id;
         }
         
+        /**
+         * Gets this color as a {@link java.awt.Color} object containing the RGB
+         * values.
+         * 
+         * @return the color as a {@link java.awt.Color} object
+         */
         public Color getColor()
         {
             return new Color(r, g, b);
