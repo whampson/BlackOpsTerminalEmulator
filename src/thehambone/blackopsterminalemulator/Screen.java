@@ -285,7 +285,7 @@ public final class Screen
                             g2d.setColor(foreground);
                         }
                         
-                        // Handle color
+                        // Handle color control characters
                         if (c == '^' && i != screenBuffer.getLength() - 1) {
                             c1 = screenBuffer.itemAt(i + 1).getCharacter();
                             colorID = c1 - 0x30; // Integer value of ASCII char
@@ -349,6 +349,7 @@ public final class Screen
         
         // TODO: develop a way to accurately measure height from text
         // As of now, height is only accurate for Courier New 13pt font
+        // (or just hardcode it)
         dim.width = (fm.stringWidth(testString) - charWidth)
                 + (charWidth * 2) - 2 + (TEXT_HORIZONTAL_OFFSET * 2)
                 + PADDING_X;

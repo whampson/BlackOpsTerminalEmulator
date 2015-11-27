@@ -24,13 +24,6 @@
 
 package thehambone.blackopsterminalemulator;
 
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import javax.imageio.ImageIO;
-
 /**
  * This class handles program initialization.
  * <p>
@@ -52,56 +45,20 @@ public class Main
      */
     public static void main(String[] args)
     {
-        Terminal terminal = Terminal.newTerminal();
-        terminal.show(PROGRAM_TITLE + " - " + PROGRAM_VERSION);
+        String title = PROGRAM_TITLE + " - " + PROGRAM_VERSION;
+        Terminal.setTitle(title);
+        Terminal.show();
         
-        int millis = 1000;
-        
+        Terminal.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+        Terminal.println("Central Intelligence Agency Data system\n");
+        Terminal.println("Unauthorized use of this system is against the law.\n");
+        Terminal.println("Security Privileges Required");
+        Terminal.println("USER:amason");
+        Terminal.println("PASSWORD:********\n");
         while (true) {
-            Terminal.println("The ^1quirky ^0quick ^7light ^5brown-colored ^4fox "
-                    + "^3hops ^8gracefully ^9over ^7the lazy, tired, ^2old ^6canine.");
-            sleep(millis);
-            Terminal.print("^1ABC");
-            sleep(millis);
-            try {
-                BufferedImage img = ImageIO.read(new File("res/reznov1.png"));
-                Terminal.println(img);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-            sleep(millis);
-            Terminal.println("01");
-            sleep(millis);
-            Terminal.println("02");
-            sleep(millis);
-            Terminal.println("03");
-            sleep(millis);
-            Terminal.println("04");
-            sleep(millis);
-            Terminal.println("05");
-            sleep(millis);
-            Terminal.println("06");
-            sleep(millis);
-            Terminal.println("07");
-            sleep(millis);
-            try {
-                BufferedImage img = ImageIO.read(new File("res/sp_bop1.png"));
-                Terminal.println(img);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-            sleep(millis);
-            Terminal.print("$");
-            sleep(millis);
-        }
-    }
-    
-    private static void sleep(int ms)
-    {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException ex) {
-            throw new RuntimeException(ex);
+            Terminal.print('$');
+            Terminal.readLine();
+            Terminal.println("Error:  Unknown Command - try \"help\"");
         }
     }
 }

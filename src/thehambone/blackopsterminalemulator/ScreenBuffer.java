@@ -121,34 +121,6 @@ public final class ScreenBuffer
         return buf.size();
     }
     
-//    /**
-//     * Calculates the number of lines filled by items in the buffer.
-//     * 
-//     * @return the number of lines 
-//     */
-//    public int getNumberOfLinesFilled()
-//    {
-//        if (buf.isEmpty()) {
-//            return 0;
-//        }
-//        
-//        int linesFilled = 1;
-//        int x = 0;
-//        
-//        for (ScreenItem i : buf) {
-//            x++;
-//            if (i.hasImage()) {
-//                linesFilled += countImageLines(i.getImage());
-//                x = 0;
-//            } else if (i.getCharacter() == '\n' || x > columns) {
-//                linesFilled++;
-//                x = 0;
-//            }
-//        }
-//        
-//        return linesFilled;
-//    }
-    
     /**
      * Gets the current x-coordinate of the cursor in terms of columns.
      * 
@@ -177,6 +149,8 @@ public final class ScreenBuffer
      */
     public void putChar(char c)
     {
+        ScreenItem item;
+        
         // Handle newlines and line wrapping
         if (c == '\n') {
             cursorX = -1;
@@ -186,8 +160,25 @@ public final class ScreenBuffer
             cursorY++;
         }
         
+        // Handle backspace
+        if (c == '\b') {
+            if (buf.isEmpty()) {
+                return;
+            }
+            item = buf.get(buf.size() - 1);
+            if (item.hasImage()) {
+                return;
+            }
+            buf.remove(item);
+            if (cursorX > 0) {
+                cursorX--;
+            }
+            return;
+        }
+        
         // Add character to buffer
-        buf.add(new ScreenItem(c));
+        item = new ScreenItem(c);
+        buf.add(item);
         
         // Trim line from the top if character will be drawn off screen (scroll)
         while (cursorY > lines - 1) {
