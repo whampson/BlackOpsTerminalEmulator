@@ -183,6 +183,21 @@ public final class ScreenBuffer
                 return;
             }
             
+            // Handle line wrapping
+            if (cursorX == 0 && item.getCharacter() == '\n') {
+                
+                // Remove newline
+                buf.remove(item);
+                
+                // End if buffer is empty
+                if (buf.isEmpty()) {
+                    return;
+                }
+                
+                // Get next item before newline
+                item = buf.get(buf.size() - 1);
+            }
+            
             // Delete the last item in the buffer
             buf.remove(item);
             
@@ -260,10 +275,12 @@ public final class ScreenBuffer
             // Add a newline to the buffer
             buf.add(new ScreenItem('\n'));
             
-            /* If the cursor is below the new character, add an extra newline to
+            /* If the cursor is below the new character, add extra newlines to
                realign the cursor */
             if (cursorY > newCharPosY) {
-                buf.add(new ScreenItem('\n'));
+                for (int i = 0; i < cursorY - newCharPosY; i++) {
+                    buf.add(new ScreenItem('\n'));
+                }
             }
             
             // Move cursor all the way to the left and down a line
