@@ -27,9 +27,8 @@ package thehambone.blackopsterminalemulator;
 import java.awt.image.BufferedImage;
 
 /**
- * A {@code ScreenItem} is an item that can be displayed on the screen.
- * <p>
- * A {@code ScreenItem} can either be an image or a character, but not both.
+ * A {@code ScreenItem} is an item that can be displayed on the screen. A
+ * {@code ScreenItem} can either be an image or a character, but not both.
  * <p>
  * Created on Nov 21, 2015.
  *

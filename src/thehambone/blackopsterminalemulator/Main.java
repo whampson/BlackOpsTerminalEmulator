@@ -24,6 +24,13 @@
 
 package thehambone.blackopsterminalemulator;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+
 /**
  * This class handles program initialization.
  * <p>
@@ -55,10 +62,33 @@ public class Main
         Terminal.println("Security Privileges Required");
         Terminal.println("USER:amason");
         Terminal.println("PASSWORD:********\n");
+        
+//        try {
+//            BufferedReader reader = new BufferedReader(new FileReader("res/bb77b895.txt"));
+//            String line;
+//            while ((line = reader.readLine()) != null) {
+//                Terminal.println(line);
+//            }
+//        } catch (FileNotFoundException ex) {
+//            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (IOException ex) {
+//            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+        
+        BufferedImage img = null;
+        try {
+            img = ImageIO.read(new File("res/reznov1.png"));
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        Terminal.println(img);
         while (true) {
-            Terminal.print('$');
-            Terminal.readLine();
-            Terminal.println("Error:  Unknown Command - try \"help\"");
+            Terminal.print("$");
+            String input = Terminal.readLine();
+            if (!input.isEmpty()) {
+                Terminal.println("Error:  Unknown Command - try \"help\"");
+            }
         }
     }
 }

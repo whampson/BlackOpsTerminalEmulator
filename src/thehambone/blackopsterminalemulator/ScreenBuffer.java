@@ -34,6 +34,10 @@ import java.util.List;
 import java.util.ListIterator;
 
 /**
+ * A {@code ScreenBuffer} contains all of the items currently visible on the
+ * screen. It is also responsible for removing items once they go off-screen as
+ * well as keeping track of the cursor position.
+ * <p>
  * Created on Nov 18, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
@@ -148,46 +152,122 @@ public final class ScreenBuffer
      * @param c the character to add to the buffer
      */
     public void putChar(char c)
-    {
-        ScreenItem item;
+    {    
+        /* Due to the lazyness of Treyarch's programmers, I had to incorporate
+           some convoluted logic here in order to get some text output to behave
+           in the same manner as is does on the actual terminal.
+           
+           On the actual terminal, if the user types text that wraps on screen
+           and then attempts to erase that text with the <backspace> key, the
+           cursor will move back with the text until it hits the left edge of
+           the screen. It will remain on the same line at the left edge of the
+           screen until text is entered back into that line, or until the
+           <enter> key is pressed. For the sake of accuracy, I've decided to
+           replicate this bug. */
         
-        // Handle newlines and line wrapping
-        if (c == '\n') {
-            cursorX = -1;
-            cursorY++;
-        } else if (cursorX > columns - 1) {
+        // Handle backspace
+        if (c == '\b') {
+            
+            // Do nothing if the buffer is already empty
+            if (buf.isEmpty()) {
+                return;
+            }
+            
+            // Get the last item in the buffer
+            ScreenItem item = buf.get(buf.size() - 1);
+            
+            // Do nothing if the item is an image
+            if (item.hasImage()) {
+                return;
+            }
+            
+            // Delete the last item in the buffer
+            buf.remove(item);
+            
+            /* Treyarch screwed up right here -- the cursor should move up a
+               line if the cursor hits the left edge of the screen when there is
+               still more text to be removed. */
+            // Move cursor back one space until it hits the left edge of screen
+            if (cursorX > 0) {
+                cursorX--;
+            }
+            
+            return;
+        }
+        
+        // Handle line wrap
+        // Ignore typed newlines; they have to be handled later
+        if (cursorX > columns - 1 && c != '\n') {
+            
+            // Add a newline to the buffer
+            buf.add(new ScreenItem('\n'));
+            
+            // Move cursor all the way to the left and down a line
             cursorX = 0;
             cursorY++;
         }
         
-        // Handle backspace
-        if (c == '\b') {
-            if (buf.isEmpty()) {
-                return;
+        // Add character to buffer
+        // Don't add newlines; they have to be handled later
+        if (c != '\n') {
+            buf.add(new ScreenItem(c));
+        }
+        
+        // Calculate the position of the new character on the screen
+        int newCharPosX = 0;
+        int newCharPosY = 0;
+        
+        for (ScreenItem i : buf) {
+            if (i.hasImage()) {
+                newCharPosX += countImageColumns(i.getImage());
+                newCharPosY += countImageLines(i.getImage());
+                continue;
             }
-            item = buf.get(buf.size() - 1);
-            if (item.hasImage()) {
-                return;
+            
+            if (i.getCharacter() == '\n') {
+                newCharPosX = 0;
+                newCharPosY++;
+                continue;
             }
-            buf.remove(item);
-            if (cursorX > 0) {
-                cursorX--;
+            
+            if (newCharPosX > columns - 1) {
+                newCharPosX = 0;
+                newCharPosY++;
             }
+            
+            newCharPosX++;
+        }
+        
+        // Handle newline
+        if (c == '\n') {
+            
+            // Add a newline to the buffer
+            buf.add(new ScreenItem('\n'));
+            
+            /* If the cursor is below the new character, add an extra newline to
+               realign the cursor */
+            if (cursorY > newCharPosY) {
+                buf.add(new ScreenItem('\n'));
+            }
+            
+            // Move cursor all the way to the left and down a line
+            cursorX = 0;
+            cursorY++;
+            
             return;
         }
         
-        // Add character to buffer
-        item = new ScreenItem(c);
-        buf.add(item);
+                
+        // Move cursor forward one space if it is not below the new character
+        if (cursorY <= newCharPosY) {
+            cursorX++;
+        }
         
         // Trim line from the top if character will be drawn off screen (scroll)
         while (cursorY > lines - 1) {
             trimLine();
             cursorY--;
         }
-        
-        // Move cursor forward 1 character
-        cursorX++;
     }
     
     /**

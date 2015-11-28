@@ -37,7 +37,8 @@ import javax.swing.JComponent;
 import javax.swing.Timer;
 
 /**
- * This class represents the terminal screen.
+ * This class represents the terminal screen. It is responsible for displaying
+ * items such as text and images.
  * <p>
  * Created on Nov 18, 2015.
  *
@@ -54,7 +55,9 @@ public final class Screen
     private static final int PADDING_X = 2;
     private static final int PADDING_Y = 2;
     
-    private final Object syncLock = new Object();
+    private static final char COLOR_ESCAPE_CHAR = '^';
+    
+    private final Object paintLock = new Object();
     
     private final ScreenBuffer screenBuffer;
     
@@ -152,6 +155,11 @@ public final class Screen
         this.background = background.getColor();
     }
     
+    /**
+     * Gets the foreground (text) color.
+     * 
+     * @return the foreground color
+     */
     public Color getForeground()
     {
         return foreground;
@@ -207,7 +215,7 @@ public final class Screen
             public void actionPerformed(ActionEvent e)
             {
                 // Toggle isVisible boolean and repaint screen
-                synchronized (syncLock) {
+                synchronized (paintLock) {
                     isCursorVisible = !isCursorVisible;
                     component.repaint();
                 }
@@ -250,15 +258,26 @@ public final class Screen
                 int x;
                 int y;
                 int colorID;
-                int colorCharOffset;
-                
+                int colorCharOffset; /* Used to keep cursor aligned after a
+                                       color char is typed */
                 x = 0;
                 y = 0;
                 colorCharOffset = 0;
                 
-                synchronized (syncLock) {
+                synchronized (paintLock) {
                     for (int i = 0; i < screenBuffer.getLength(); i++) {
+                        
+                        // Get next item
                         item = screenBuffer.itemAt(i);
+                        
+                        /* For some reason, a null item is retrieved every once
+                           in a while and causes a NullPointerException. I'll
+                           investigate this in the future. For now, ignore it.
+                        */
+                        // TODO: Investigate null items (concurrency issue?)
+                        if (item == null) {
+                            continue;
+                        }
                         
                         // Draw image
                         if (item.hasImage()) {
@@ -270,8 +289,10 @@ public final class Screen
                             continue;
                         }
                         
-                        // Handle newlines
+                        // Get character
                         c = item.getCharacter();
+                        
+                        // Handle newlines
                         if (c == '\n') {
                             x = 0;
                             y++;
@@ -279,6 +300,8 @@ public final class Screen
                             colorCharOffset = 0;
                             continue;
                         }
+                        
+                        // Handle line wrapping
                         if (x > columns - 1) {
                             x = 0;
                             y++;
@@ -286,10 +309,16 @@ public final class Screen
                         }
                         
                         // Handle color control characters
-                        if (c == '^' && i != screenBuffer.getLength() - 1) {
+                        if (c == COLOR_ESCAPE_CHAR
+                                && i != screenBuffer.getLength() - 1) {
+                            
+                            // Get next character (color code)
                             c1 = screenBuffer.itemAt(i + 1).getCharacter();
-                            colorID = c1 - 0x30; // Integer value of ASCII char
-
+                            
+                            // Get integer value of ASCII character
+                            colorID = c1 - 0x30;
+                            
+                            // Change text color if color code is valid
                             if (colorID >= 0 && colorID <= 9) {
                                 for (ScreenColor sc : ScreenColor.values()) {
                                     if (colorID == sc.getID()) {
@@ -297,7 +326,10 @@ public final class Screen
                                         break;
                                     }
                                 }
+                                
+                                // Needed to keep cursor aligned
                                 colorCharOffset += 2;
+                                
                                 i++;
                                 continue;
                             }
@@ -311,11 +343,14 @@ public final class Screen
                     }
                 }
                 
-                // Draw cursor
                 if (isCursorVisible) {
-                    g2d.setColor(foreground);
+                    
+                    // Get cursor coordinates
                     x = screenBuffer.getCursorX() - colorCharOffset;
                     y = screenBuffer.getCursorY();
+                    
+                    // Draw cursor
+                    g2d.setColor(foreground);
                     g2d.drawLine(x * charWidth + TEXT_HORIZONTAL_OFFSET + 1,
                             (y + 1) * charHeight - TEXT_VERTICAL_OFFSET,
                             (x + 1) * charWidth + TEXT_HORIZONTAL_OFFSET,

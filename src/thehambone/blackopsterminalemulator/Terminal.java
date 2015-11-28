@@ -51,11 +51,15 @@ public final class Terminal
     private static final int CURSOR_BLINK_RATE = 300;
     private static final int INPUT_BUFFER_LENGTH = 81;
     
-    private static final Screen.ScreenColor BACKGROUND = Screen.ScreenColor.BLACK;
-    private static final Screen.ScreenColor FOREGROUND = Screen.ScreenColor.WHITE;
+    private static final Screen.ScreenColor BACKGROUND
+            = Screen.ScreenColor.BLACK;
+    private static final Screen.ScreenColor FOREGROUND
+            = Screen.ScreenColor.WHITE;
     
     private static final JFrame FRAME = new JFrame();
-    private static final Screen SCREEN = new Screen(COLUMNS, LINES, BACKGROUND, FOREGROUND, FONT, CURSOR_BLINK_RATE);
+    private static final Screen SCREEN 
+            = new Screen(COLUMNS, LINES, BACKGROUND,
+            FOREGROUND, FONT, CURSOR_BLINK_RATE);
     
     private static final InputMap INPUT_MAP = new InputMap();
     private static final ActionMap ACTION_MAP = new ActionMap();
@@ -75,16 +79,31 @@ public final class Terminal
     // Don't allow this class to be instantiated
     private Terminal() { }
     
+    /**
+     * Sets the window title.
+     * 
+     * @param title the text to be used as the new title
+     */
     public static void setTitle(String title)
     {
         FRAME.setTitle(title);
     }
     
+    /**
+     * Appends a character to the screen.
+     * 
+     * @param c the character to be printed
+     */
     public static void print(char c)
     {
         SCREEN.print(c);
     }
     
+    /**
+     * Appends a string of characters to the screen.
+     * 
+     * @param s the string to be printed
+     */
     public static void print(String s)
     {
         for (int i = 0; i < s.length(); i++) {            
@@ -99,32 +118,63 @@ public final class Terminal
         }
     }
     
+    /**
+     * Appends a newline to the screen.
+     */
     public static void println()
     {
         println("");
     }
     
+    /**
+     * Appends a string of characters to the screen followed by a newline.
+     * 
+     * @param s the string to be printed
+     */
     public static void println(String s)
     {
         print(s + "\n");
     }
     
+    /**
+     * Appends an image to the screen followed by a newline.
+     * 
+     * @param img the image to be printed
+     */
     public static void println(BufferedImage img)
     {
         SCREEN.printImage(img);
         println();
     }
     
+    /**
+     * Gets a character typed from the keyboard and prints that character to the
+     * screen.
+     * <p>
+     * This method blocks until a character is typed.
+     * 
+     * @return the typed character
+     */
     public static char getChar()
     {
         return getChar(true);
     }
     
+    /**
+     * Gets a character typed from the keyboard.
+     * <p>
+     * This method blocks until a character is typed.
+     * 
+     * @param printChar a boolean indicating whether the typed character should
+     *                  be displayed on screen
+     * @return the typed character
+     */
     public static char getChar(boolean printChar)
     {
-        
+        // Reset typed char
         charTyped = 0;
         
+        // Wait until a character is typed
         synchronized (INPUT_LOCK) {
             try {
                 INPUT_LOCK.wait();
@@ -133,6 +183,7 @@ public final class Terminal
             }
         }
         
+        // Print the character
         if (printChar) {
             print(charTyped);
         }
@@ -140,11 +191,29 @@ public final class Terminal
         return charTyped;
     }
     
+    /**
+     * Reads a string of characters typed from the keyboard and prints
+     * characters to the screen as they're typed.
+     * <p>
+     * This method blocks until the {@code <ENTER>} key is pressed.
+     * 
+     * @return the string typed
+     */
     public static String readLine()
     {
         return readLine((char)0);
     }
     
+    /**
+     * Reads a string of characters typed from the keyboard.
+     * <p>
+     * This method blocks until the {@code <ENTER>} key is pressed.
+     * 
+     * @param charToPrint the character to print in place of the typed
+     *                    characters; use 0 ({@code NUL}) to indicate that
+     *                    characters should be printed exactly as they're typed
+     * @return the string typed
+     */
     public static String readLine(char charToPrint)
     {
         char c;
@@ -158,17 +227,23 @@ public final class Terminal
         printDifferentChar = charToPrint != 0;
         isReadingInput = true;
         
+        // Loop until <enter> is pressed
         do {
+            // Get character
             c = getChar(false);
+            
+            // Print character
             if (!printDifferentChar) {
                 charToPrint = c;
             }
+            
+            // Handle control characters
             switch (c) {
-                case '\n':
+                case '\n':  // Newline (<enter>)
                     isReadingInput = false;
                     println();
                     break;
-                case '\b':
+                case '\b':  // Backspace
                     if (pointer > 0) {
                         buf[--pointer] = 0;
                         print('\b');
@@ -182,9 +257,12 @@ public final class Terminal
             }
         } while (isReadingInput);
         
-        return new String(buf);
+        return new String(buf).trim();  // Trim to remove extra null characters
     }
     
+    /**
+     * Displays the terminal window.
+     */
     public static void show()
     {
         SwingUtilities.invokeLater(new Runnable()
@@ -203,6 +281,9 @@ public final class Terminal
         });
     }
     
+    /*
+     * Registers all of the keystrokes that can be used with the terminal.
+     */
     private static void registerKeys()
     {
         // Lowercase letters
@@ -333,6 +414,9 @@ public final class Terminal
         registerKey('\n', KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK);
     }
     
+    /*
+     * Registers a keystroke.
+     */
     private static void registerKey(final char ch, int keyChar, int modifiers)
     {
         AbstractAction keyAction = new AbstractAction()
