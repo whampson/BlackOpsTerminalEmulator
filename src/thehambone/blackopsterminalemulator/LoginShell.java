@@ -24,45 +24,23 @@
 
 package thehambone.blackopsterminalemulator;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
-
 /**
- * This class handles program initialization.
- * <p>
- * Created on Nov 17, 2015.
+ * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class Main
+public class LoginShell extends Shell
 {
-    public static final String PROGRAM_TITLE
-            = "Call of Duty: Black Ops Terminal Emulator";
-    public static final String PROGRAM_VERSION
-            = "1.0-alpha (dev build)";
-    
-    /**
-     * Program entry point.
-     * 
-     * @param args command-line arguments
-     */
-    public static void main(String[] args)
+    public LoginShell()
     {
-        String title = PROGRAM_TITLE + " - " + PROGRAM_VERSION;
-        Terminal.setTitle(title);
-        Terminal.show();
+        super("$", "Error:  Unknown Command - try \"help\"");
         
-        Terminal.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-        Terminal.println("Central Intelligence Agency Data system\n");
-        Terminal.println("Unauthorized use of this system is against the law.\n");
-        Terminal.println("Security Privileges Required");
-        Terminal.println("USER:amason");
-        Terminal.println("PASSWORD:********\n");
-        
-        Terminal.getShell().launch();
+        commands.put("help", new HelpCommand());
+    }
+    
+    @Override
+    protected void onLaunch()
+    {
+        // do nothing
     }
 }

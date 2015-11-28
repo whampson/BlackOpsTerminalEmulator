@@ -46,6 +46,8 @@ public final class ScreenBuffer
 {
     private static final float IMAGE_SCALE_FACTOR = 0.66f;
     
+    private static final int TAB_LENGTH = 4;
+    
     private final int columns;
     private final int lines;
     private final int charWidth;
@@ -195,6 +197,20 @@ public final class ScreenBuffer
             return;
         }
         
+        // Handle tab
+        if (c == '\t') {
+            // Calculate number of spaces to add to buffer
+            int spacesToAdd = TAB_LENGTH - (cursorX % TAB_LENGTH);
+            
+            // Add spaces to buffer and increment cursor
+            for (int i = 0; i < spacesToAdd; i++) {
+                buf.add(new ScreenItem(' '));
+                cursorX++;
+            }
+            
+            return;
+        }
+        
         // Handle line wrap
         // Ignore typed newlines; they have to be handled later
         if (cursorX > columns - 1 && c != '\n') {
@@ -256,7 +272,6 @@ public final class ScreenBuffer
             
             return;
         }
-        
                 
         // Move cursor forward one space if it is not below the new character
         if (cursorY <= newCharPosY) {

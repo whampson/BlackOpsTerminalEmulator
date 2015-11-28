@@ -68,6 +68,8 @@ public final class Terminal
     
     private static volatile char charTyped = 0;
     
+    private static Shell shell = new LoginShell();
+    
     static
     {
         registerKeys();
@@ -78,6 +80,11 @@ public final class Terminal
     
     // Don't allow this class to be instantiated
     private Terminal() { }
+    
+    public static Shell getShell()
+    {
+        return shell;
+    }
     
     /**
      * Sets the window title.

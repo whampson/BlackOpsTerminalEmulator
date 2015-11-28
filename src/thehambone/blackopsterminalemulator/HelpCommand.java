@@ -24,45 +24,29 @@
 
 package thehambone.blackopsterminalemulator;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
-
 /**
- * This class handles program initialization.
- * <p>
- * Created on Nov 17, 2015.
+ * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class Main
+public class HelpCommand extends Command
 {
-    public static final String PROGRAM_TITLE
-            = "Call of Duty: Black Ops Terminal Emulator";
-    public static final String PROGRAM_VERSION
-            = "1.0-alpha (dev build)";
-    
-    /**
-     * Program entry point.
-     * 
-     * @param args command-line arguments
-     */
-    public static void main(String[] args)
+    @Override
+    public void exec(String[] args)
     {
-        String title = PROGRAM_TITLE + " - " + PROGRAM_VERSION;
-        Terminal.setTitle(title);
-        Terminal.show();
-        
-        Terminal.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-        Terminal.println("Central Intelligence Agency Data system\n");
-        Terminal.println("Unauthorized use of this system is against the law.\n");
-        Terminal.println("Security Privileges Required");
-        Terminal.println("USER:amason");
-        Terminal.println("PASSWORD:********\n");
-        
-        Terminal.getShell().launch();
+        Terminal.println("System Help:\n");
+        Terminal.println("help\tdisplays this help information");
+        Terminal.println("cat\t\t\t\t   prints the contents of a file (.txt,.pic,.snd)");
+        Terminal.println("cd [ |.|..|path]   changes the current directory.");
+        Terminal.println("clear\t\t\t   clear the display");
+        Terminal.println("dir\t\t\t\t   displays the contents of the current directory");
+        Terminal.println("decode\t\t\t   decodes a encrypted string using an agency standard cypher");
+        Terminal.println("encode\t\t\t   encodes a string using an agency standard cypher");
+        Terminal.println("exit\t\t\t   exits the current login session");
+        Terminal.println("help\t\t\t   display's this help screen");
+        Terminal.println("login\t\t\t   starts a new login session on the current system");
+        Terminal.println("mail\t\t\t   opens the current users mailbox");
+        Terminal.println("rlogin [system]\t   attempts a login session on a remote system");
+        Terminal.println("who\t\t\t\t   lists the users that have accounts on the current system");
     }
 }
