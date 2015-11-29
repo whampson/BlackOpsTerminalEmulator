@@ -24,39 +24,46 @@
 
 package thehambone.blackopsterminalemulator;
 
-import thehambone.blackopsterminalemulator.filesystem.Executable;
-import java.util.HashMap;
-import java.util.Map;
+import thehambone.blackopsterminalemulator.filesystem.File;
+import java.util.ArrayList;
+import java.util.List;
+import thehambone.blackopsterminalemulator.filesystem.Directory;
+import thehambone.blackopsterminalemulator.filesystem.HomeDirectory;
 
 /**
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public abstract class Shell
+public class User
 {
-//    protected final Map<String, Executable> commands;
+    public final String username;
+    public final String password;
+    public final HomeDirectory homeDirectory;
+    public final List<File> files;
+//    public final Mailbox mailbox;
     
-    protected String prompt;
-    protected String errorMessage;
-    
-    protected Shell(String prompt, String errorMessage)
+    public User(String username, String password,
+            HomeDirectory homeDirectory, List<File> files)
     {
-//        commands = new HashMap<>();
-        
-        this.prompt = prompt;
-        this.errorMessage = errorMessage;
+        this.username = username;
+        this.password = password;
+        this.homeDirectory = homeDirectory;
+        this.files = new ArrayList<>(files);
     }
     
-    public void setPrompt(String prompt)
+    public String getUsername()
     {
-        this.prompt = prompt;
+        return username;
     }
     
-    public void exec()
+    public String getPassword()
     {
-        onLaunch();
+        return password;
     }
     
-    protected abstract void onLaunch();
+    public HomeDirectory getHomeDirectory()
+    {
+        return homeDirectory;
+    }
 }

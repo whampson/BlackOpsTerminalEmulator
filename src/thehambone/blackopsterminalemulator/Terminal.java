@@ -68,7 +68,9 @@ public final class Terminal
     
     private static volatile char charTyped = 0;
     
-    private static Shell shell = new LoginShell();
+    private static final Stack<LoginShell> SHELL_STACK = new Stack<>(16); // check capacity
+    
+    private static String motd = "";
     
     static
     {
@@ -81,9 +83,9 @@ public final class Terminal
     // Don't allow this class to be instantiated
     private Terminal() { }
     
-    public static Shell getShell()
+    public static LoginShell getActiveLoginShell()
     {
-        return shell;
+        return SHELL_STACK.peek();
     }
     
     /**
@@ -94,6 +96,24 @@ public final class Terminal
     public static void setTitle(String title)
     {
         FRAME.setTitle(title);
+    }
+    
+    public static void setMOTD(String motd)
+    {
+        Terminal.motd = motd;
+    }
+    
+    public static boolean login(String server, String user, String password)
+    {
+        Server s = Server.getServer(server);
+        User u = s.getUser(user);
+        
+        LoginShell newShell = new LoginShell(s, u);
+        SHELL_STACK.push(newShell);
+        
+        newShell.exec();
+        
+        return true;
     }
     
     /**
@@ -286,6 +306,11 @@ public final class Terminal
                 FRAME.setVisible(true);
             }
         });
+        
+        for (int i = 0; i < LINES; i++) {
+            Terminal.println();
+        }
+        Terminal.println(motd);
     }
     
     /*

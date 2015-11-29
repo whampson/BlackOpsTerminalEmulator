@@ -24,12 +24,16 @@
 
 package thehambone.blackopsterminalemulator;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
+import thehambone.blackopsterminalemulator.filesystem.File;
+import java.util.ArrayList;
+import java.util.List;
+import thehambone.blackopsterminalemulator.filesystem.Directory;
+import thehambone.blackopsterminalemulator.filesystem.FileSystem;
+import thehambone.blackopsterminalemulator.filesystem.HomeDirectory;
+import thehambone.blackopsterminalemulator.filesystem.command.CdCommand;
+import thehambone.blackopsterminalemulator.filesystem.command.DirCommand;
+import thehambone.blackopsterminalemulator.filesystem.Executable;
+import thehambone.blackopsterminalemulator.filesystem.command.HelpCommand;
 
 /**
  * This class handles program initialization.
@@ -43,7 +47,7 @@ public class Main
     public static final String PROGRAM_TITLE
             = "Call of Duty: Black Ops Terminal Emulator";
     public static final String PROGRAM_VERSION
-            = "1.0-alpha (dev build)";
+            = "1.0-alpha";
     
     /**
      * Program entry point.
@@ -54,15 +58,45 @@ public class Main
     {
         String title = PROGRAM_TITLE + " - " + PROGRAM_VERSION;
         Terminal.setTitle(title);
+        Terminal.setMOTD("Central Intelligence Agency Data system\n\n"
+                + "Unauthorized use of this system is against the law.\n\n"
+                + "Security Privileges Required\n"
+                + "USER:amason\n"
+                + "PASSWORD:********\n");
+        
+        Directory root = new Directory("");
+        Directory bin = new Directory("bin");
+        Directory home = new Directory("home");
+        HomeDirectory amason = new HomeDirectory("amason");
+        HomeDirectory asmith = new HomeDirectory("asmith");
+        
+        root.addChild(bin);
+        root.addChild(home);
+        home.addChild(amason);
+        home.addChild(asmith);
+        
+        Executable cd = new CdCommand();
+        Executable help = new HelpCommand();
+        Executable dir = new DirCommand();
+        File ls = new File("ls");
+        ls.markAsAlias(dir);
+        bin.addChild(cd);
+        bin.addChild(help);
+        bin.addChild(dir);
+        bin.addChild(ls);
+        
+        File motd = new File("_motd.txt", true);
+        root.addChild(motd);
+        
+        FileSystem ciaFileSystem = new FileSystem(root);
+        
+        List<User> users = new ArrayList<>();
+        List<File> files = new ArrayList<>();
+        users.add(new User("amason", "password", amason, files));
+        users.add(new User("asmith", "roxy", asmith, files));
+        Server cia = new Server("cia", "", users, files, ciaFileSystem, bin);
+        Server.addServer(cia);
         Terminal.show();
-        
-        Terminal.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-        Terminal.println("Central Intelligence Agency Data system\n");
-        Terminal.println("Unauthorized use of this system is against the law.\n");
-        Terminal.println("Security Privileges Required");
-        Terminal.println("USER:amason");
-        Terminal.println("PASSWORD:********\n");
-        
-        Terminal.getShell().launch();
+        Terminal.login("cia", "amason", "password");
     }
 }

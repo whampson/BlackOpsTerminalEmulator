@@ -24,39 +24,63 @@
 
 package thehambone.blackopsterminalemulator;
 
-import thehambone.blackopsterminalemulator.filesystem.Executable;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public abstract class Shell
+public final class Stack<T>
 {
-//    protected final Map<String, Executable> commands;
+    private final T[] stack;
     
-    protected String prompt;
-    protected String errorMessage;
+    private int pointer;
     
-    protected Shell(String prompt, String errorMessage)
+    public Stack(int capacity)
     {
-//        commands = new HashMap<>();
+        if (capacity < 1) {
+            throw new IllegalArgumentException(
+                    "capacity must be a postive integer");
+        }
+        stack = (T[])new Object[capacity];
+        pointer = -1;
+    }
+    
+    public boolean isEmpty()
+    {
+        return pointer < 0;
+    }
+    
+    public boolean isFull()
+    {
+        return pointer >= stack.length - 1;
+    }
+    
+    public T peek()
+    {
+        if (isEmpty()) {
+            throw new StackException("stack is empty");
+        } else if (isFull()) {
+            throw new StackException("stack is full");
+        }
         
-        this.prompt = prompt;
-        this.errorMessage = errorMessage;
+        return stack[pointer];
     }
     
-    public void setPrompt(String prompt)
+    public void push(T item)
     {
-        this.prompt = prompt;
+        if (isFull()) {
+            throw new StackException("stack is full");
+        }
+        
+        stack[++pointer] = item;
     }
     
-    public void exec()
+    public T pop()
     {
-        onLaunch();
+        if (isEmpty()) {
+            throw new StackException("stack is empty");
+        }
+        
+        return stack[pointer--];
     }
-    
-    protected abstract void onLaunch();
 }

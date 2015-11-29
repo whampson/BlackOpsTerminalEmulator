@@ -22,41 +22,39 @@
  * THE SOFTWARE.
  */
 
-package thehambone.blackopsterminalemulator;
+package thehambone.blackopsterminalemulator.filesystem;
 
-import thehambone.blackopsterminalemulator.filesystem.Executable;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public abstract class Shell
+public class FileSystem
 {
-//    protected final Map<String, Executable> commands;
+    private final FileSystemObject root;
     
-    protected String prompt;
-    protected String errorMessage;
-    
-    protected Shell(String prompt, String errorMessage)
+    public FileSystem(FileSystemObject root)
     {
-//        commands = new HashMap<>();
+        this.root = root;
+    }
+    
+    public FileSystemObject getRoot()
+    {
+        return root;
+    }
+    
+    public FileSystemObject getFileSystemObject(String name)
+    {
+        String rootName
+                = Character.toString(FileSystemObject.FILE_SEPARATOR_CHAR);
         
-        this.prompt = prompt;
-        this.errorMessage = errorMessage;
+        if (name.equals(rootName)) {
+            return root;
+        }
+        
+        return root.getChild(name);
     }
-    
-    public void setPrompt(String prompt)
-    {
-        this.prompt = prompt;
-    }
-    
-    public void exec()
-    {
-        onLaunch();
-    }
-    
-    protected abstract void onLaunch();
 }

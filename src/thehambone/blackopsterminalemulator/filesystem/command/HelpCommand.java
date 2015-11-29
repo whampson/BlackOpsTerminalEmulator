@@ -22,15 +22,23 @@
  * THE SOFTWARE.
  */
 
-package thehambone.blackopsterminalemulator;
+package thehambone.blackopsterminalemulator.filesystem.command;
+
+import thehambone.blackopsterminalemulator.filesystem.Executable;
+import thehambone.blackopsterminalemulator.Terminal;
 
 /**
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class HelpCommand extends Command
+public class HelpCommand extends Executable
 {
+    public HelpCommand()
+    {
+        super("help");
+    }
+    
     @Override
     public void exec(String[] args)
     {

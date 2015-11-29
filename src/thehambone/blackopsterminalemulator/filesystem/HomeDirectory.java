@@ -22,14 +22,17 @@
  * THE SOFTWARE.
  */
 
-package thehambone.blackopsterminalemulator;
+package thehambone.blackopsterminalemulator.filesystem;
 
 /**
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public abstract class Command
+public class HomeDirectory extends Directory
 {
-    public abstract void exec(String[] args);
+    public HomeDirectory(String name)
+    {
+        super(name);
+    }
 }

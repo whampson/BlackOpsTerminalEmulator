@@ -24,39 +24,30 @@
 
 package thehambone.blackopsterminalemulator;
 
-import thehambone.blackopsterminalemulator.filesystem.Executable;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public abstract class Shell
+public class StackException extends RuntimeException
 {
-//    protected final Map<String, Executable> commands;
-    
-    protected String prompt;
-    protected String errorMessage;
-    
-    protected Shell(String prompt, String errorMessage)
+    public StackException()
     {
-//        commands = new HashMap<>();
-        
-        this.prompt = prompt;
-        this.errorMessage = errorMessage;
+        super();
     }
     
-    public void setPrompt(String prompt)
+    public StackException(String message)
     {
-        this.prompt = prompt;
+        super(message);
     }
     
-    public void exec()
+    public StackException(Throwable cause)
     {
-        onLaunch();
+        super(cause);
     }
     
-    protected abstract void onLaunch();
+    public StackException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
 }

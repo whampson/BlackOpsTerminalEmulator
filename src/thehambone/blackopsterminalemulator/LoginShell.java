@@ -24,6 +24,13 @@
 
 package thehambone.blackopsterminalemulator;
 
+import thehambone.blackopsterminalemulator.filesystem.command.CdCommand;
+import thehambone.blackopsterminalemulator.filesystem.command.HelpCommand;
+import thehambone.blackopsterminalemulator.filesystem.Directory;
+import thehambone.blackopsterminalemulator.filesystem.File;
+import thehambone.blackopsterminalemulator.filesystem.FileSystemObject;
+import thehambone.blackopsterminalemulator.filesystem.Executable;
+
 /**
  * Created on Nov 28, 2015.
  *
@@ -31,16 +38,90 @@ package thehambone.blackopsterminalemulator;
  */
 public class LoginShell extends Shell
 {
-    public LoginShell()
+    private final Server server;
+    private final User user;
+    
+    private FileSystemObject currentDirectory;
+    
+    public LoginShell(Server server, User user)
     {
         super("$", "Error:  Unknown Command - try \"help\"");
         
-        commands.put("help", new HelpCommand());
+        this.server = server;
+        this.user = user;
+        
+        currentDirectory = user.getHomeDirectory();
+        
+//        commands.put("cd", new CdCommand());
+//        commands.put("help", new HelpCommand());
+    }
+    
+    public Server getServer()
+    {
+        return server;
+    }
+    
+    public User getUser()
+    {
+        return user;
+    }
+    
+    public FileSystemObject getCurrentDirectory()
+    {
+        return currentDirectory;
+    }
+    
+    public void setCurrentDirectory(FileSystemObject dir)
+    {
+        currentDirectory = dir;
     }
     
     @Override
     protected void onLaunch()
     {
-        // do nothing
+        String input;
+        String commandName;
+        String[] args;
+        Executable executable;
+        FileSystemObject fso;
+        
+        Directory commandDir = server.getCommandDirectory();
+        
+        while (true) {
+            executable = null;
+            Terminal.print(prompt);
+            input = Terminal.readLine();
+            if (input.isEmpty()) {
+                continue;
+            }
+            if (input.contains(" ")) {
+                int spaceIndex = input.indexOf(' ');
+                commandName = input.substring(0, spaceIndex);
+                args = input.substring(spaceIndex + 1).split("\\s");
+            } else {
+                commandName = input;
+                args = new String[0];
+            }
+            
+            fso = commandDir.getChild(commandName);
+            if (fso instanceof File) {
+                File f = (File)fso;
+                if (f.isAlias() && f.getAliasTarget() instanceof Executable) {
+                    executable = (Executable)f.getAliasTarget();
+                }
+            }
+            if (fso instanceof Executable) {
+                executable = (Executable)fso;
+            }
+            
+            if (executable == null) {
+                Terminal.println(errorMessage);
+            } else {
+                executable.exec(args);
+            }
+            if (commandName.equals("exit")) {
+                break;
+            }
+        }
     }
 }
