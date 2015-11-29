@@ -24,8 +24,6 @@
 
 package thehambone.blackopsterminalemulator.filesystem;
 
-import thehambone.blackopsterminalemulator.filesystem.File;
-
 /**
  * Created on Nov 28, 2015.
  *

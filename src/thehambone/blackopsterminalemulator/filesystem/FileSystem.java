@@ -24,9 +24,6 @@
 
 package thehambone.blackopsterminalemulator.filesystem;
 
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * Created on Nov 28, 2015.
  *

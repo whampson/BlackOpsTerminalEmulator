@@ -24,10 +24,11 @@
 
 package thehambone.blackopsterminalemulator;
 
-import thehambone.blackopsterminalemulator.filesystem.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import thehambone.blackopsterminalemulator.filesystem.Directory;
+import thehambone.blackopsterminalemulator.filesystem.File;
 import thehambone.blackopsterminalemulator.filesystem.FileSystem;
 
 /**
@@ -49,7 +50,7 @@ public class Server
         Server server = null;
         
         for (Server s : SERVERS) {
-            if (s.name.equals(name)) {
+            if (s.getName().equals(name)) {
                 server = s;
                 break;
             }
@@ -62,7 +63,6 @@ public class Server
     private final String loginMessage;
     
     private final List<User> users;
-    private final List<File> files;
     private final FileSystem fileSystem;
     private final Directory commandDirectory;
     
@@ -74,9 +74,18 @@ public class Server
         this.loginMessage = loginMessage;
         
         this.users = new ArrayList<>(users);
-        this.files = new ArrayList<>(files);
         this.fileSystem = fileSystem;
         this.commandDirectory = commandDirectory;
+    }
+    
+    public String getName()
+    {
+        return name;
+    }
+    
+    public String getLoginMessage()
+    {
+        return loginMessage;
     }
     
     public FileSystem getFileSystem()
@@ -101,5 +110,30 @@ public class Server
         }
         
         return user;
+    }
+    
+    public List<User> getUsers()
+    {
+        return Collections.unmodifiableList(users);
+    }
+    
+    public LoginShell login()
+    {
+        Terminal.println(getLoginMessage());
+        
+        Terminal.print("USER:");
+        String username = Terminal.readLine();
+        Terminal.print("PASSWORD:");
+        String password = Terminal.readLine('*');
+        
+        LoginShell shell = null;
+        User user = getUser(username);
+        if (user == null || !user.getPassword().equals(password)) {
+            Terminal.println("Invalid Password");
+        } else {
+            shell = new LoginShell(this, user);
+        }
+        
+        return shell;
     }
 }

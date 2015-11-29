@@ -24,10 +24,6 @@
 
 package thehambone.blackopsterminalemulator;
 
-import thehambone.blackopsterminalemulator.filesystem.Executable;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created on Nov 28, 2015.
  *
@@ -35,17 +31,21 @@ import java.util.Map;
  */
 public abstract class Shell
 {
-//    protected final Map<String, Executable> commands;
+    protected volatile boolean isRunning;
     
     protected String prompt;
     protected String errorMessage;
     
     protected Shell(String prompt, String errorMessage)
     {
-//        commands = new HashMap<>();
-        
         this.prompt = prompt;
         this.errorMessage = errorMessage;
+        isRunning = false;
+    }
+    
+    public String getPrompt()
+    {
+        return prompt;
     }
     
     public void setPrompt(String prompt)
@@ -55,7 +55,13 @@ public abstract class Shell
     
     public void exec()
     {
+        isRunning = true;
         onLaunch();
+    }
+    
+    public void terminate()
+    {
+        isRunning = false;
     }
     
     protected abstract void onLaunch();

@@ -43,11 +43,11 @@ public interface FileSystemObject extends Comparable<FileSystemObject>
     
     public boolean hasChildren();
     
+    public void addChild(FileSystemObject child);
+    
     public FileSystemObject getChild(String name);
     
     public List<FileSystemObject> getChildren();
-    
-    public void addChild(FileSystemObject child);
     
     public String getName();
     

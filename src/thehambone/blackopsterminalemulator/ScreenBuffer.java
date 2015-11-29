@@ -44,9 +44,9 @@ import java.util.ListIterator;
  */
 public final class ScreenBuffer
 {
-    private static final float IMAGE_SCALE_FACTOR = 0.66f;
+    public static final int TAB_LENGTH = 4;
     
-    private static final int TAB_LENGTH = 4;
+    private static final float IMAGE_SCALE_FACTOR = 0.66f;
     
     private final int columns;
     private final int lines;

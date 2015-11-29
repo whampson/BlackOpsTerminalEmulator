@@ -44,10 +44,11 @@ import javax.swing.SwingUtilities;
  */
 public final class Terminal
 {
+    public static final int COLUMNS = 80;
+    public static final int LINES = 27;
+    
     private static final Font FONT = new Font("Courier New", 0, 13);
     
-    private static final int COLUMNS = 80;
-    private static final int LINES = 27;
     private static final int CURSOR_BLINK_RATE = 300;
     private static final int INPUT_BUFFER_LENGTH = 81;
     
@@ -66,11 +67,15 @@ public final class Terminal
     
     private static final Object INPUT_LOCK = new Object();
     
+    private static char[] inputBuffer = new char[INPUT_BUFFER_LENGTH];
+    
     private static volatile char charTyped = 0;
     
-    private static final Stack<LoginShell> SHELL_STACK = new Stack<>(16); // check capacity
+    private static final Stack<LoginShell> SHELL_STACK = new Stack<>(15); // check capacity
     
     private static String motd = "";
+    
+    private static String lastLineTyped = "";
     
     static
     {
@@ -88,6 +93,11 @@ public final class Terminal
         return SHELL_STACK.peek();
     }
     
+    public static Stack<LoginShell> getLoginShellStack()
+    {
+        return SHELL_STACK;
+    }
+    
     /**
      * Sets the window title.
      * 
@@ -103,17 +113,9 @@ public final class Terminal
         Terminal.motd = motd;
     }
     
-    public static boolean login(String server, String user, String password)
+    public static void printMOTD()
     {
-        Server s = Server.getServer(server);
-        User u = s.getUser(user);
-        
-        LoginShell newShell = new LoginShell(s, u);
-        SHELL_STACK.push(newShell);
-        
-        newShell.exec();
-        
-        return true;
+        println(motd);
     }
     
     /**
@@ -211,7 +213,7 @@ public final class Terminal
         }
         
         // Print the character
-        if (printChar) {
+        if (printChar && charTyped != 0) {
             print(charTyped);
         }
         
@@ -244,15 +246,14 @@ public final class Terminal
     public static String readLine(char charToPrint)
     {
         char c;
-        char[] buf;
         int pointer;
         boolean printDifferentChar;
         boolean isReadingInput;
         
-        buf = new char[INPUT_BUFFER_LENGTH];
         pointer = 0;
         printDifferentChar = charToPrint != 0;
         isReadingInput = true;
+        inputBuffer = new char[INPUT_BUFFER_LENGTH];
         
         // Loop until <enter> is pressed
         do {
@@ -272,19 +273,21 @@ public final class Terminal
                     break;
                 case '\b':  // Backspace
                     if (pointer > 0) {
-                        buf[--pointer] = 0;
+                        inputBuffer[--pointer] = 0;
                         print('\b');
                     }
                     break;
                 default:
-                    if (pointer < buf.length) {
-                        buf[pointer++] = c;
+                    if (pointer < inputBuffer.length) {
+                        inputBuffer[pointer++] = c;
                         print(charToPrint);
                     }
             }
         } while (isReadingInput);
         
-        return new String(buf).trim();  // Trim to remove extra null characters
+        lastLineTyped = new String(inputBuffer).trim();  // Trim to remove extra null characters
+        
+        return lastLineTyped;
     }
     
     /**
@@ -397,8 +400,6 @@ public final class Terminal
         registerKey('9', KeyEvent.VK_NUMPAD9, 0);
         
         // Symbols
-        registerKey(' ', KeyEvent.VK_SPACE, 0);
-        registerKey(' ', KeyEvent.VK_SPACE, KeyEvent.SHIFT_DOWN_MASK);
         registerKey('-', KeyEvent.VK_MINUS, 0);
         registerKey('=', KeyEvent.VK_EQUALS, 0);
         registerKey('[', KeyEvent.VK_OPEN_BRACKET, 0);
@@ -444,6 +445,31 @@ public final class Terminal
         registerKey('\b', KeyEvent.VK_BACK_SPACE, KeyEvent.SHIFT_DOWN_MASK);
         registerKey('\n', KeyEvent.VK_ENTER, 0);
         registerKey('\n', KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK);
+        registerKey(' ', KeyEvent.VK_SPACE, 0);
+        registerKey(' ', KeyEvent.VK_SPACE, KeyEvent.SHIFT_DOWN_MASK);
+        
+        registerUpArrow();
+    }
+    
+    private static void registerUpArrow()
+    {
+        AbstractAction keyAction = new AbstractAction()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                synchronized (INPUT_LOCK) {
+                    inputBuffer = new char[INPUT_BUFFER_LENGTH];
+                    for (int i = 0; i < lastLineTyped.length(); i++) {
+                        inputBuffer[i] = lastLineTyped.charAt(i);
+                    }
+                    print(lastLineTyped);
+                }
+            }
+        };
+        
+        INPUT_MAP.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "up");
+        ACTION_MAP.put("up", keyAction);
     }
     
     /*

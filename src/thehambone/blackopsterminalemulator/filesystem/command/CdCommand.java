@@ -24,10 +24,10 @@
 
 package thehambone.blackopsterminalemulator.filesystem.command;
 
-import thehambone.blackopsterminalemulator.filesystem.Executable;
 import thehambone.blackopsterminalemulator.LoginShell;
 import thehambone.blackopsterminalemulator.Terminal;
 import thehambone.blackopsterminalemulator.filesystem.Directory;
+import thehambone.blackopsterminalemulator.filesystem.Executable;
 import thehambone.blackopsterminalemulator.filesystem.FileSystem;
 import thehambone.blackopsterminalemulator.filesystem.FileSystemObject;
 import thehambone.blackopsterminalemulator.filesystem.HomeDirectory;
@@ -65,22 +65,22 @@ public class CdCommand extends Executable
                 return;     // root node; do nothing
             }
             shell.setCurrentDirectory(cd.getParent());
-        } else {
-            FileSystemObject fso = fileSystem.getFileSystemObject(args[0]);
-            if (fso == null) {
-                Terminal.println("Error: Invalid Path");
-                return;
-            }
-            
-            if (fso instanceof HomeDirectory) {
-                HomeDirectory homeDir = (HomeDirectory)fso;
-                if (!homeDir.getName().equals(shell.getUser().getUsername())) {
-                    Terminal.println("Error: Insufficient Permissions");
-                return;
-                }
-            }
-            shell.setCurrentDirectory(fso);
+            return;
         }
         
+        FileSystemObject fso = fileSystem.getFileSystemObject(args[0]);
+        if (fso == null || (fso instanceof Executable && ((Executable)fso).isHidden())) {
+            Terminal.println("Error:  Invalid Path");
+            return;
+        }
+
+        if (fso instanceof HomeDirectory) {
+            HomeDirectory homeDir = (HomeDirectory)fso;
+            if (!homeDir.getName().equals(shell.getUser().getUsername())) {
+                Terminal.println("Error:  Insufficient Permissions");
+                return;
+            }
+        }
+        shell.setCurrentDirectory(fso);
     }
 }

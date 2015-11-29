@@ -22,47 +22,31 @@
  * THE SOFTWARE.
  */
 
-package thehambone.blackopsterminalemulator;
+package thehambone.blackopsterminalemulator.filesystem.command;
 
-import java.util.ArrayList;
-import java.util.List;
-import thehambone.blackopsterminalemulator.filesystem.File;
-import thehambone.blackopsterminalemulator.filesystem.HomeDirectory;
+import thehambone.blackopsterminalemulator.Terminal;
+import thehambone.blackopsterminalemulator.filesystem.Executable;
 
 /**
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class User
+public class HelloCommand extends Executable
 {
-    private final String username;
-    private final String password;
-    private final HomeDirectory homeDirectory;
-    private final List<File> files;
-//    public final Mailbox mailbox;
-    
-    public User(String username, String password,
-            HomeDirectory homeDirectory, List<File> files)
+    public HelloCommand()
     {
-        this.username = username;
-        this.password = password;
-        this.homeDirectory = homeDirectory;
-        this.files = new ArrayList<>(files);
+        super("hello");
     }
     
-    public String getUsername()
+    @Override
+    public void exec(String[] args)
     {
-        return username;
-    }
-    
-    public String getPassword()
-    {
-        return password;
-    }
-    
-    public HomeDirectory getHomeDirectory()
-    {
-        return homeDirectory;
+        if (args.length == 0) {
+            Terminal.println("Error:  Invalid Input - common usages include:");
+            Terminal.println("hello brother, hello nurse, and hello sailor");
+        } else if (args[0].equals("sailor")) {
+            new ZorkCommand().exec(args);
+        }
     }
 }

@@ -34,11 +34,11 @@ import java.util.List;
  */
 public class File implements FileSystemObject
 {
-    private final String name;
+    protected final String name;
     
-    private FileSystemObject parent;
-    private boolean isHidden;
-    private File aliasTarget;
+    protected FileSystemObject parent;
+    protected boolean isHidden;
+    protected File aliasTarget;
     
     public File(String name)
     {
@@ -104,7 +104,8 @@ public class File implements FileSystemObject
     @Override
     public void addChild(FileSystemObject child)
     {
-        // nop
+        throw new UnsupportedOperationException(
+                "this operation is not supported for files");
     }
     
     @Override

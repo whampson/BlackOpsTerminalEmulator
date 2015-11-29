@@ -24,12 +24,10 @@
 
 package thehambone.blackopsterminalemulator;
 
-import thehambone.blackopsterminalemulator.filesystem.command.CdCommand;
-import thehambone.blackopsterminalemulator.filesystem.command.HelpCommand;
 import thehambone.blackopsterminalemulator.filesystem.Directory;
+import thehambone.blackopsterminalemulator.filesystem.Executable;
 import thehambone.blackopsterminalemulator.filesystem.File;
 import thehambone.blackopsterminalemulator.filesystem.FileSystemObject;
-import thehambone.blackopsterminalemulator.filesystem.Executable;
 
 /**
  * Created on Nov 28, 2015.
@@ -38,6 +36,7 @@ import thehambone.blackopsterminalemulator.filesystem.Executable;
  */
 public class LoginShell extends Shell
 {
+    private static final String DEFAULT_PROMPT = "$";
     private final Server server;
     private final User user;
     
@@ -45,15 +44,12 @@ public class LoginShell extends Shell
     
     public LoginShell(Server server, User user)
     {
-        super("$", "Error:  Unknown Command - try \"help\"");
+        super(DEFAULT_PROMPT, "Error:  Unknown Command - try \"help\"");
         
         this.server = server;
         this.user = user;
         
         currentDirectory = user.getHomeDirectory();
-        
-//        commands.put("cd", new CdCommand());
-//        commands.put("help", new HelpCommand());
     }
     
     public Server getServer()
@@ -87,10 +83,15 @@ public class LoginShell extends Shell
         
         Directory commandDir = server.getCommandDirectory();
         
-        while (true) {
+        while (isRunning) {
             executable = null;
             Terminal.print(prompt);
             input = Terminal.readLine();
+            
+            if (!prompt.equals(DEFAULT_PROMPT)) {
+                prompt = DEFAULT_PROMPT;
+            }
+            
             if (input.isEmpty()) {
                 continue;
             }
@@ -118,9 +119,6 @@ public class LoginShell extends Shell
                 Terminal.println(errorMessage);
             } else {
                 executable.exec(args);
-            }
-            if (commandName.equals("exit")) {
-                break;
             }
         }
     }

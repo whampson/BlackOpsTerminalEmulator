@@ -24,14 +24,16 @@
 
 package thehambone.blackopsterminalemulator.filesystem.command;
 
-import thehambone.blackopsterminalemulator.filesystem.Executable;
-import java.util.Collections;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.List;
 import thehambone.blackopsterminalemulator.LoginShell;
+import thehambone.blackopsterminalemulator.ScreenBuffer;
 import thehambone.blackopsterminalemulator.Terminal;
 import thehambone.blackopsterminalemulator.filesystem.Directory;
+import thehambone.blackopsterminalemulator.filesystem.Executable;
 import thehambone.blackopsterminalemulator.filesystem.File;
-import thehambone.blackopsterminalemulator.filesystem.FileSystem;
 import thehambone.blackopsterminalemulator.filesystem.FileSystemObject;
 
 /**
@@ -46,6 +48,12 @@ public class DirCommand extends Executable
         super("dir");
     }
     
+    private double roundHalfDown(double d)
+    {
+        return new BigDecimal(d).setScale(0, RoundingMode.HALF_DOWN)
+                .doubleValue();
+    }
+    
     @Override
     public void exec(String[] args)
     {
@@ -56,6 +64,7 @@ public class DirCommand extends Executable
         
         FileSystemObject o;
         String objName;
+        int itemsPrinted = 0;
         for (int i = 0; i < objs.size(); i++) {
             o = objs.get(i);
             objName = o.getName();
@@ -68,13 +77,17 @@ public class DirCommand extends Executable
                 continue;
             }
             
-            Terminal.print(" ");
+            Terminal.print(' ');
             Terminal.print(objName);
+            itemsPrinted++;
             
-            if ((i + 1) % 4 == 0) {
+            if (itemsPrinted % 4 == 0) {
                 Terminal.println();
             } else {
-                Terminal.print("\t\t\t\t");
+                int tabCount = 5 - (int)roundHalfDown((double)objName.length() / ScreenBuffer.TAB_LENGTH);
+                for (int j = 0; j < tabCount; j++) {
+                    Terminal.print('\t');
+                }
             }
         }
         

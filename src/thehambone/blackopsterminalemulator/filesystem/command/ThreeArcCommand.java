@@ -22,47 +22,33 @@
  * THE SOFTWARE.
  */
 
-package thehambone.blackopsterminalemulator;
+package thehambone.blackopsterminalemulator.filesystem.command;
 
-import java.util.ArrayList;
-import java.util.List;
-import thehambone.blackopsterminalemulator.filesystem.File;
-import thehambone.blackopsterminalemulator.filesystem.HomeDirectory;
+import thehambone.blackopsterminalemulator.Terminal;
+import thehambone.blackopsterminalemulator.filesystem.Executable;
 
 /**
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class User
+public class ThreeArcCommand extends Executable
 {
-    private final String username;
-    private final String password;
-    private final HomeDirectory homeDirectory;
-    private final List<File> files;
-//    public final Mailbox mailbox;
-    
-    public User(String username, String password,
-            HomeDirectory homeDirectory, List<File> files)
+    public ThreeArcCommand()
     {
-        this.username = username;
-        this.password = password;
-        this.homeDirectory = homeDirectory;
-        this.files = new ArrayList<>(files);
+        super("3arc");
+        isHidden = true;
     }
     
-    public String getUsername()
+    @Override
+    public void exec(String[] args)
     {
-        return username;
-    }
-    
-    public String getPassword()
-    {
-        return password;
-    }
-    
-    public HomeDirectory getHomeDirectory()
-    {
-        return homeDirectory;
+        if (args.length == 0) {
+            return;
+        }
+        
+        if (args[0].equals("intel") || args[0].equals("unlock")) {
+            Terminal.println("Cheat Enabled!");
+        }
     }
 }

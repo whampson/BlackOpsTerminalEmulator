@@ -22,70 +22,53 @@
  * THE SOFTWARE.
  */
 
-package thehambone.blackopsterminalemulator;
+package thehambone.blackopsterminalemulator.filesystem.command;
+
+import thehambone.blackopsterminalemulator.LoginShell;
+import thehambone.blackopsterminalemulator.Server;
+import thehambone.blackopsterminalemulator.Stack;
+import thehambone.blackopsterminalemulator.Terminal;
+import thehambone.blackopsterminalemulator.filesystem.Executable;
 
 /**
- * Created on Nov 28, 2015.
+ * Created on Nov 29, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
- * @param <T>
  */
-public final class Stack<T>
+public class RloginCommand extends Executable
 {
-    private final T[] stack;
-    
-    private int pointer;
-    
-    @SuppressWarnings("unchecked")
-    public Stack(int capacity)
+    public RloginCommand()
     {
-        if (capacity < 1) {
-            throw new IllegalArgumentException(
-                    "capacity must be a postive integer");
-        }
-        stack = (T[])new Object[capacity];
-        pointer = -1;
+        super("rlogin");
     }
     
-    public boolean isEmpty()
+    @Override
+    public void exec(String[] args)
     {
-        return pointer < 0;
-    }
-    
-    public boolean isFull()
-    {
-        return pointer >= stack.length - 1;
-    }
-    
-    public int getItemCount()
-    {
-        return pointer + 1;
-    }
-    
-    public T peek()
-    {
-        if (isEmpty()) {
-            throw new StackException("stack is empty");
+        if (args.length == 0) {
+            Terminal.println("Error:  Invalid Input - expected machine name");
+            return;
         }
         
-        return stack[pointer];
-    }
-    
-    public void push(T item)
-    {
-        if (isFull()) {
-            throw new StackException("stack is full");
+        Stack<LoginShell> stack = Terminal.getLoginShellStack();
+        
+        if (stack.isFull()) {
+            Terminal.println("Error:  Too many logins - "
+                    + "Use exit to close open shells");
+            return;
         }
         
-        stack[++pointer] = item;
-    }
-    
-    public T pop()
-    {
-        if (isEmpty()) {
-            throw new StackException("stack is empty");
-        }
+        Server server = Server.getServer(args[0]);
         
-        return stack[pointer--];
+        if (server == null) {
+            Terminal.println("Error:  unknown system");
+            return;
+        }
+        LoginShell newShell = server.login();
+        
+        if (newShell != null) {
+            stack.push(newShell);
+            newShell.exec();
+        }
     }
 }

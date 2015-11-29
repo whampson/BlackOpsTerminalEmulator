@@ -25,67 +25,79 @@
 package thehambone.blackopsterminalemulator;
 
 /**
- * Created on Nov 28, 2015.
+ * Created on Nov 29, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
- * @param <T>
  */
-public final class Stack<T>
+public class Queue<T>
 {
-    private final T[] stack;
+    private final T[] queue;
     
-    private int pointer;
+    private int front;
+    private int rear;
+    private int itemCount;
     
     @SuppressWarnings("unchecked")
-    public Stack(int capacity)
+    public Queue(int capacity)
     {
         if (capacity < 1) {
             throw new IllegalArgumentException(
                     "capacity must be a postive integer");
         }
-        stack = (T[])new Object[capacity];
-        pointer = -1;
+        queue = (T[])new Object[capacity];
+        front = 0;
+        rear = -1;
+        itemCount = 0;
     }
     
     public boolean isEmpty()
     {
-        return pointer < 0;
+        return itemCount == 0;
     }
     
     public boolean isFull()
     {
-        return pointer >= stack.length - 1;
+        return itemCount == queue.length;
     }
     
     public int getItemCount()
     {
-        return pointer + 1;
+        return itemCount;
     }
     
     public T peek()
     {
         if (isEmpty()) {
-            throw new StackException("stack is empty");
+            throw new QueueException("queue is empty");
         }
         
-        return stack[pointer];
+        return queue[front];
     }
     
-    public void push(T item)
+    public void insert(T item)
     {
         if (isFull()) {
-            throw new StackException("stack is full");
+            throw new QueueException("queue is full");
         }
         
-        stack[++pointer] = item;
+        if (rear == queue.length - 1) {
+            rear = -1;
+        }
+        
+        queue[++rear] = item;
+        itemCount++;
     }
     
-    public T pop()
+    public T remove()
     {
         if (isEmpty()) {
-            throw new StackException("stack is empty");
+            throw new QueueException("queue is empty");
         }
         
-        return stack[pointer--];
+        if (front == queue.length) {
+            front = 0;
+        }
+        itemCount--;
+        return queue[front++];
     }
 }

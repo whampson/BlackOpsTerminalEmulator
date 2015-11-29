@@ -24,45 +24,30 @@
 
 package thehambone.blackopsterminalemulator;
 
-import java.util.ArrayList;
-import java.util.List;
-import thehambone.blackopsterminalemulator.filesystem.File;
-import thehambone.blackopsterminalemulator.filesystem.HomeDirectory;
-
 /**
- * Created on Nov 28, 2015.
+ * Created on Nov 29, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class User
+public class QueueException extends RuntimeException
 {
-    private final String username;
-    private final String password;
-    private final HomeDirectory homeDirectory;
-    private final List<File> files;
-//    public final Mailbox mailbox;
-    
-    public User(String username, String password,
-            HomeDirectory homeDirectory, List<File> files)
+    public QueueException()
     {
-        this.username = username;
-        this.password = password;
-        this.homeDirectory = homeDirectory;
-        this.files = new ArrayList<>(files);
+        super();
     }
     
-    public String getUsername()
+    public QueueException(String message)
     {
-        return username;
+        super(message);
     }
     
-    public String getPassword()
+    public QueueException(Throwable cause)
     {
-        return password;
+        super(cause);
     }
     
-    public HomeDirectory getHomeDirectory()
+    public QueueException(String message, Throwable cause)
     {
-        return homeDirectory;
+        super(message, cause);
     }
 }

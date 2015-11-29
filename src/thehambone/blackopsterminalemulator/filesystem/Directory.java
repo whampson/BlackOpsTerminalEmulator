@@ -119,12 +119,12 @@ public class Directory implements FileSystemObject
     @Override
     public String getPath()
     {
-        FileSystemObject par = this;
+        FileSystemObject obj = this;
         String path = "";
         
-        while (par != null) {
-            path = par.getName() + FILE_SEPARATOR_CHAR + path;
-            par = par.getParent();
+        while (obj != null) {
+            path = obj.getName() + FILE_SEPARATOR_CHAR + path;
+            obj = obj.getParent();
         }
         
         return path;
