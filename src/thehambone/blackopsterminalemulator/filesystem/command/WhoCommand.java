@@ -28,18 +28,18 @@ import java.util.List;
 import thehambone.blackopsterminalemulator.Server;
 import thehambone.blackopsterminalemulator.Terminal;
 import thehambone.blackopsterminalemulator.User;
-import thehambone.blackopsterminalemulator.filesystem.Executable;
+import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
 /**
  * Created on Nov 29, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class WhoCommand extends Executable
+public class WhoCommand extends ExecutableFile
 {
     public WhoCommand()
     {
-        super("who");
+        super(114, "who");
     }
     
     @Override
@@ -50,7 +50,9 @@ public class WhoCommand extends Executable
         List<User> users = server.getUsers();
         
         for (User u : users) {
-            Terminal.println(u.getUsername());
+            if (!u.getHomeDirectory().isUnlisted()) {
+                Terminal.println(u.getUsername());
+            }
         }
     }
 }

@@ -32,7 +32,7 @@ import thehambone.blackopsterminalemulator.LoginShell;
 import thehambone.blackopsterminalemulator.ScreenBuffer;
 import thehambone.blackopsterminalemulator.Terminal;
 import thehambone.blackopsterminalemulator.filesystem.Directory;
-import thehambone.blackopsterminalemulator.filesystem.Executable;
+import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 import thehambone.blackopsterminalemulator.filesystem.File;
 import thehambone.blackopsterminalemulator.filesystem.FileSystemObject;
 
@@ -41,11 +41,11 @@ import thehambone.blackopsterminalemulator.filesystem.FileSystemObject;
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class DirCommand extends Executable
+public class DirCommand extends ExecutableFile
 {
     public DirCommand()
     {
-        super("dir");
+        super(104, "dir");
     }
     
     private double roundHalfDown(double d)

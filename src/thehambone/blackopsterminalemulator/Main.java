@@ -32,7 +32,12 @@ import thehambone.blackopsterminalemulator.filesystem.FileSystem;
 import thehambone.blackopsterminalemulator.filesystem.HomeDirectory;
 import thehambone.blackopsterminalemulator.filesystem.command.CdCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.DirCommand;
-import thehambone.blackopsterminalemulator.filesystem.Executable;
+import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
+import thehambone.blackopsterminalemulator.filesystem.ImageFile;
+import thehambone.blackopsterminalemulator.filesystem.PrintableFile;
+import thehambone.blackopsterminalemulator.filesystem.SoundFile;
+import thehambone.blackopsterminalemulator.filesystem.TextFile;
+import thehambone.blackopsterminalemulator.filesystem.command.CatCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.ClearCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.DOACommand;
 import thehambone.blackopsterminalemulator.filesystem.command.ExitCommand;
@@ -68,11 +73,13 @@ public class Main
     public static void main(String[] args)
     {
         // TODO: caps lock, arrow keys, cd command arg parsing, documentation,
-        // "more" should not do anything if newline typed once
+        // logging
         
         String title = PROGRAM_TITLE + " - " + PROGRAM_VERSION;
         Terminal.setTitle(title);
         
+        // TEMPORARY CODE FOR TESTING
+        // ALL CONTENT WILL BE DEFINED EXTERNALLY
         String ciaLoginMessage = "Central Intelligence Agency Data system\n\n"
                 + "Unauthorized use of this system is against the law.\n\n"
                 + "Security Privileges Required";
@@ -83,34 +90,41 @@ public class Main
                 + "USER:amason\n"
                 + "PASSWORD:********\n");
         
-        Directory root = new Directory("");
-        Directory bin = new Directory("bin");
-        Directory home = new Directory("home");
-        HomeDirectory amason = new HomeDirectory("amason");
-        HomeDirectory asmith = new HomeDirectory("asmith");
+        Directory root = new Directory(1, "");
+        Directory bin = new Directory(2, "bin");
+        Directory home = new Directory(3, "home");
+        HomeDirectory amason = new HomeDirectory(4, "amason");
+        HomeDirectory asmith = new HomeDirectory(5, "asmith");
+        HomeDirectory hkissinger = new HomeDirectory(6, "hkissinger", true);
+        HomeDirectory jhudson = new HomeDirectory(7, "jhudson");
+        HomeDirectory vbush = new HomeDirectory(33, "vbush");
         
         root.addChild(bin);
         root.addChild(home);
         home.addChild(amason);
         home.addChild(asmith);
+        home.addChild(hkissinger);
+        home.addChild(jhudson);
+        home.addChild(vbush);
         
-        Executable cd = new CdCommand();
-        Executable help = new HelpCommand();
-        Executable dir = new DirCommand();
-        Executable login = new LoginCommand();
-        Executable exit = new ExitCommand();
-        Executable clear = new ClearCommand();
-        Executable foobar = new FoobarCommand();
-        Executable hello = new HelloCommand();
-        Executable doa = new DOACommand();
-        Executable threearc = new ThreeArcCommand();
-        Executable zork = new ZorkCommand();
-        Executable more = new MoreCommand();
-        Executable who = new WhoCommand();
-        Executable rlogin = new RloginCommand();
-        File ls = new File("ls");
+        ExecutableFile cd = new CdCommand();
+        ExecutableFile help = new HelpCommand();
+        ExecutableFile dir = new DirCommand();
+        ExecutableFile login = new LoginCommand();
+        ExecutableFile exit = new ExitCommand();
+        ExecutableFile clear = new ClearCommand();
+        ExecutableFile foobar = new FoobarCommand();
+        ExecutableFile hello = new HelloCommand();
+        ExecutableFile doa = new DOACommand();
+        ExecutableFile threearc = new ThreeArcCommand();
+        ExecutableFile zork = new ZorkCommand();
+        ExecutableFile more = new MoreCommand();
+        ExecutableFile who = new WhoCommand();
+        ExecutableFile rlogin = new RloginCommand();
+        ExecutableFile cat = new CatCommand();
+        File ls = new File(8, "ls");
         ls.markAsAlias(dir);
-        File cls = new File("cls");
+        File cls = new File(9, "cls");
         cls.markAsAlias(clear);
         bin.addChild(cd);
         bin.addChild(help);
@@ -128,32 +142,61 @@ public class Main
         bin.addChild(more);
         bin.addChild(who);
         bin.addChild(rlogin);
+        bin.addChild(cat);
         
-        File motd = new File("_motd.txt", true);
+        File motd = new File(19, "_motd.txt", true);
+        PrintableFile battleberlin = new TextFile(11, "BattleBerlin.txt", "res/files/bb77b895.txt");
+        PrintableFile gknovamemo = new TextFile(11, "GK-NovaMemo.txt", "res/files/c5be8bb9.txt");
+        PrintableFile thewolf = new ImageFile(20, "thewolf.pic", "res/files/reznov1.png");
+        PrintableFile barhavana = new ImageFile(20, "barhavana.pic", "res/files/sp_bop1.png");
+        PrintableFile anvil = new SoundFile(21, "anvil.snd", "res/files/mus_anvil_trippy.wav");
+        PrintableFile reznov = new SoundFile(23, "reznov.snd", "res/files/mus_rapture_intro_radio.wav");
+        PrintableFile doa1 = new ImageFile(34, "doa1.pic", "res/files/doa1.png");
+        PrintableFile doa2 = new ImageFile(34, "doa2.pic", "res/files/doa2.png");
+        PrintableFile doa3 = new ImageFile(34, "doa3.pic", "res/files/doa3.png");
+        File masonbio = new File(12, "MasonBio.txt");
         root.addChild(motd);
-        
-        Directory root2 = new Directory("");
-        Directory home2 = new Directory("home");
-        HomeDirectory vbush = new HomeDirectory("vbush");
+        asmith.addChild(battleberlin);
+        asmith.addChild(masonbio);
+        amason.addChild(battleberlin);
+        amason.addChild(thewolf);
+        amason.addChild(anvil);
+        amason.addChild(reznov);
+        amason.addChild(barhavana);
+        jhudson.addChild(gknovamemo);
+        amason.addChild(gknovamemo);
+        vbush.addChild(doa1);
+        vbush.addChild(doa2);
+        vbush.addChild(doa3);
+
+        Directory root2 = new Directory(13, "");
+        Directory home2 = new Directory(14, "home");
+        HomeDirectory vbush2 = new HomeDirectory(15, "vbush");
         
         root2.addChild(bin);
         root2.addChild(home2);
-        home2.addChild(vbush);
+        home2.addChild(vbush2);
         
         FileSystem ciaFileSystem = new FileSystem(root);
         FileSystem dreamlandFileSystem = new FileSystem(root2);
         
-        List<File> files = new ArrayList<>();
         List<User> ciaUsers = new ArrayList<>();
         List<User> dreamlandUsers = new ArrayList<>();
-        User userAmason = new User("amason", "password", amason, files);
-        ciaUsers.add(new User("asmith", "roxy", asmith, files));
+        User userAmason = new User("amason", "password", amason);
+        ciaUsers.add(new User("vbush", "manhattan", vbush));
+        ciaUsers.add(new User("jhudson", "bryant1950", jhudson));
+        ciaUsers.add(new User("hkissinger", "", hkissinger));
+        ciaUsers.add(new User("asmith", "roxy", asmith));
         ciaUsers.add(userAmason);
-        dreamlandUsers.add(new User("vbush", "majestic1", vbush, files));
-        Server cia = new Server("cia", ciaLoginMessage, ciaUsers, files, ciaFileSystem, bin);
-        Server dreamland = new Server("dreamland", dreamlandLoginMessage, dreamlandUsers, files, dreamlandFileSystem, bin);
+        dreamlandUsers.add(new User("vbush", "majestic1", vbush2));
+        Server cia = new Server("CIA", ciaLoginMessage, ciaUsers, ciaFileSystem, bin);
+        Server dreamland = new Server("Dreamland", dreamlandLoginMessage, dreamlandUsers, dreamlandFileSystem, bin);
+        Server dod = new Server("DoD", "", new ArrayList<User>(), null, bin);
+        Server derriese = new Server("DerRiese", "", new ArrayList<User>(), null, bin);
         Server.addServer(cia);
         Server.addServer(dreamland);
+        Server.addServer(dod);
+        Server.addServer(derriese);
         Terminal.show();
         
         LoginShell loginShell = new LoginShell(cia, userAmason);

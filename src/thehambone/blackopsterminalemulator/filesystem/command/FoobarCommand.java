@@ -25,18 +25,18 @@
 package thehambone.blackopsterminalemulator.filesystem.command;
 
 import thehambone.blackopsterminalemulator.Terminal;
-import thehambone.blackopsterminalemulator.filesystem.Executable;
+import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
 /**
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class FoobarCommand extends Executable
+public class FoobarCommand extends ExecutableFile
 {
     public FoobarCommand()
     {
-        super("foobar");
+        super(106, "foobar");
     }
     
     @Override

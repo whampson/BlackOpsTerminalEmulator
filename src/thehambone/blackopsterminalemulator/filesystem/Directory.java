@@ -35,15 +35,23 @@ import java.util.List;
  */
 public class Directory implements FileSystemObject
 {
+    private final int id;
     private final String name;
     private final List<FileSystemObject> children;
     
     private FileSystemObject parent;
     
-    public Directory(String name)
+    public Directory(int id, String name)
     {
+        this.id = id;
         this.name = name;
         children = new ArrayList<>();
+    }
+    
+    @Override
+    public int getID()
+    {
+        return id;
     }
     
     @Override
@@ -89,14 +97,14 @@ public class Directory implements FileSystemObject
             if (child == null) {
                 continue;
             }
-            if (child.getName().equals(name)) {
+            if (child.getName().equalsIgnoreCase(name)) {
                 return child;
             }
             if (!child.hasChildren()) {
                 continue;
             }
             child = child.getChild(name);
-            if (child != null && child.getName().equals(name)) {
+            if (child != null && child.getName().equalsIgnoreCase(name)) {
                 return child;
             }
         }

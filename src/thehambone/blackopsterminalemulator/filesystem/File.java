@@ -34,19 +34,21 @@ import java.util.List;
  */
 public class File implements FileSystemObject
 {
-    protected final String name;
+    private final int id;
+    private final String name;
     
-    protected FileSystemObject parent;
-    protected boolean isHidden;
-    protected File aliasTarget;
+    private FileSystemObject parent;
+    private boolean isHidden;
+    private File aliasTarget;
     
-    public File(String name)
+    public File(int id, String name)
     {
-        this(name, false);
+        this(id, name, false);
     }
     
-    public File(String name, boolean isHidden)
+    public File(int id, String name, boolean isHidden)
     {
+        this.id = id;
         this.name = name;
         this.isHidden = isHidden;
         aliasTarget = null;
@@ -75,6 +77,12 @@ public class File implements FileSystemObject
     public File getAliasTarget()
     {
         return aliasTarget;
+    }
+    
+    @Override
+    public int getID()
+    {
+        return id;
     }
     
     @Override

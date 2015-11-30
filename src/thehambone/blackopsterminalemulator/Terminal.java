@@ -28,12 +28,15 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
@@ -67,15 +70,16 @@ public final class Terminal
     
     private static final Object INPUT_LOCK = new Object();
     
-    private static char[] inputBuffer = new char[INPUT_BUFFER_LENGTH];
-    
     private static volatile char charTyped = 0;
     
-    private static final Stack<LoginShell> SHELL_STACK = new Stack<>(15); // check capacity
+    private static final Stack<LoginShell> SHELL_STACK = new Stack<>(15);
+    
+    private static final Queue<String> PREVIOUS_INPUT_QUEUE = new Queue<>(8);
+    
+    private static final char VK_UP_CHAR = '\uFFFE';
+    private static final char VK_DOWN_CHAR = '\uFFFF';
     
     private static String motd = "";
-    
-    private static String lastLineTyped = "";
     
     static
     {
@@ -135,8 +139,32 @@ public final class Terminal
      */
     public static void print(String s)
     {
-        for (int i = 0; i < s.length(); i++) {            
-            SCREEN.print(s.charAt(i));
+        char c;
+        int lineIndex = 0;
+        int linesPrinted = 0;
+        
+        for (int i = 0; i < s.length(); i++) {
+            c = s.charAt(i);
+            SCREEN.print(c);
+            lineIndex++;
+            
+            if (lineIndex > (COLUMNS - 1)
+                    || c == '\n') {
+                linesPrinted++;
+                lineIndex = 0;
+            }
+            
+            if (linesPrinted == 22) {
+                String morePrompt = "--MORE--";
+                for (int j = 0; j < morePrompt.length(); j++) {
+                    SCREEN.print(morePrompt.charAt(j));
+                }
+                getChar(false);
+                for (int j = 0; j < morePrompt.length(); j++) {
+                    SCREEN.print('\b');
+                }
+                linesPrinted = 0;
+            }
             
             // Sleep 1ms to simulate output on a terminal with a low baud rate
             try {
@@ -246,19 +274,89 @@ public final class Terminal
     public static String readLine(char charToPrint)
     {
         char c;
+        char[] buf;
         int pointer;
         boolean printDifferentChar;
         boolean isReadingInput;
+        String input;
+        int previousInputIndex = 0;
+        Iterator<String> it;
         
         pointer = 0;
         printDifferentChar = charToPrint != 0;
         isReadingInput = true;
-        inputBuffer = new char[INPUT_BUFFER_LENGTH];
+        buf = new char[INPUT_BUFFER_LENGTH];
         
         // Loop until <enter> is pressed
         do {
             // Get character
             c = getChar(false);
+            
+            // Handle arrow keys
+            // TODO: ugly code, clean upls
+            if (c == VK_UP_CHAR) {
+                if (previousInputIndex + 1 > PREVIOUS_INPUT_QUEUE.getItemCount()) {
+                    continue;
+                }
+                previousInputIndex++;
+                System.out.println(previousInputIndex);
+                it = PREVIOUS_INPUT_QUEUE.iterator();
+                String previousInput = null;
+                int i = 0;
+                while (it.hasNext() && i < PREVIOUS_INPUT_QUEUE.getItemCount() + 1 - previousInputIndex) {
+                    previousInput = it.next();
+                    i++;
+                }
+                for (i = 0; i < buf.length; i++) {
+                    if (buf[i] == 0) {
+                        break;
+                    }
+                    print('\b');
+                }
+                buf = new char[INPUT_BUFFER_LENGTH];
+                pointer = 0;
+                for (i = 0; i < previousInput.length(); i++) {
+                    buf[i] = previousInput.charAt(i);
+                    pointer++;
+                }
+                print(previousInput);
+                continue;
+            } else if (c == VK_DOWN_CHAR) {
+                if (previousInputIndex - 1 < 0) {
+                    continue;
+                }
+                previousInputIndex--;
+                boolean wrapAround = false;
+                if (previousInputIndex == 0) {
+                    previousInputIndex = PREVIOUS_INPUT_QUEUE.getItemCount();
+                    wrapAround = true;
+                }
+                System.out.println(previousInputIndex);
+                it = PREVIOUS_INPUT_QUEUE.iterator();
+                String previousInput = null;
+                int i = 0;
+                while (it.hasNext() && i < PREVIOUS_INPUT_QUEUE.getItemCount() + 1 - previousInputIndex) {
+                    previousInput = it.next();
+                    i++;
+                }
+                pointer = 0;
+                for (i = 0; i < buf.length; i++) {
+                    if (buf[i] == 0) {
+                        break;
+                    }
+                    print('\b');
+                }
+                buf = new char[INPUT_BUFFER_LENGTH];
+                for (i = 0; i < previousInput.length(); i++) {
+                    buf[i] = previousInput.charAt(i);
+                    pointer++;
+                }
+                print(previousInput);
+                if (wrapAround) {
+                    previousInputIndex = 0;
+                }
+                continue;
+            }
             
             // Print character
             if (!printDifferentChar) {
@@ -273,21 +371,26 @@ public final class Terminal
                     break;
                 case '\b':  // Backspace
                     if (pointer > 0) {
-                        inputBuffer[--pointer] = 0;
+                        buf[--pointer] = 0;
                         print('\b');
                     }
                     break;
                 default:
-                    if (pointer < inputBuffer.length) {
-                        inputBuffer[pointer++] = c;
+                    if (pointer < buf.length) {
+                        buf[pointer++] = c;
                         print(charToPrint);
                     }
             }
         } while (isReadingInput);
         
-        lastLineTyped = new String(inputBuffer).trim();  // Trim to remove extra null characters
+        input = new String(buf).trim();  // Trim to remove extra null characters
         
-        return lastLineTyped;
+        if (PREVIOUS_INPUT_QUEUE.isFull()) {
+            PREVIOUS_INPUT_QUEUE.remove();
+        }
+        PREVIOUS_INPUT_QUEUE.insert(input);
+        
+        return input;
     }
     
     /**
@@ -447,29 +550,8 @@ public final class Terminal
         registerKey('\n', KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK);
         registerKey(' ', KeyEvent.VK_SPACE, 0);
         registerKey(' ', KeyEvent.VK_SPACE, KeyEvent.SHIFT_DOWN_MASK);
-        
-        registerUpArrow();
-    }
-    
-    private static void registerUpArrow()
-    {
-        AbstractAction keyAction = new AbstractAction()
-        {
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                synchronized (INPUT_LOCK) {
-                    inputBuffer = new char[INPUT_BUFFER_LENGTH];
-                    for (int i = 0; i < lastLineTyped.length(); i++) {
-                        inputBuffer[i] = lastLineTyped.charAt(i);
-                    }
-                    print(lastLineTyped);
-                }
-            }
-        };
-        
-        INPUT_MAP.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "up");
-        ACTION_MAP.put("up", keyAction);
+        registerKey(VK_UP_CHAR, KeyEvent.VK_UP, 0);
+        registerKey(VK_DOWN_CHAR, KeyEvent.VK_DOWN, 0);
     }
     
     /*

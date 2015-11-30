@@ -1,7 +1,0 @@
-Central Intelligence Agency Data system
-
-Unauthorized use of this system is against the law.
-
-Security Privileges Required
-USER:amason
-PASSWORD:********

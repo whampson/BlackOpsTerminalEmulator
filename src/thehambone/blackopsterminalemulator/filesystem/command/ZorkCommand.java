@@ -24,23 +24,24 @@
 
 package thehambone.blackopsterminalemulator.filesystem.command;
 
-import thehambone.blackopsterminalemulator.filesystem.Executable;
+import thehambone.blackopsterminalemulator.Terminal;
+import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
 /**
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class ZorkCommand extends Executable
+public class ZorkCommand extends ExecutableFile
 {
     public ZorkCommand()
     {
-        super("zork");
+        super(115, "zork");
     }
     
     @Override
     public void exec(String[] args)
     {
-        // nop
+        Terminal.println("*** Launches Zork I: The Great Underground Empire ***");
     }
 }

@@ -25,18 +25,18 @@
 package thehambone.blackopsterminalemulator.filesystem.command;
 
 import thehambone.blackopsterminalemulator.Terminal;
-import thehambone.blackopsterminalemulator.filesystem.Executable;
+import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
 /**
  * Created on Nov 29, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class MoreCommand extends Executable
+public class MoreCommand extends ExecutableFile
 {
     public MoreCommand()
     {
-        super("more");
+        super(111, "more");
     }
     
     @Override

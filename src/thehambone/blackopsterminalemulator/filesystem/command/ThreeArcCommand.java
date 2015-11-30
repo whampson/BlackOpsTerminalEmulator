@@ -25,19 +25,19 @@
 package thehambone.blackopsterminalemulator.filesystem.command;
 
 import thehambone.blackopsterminalemulator.Terminal;
-import thehambone.blackopsterminalemulator.filesystem.Executable;
+import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
 /**
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class ThreeArcCommand extends Executable
+public class ThreeArcCommand extends ExecutableFile
 {
     public ThreeArcCommand()
     {
-        super("3arc");
-        isHidden = true;
+        super(113, "3arc");
+//        isHidden = true;
     }
     
     @Override

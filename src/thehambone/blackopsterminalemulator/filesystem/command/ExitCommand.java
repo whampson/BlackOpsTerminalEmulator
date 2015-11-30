@@ -28,19 +28,19 @@ import thehambone.blackopsterminalemulator.LoginShell;
 import thehambone.blackopsterminalemulator.Shell;
 import thehambone.blackopsterminalemulator.Stack;
 import thehambone.blackopsterminalemulator.Terminal;
-import thehambone.blackopsterminalemulator.filesystem.Executable;
+import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
 /**
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class ExitCommand extends Executable
+public class ExitCommand extends ExecutableFile
 {
     public ExitCommand()
     {
-        super("exit");
-        isHidden = true;
+        super(105, "exit");
+//        isHidden = true;
     }
     
     @Override

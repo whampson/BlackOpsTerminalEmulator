@@ -25,7 +25,7 @@
 package thehambone.blackopsterminalemulator;
 
 import thehambone.blackopsterminalemulator.filesystem.Directory;
-import thehambone.blackopsterminalemulator.filesystem.Executable;
+import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 import thehambone.blackopsterminalemulator.filesystem.File;
 import thehambone.blackopsterminalemulator.filesystem.FileSystemObject;
 
@@ -78,7 +78,7 @@ public class LoginShell extends Shell
         String input;
         String commandName;
         String[] args;
-        Executable executable;
+        ExecutableFile executable;
         FileSystemObject fso;
         
         Directory commandDir = server.getCommandDirectory();
@@ -107,12 +107,12 @@ public class LoginShell extends Shell
             fso = commandDir.getChild(commandName);
             if (fso instanceof File) {
                 File f = (File)fso;
-                if (f.isAlias() && f.getAliasTarget() instanceof Executable) {
-                    executable = (Executable)f.getAliasTarget();
+                if (f.isAlias() && f.getAliasTarget() instanceof ExecutableFile) {
+                    executable = (ExecutableFile)f.getAliasTarget();
                 }
             }
-            if (fso instanceof Executable) {
-                executable = (Executable)fso;
+            if (fso instanceof ExecutableFile) {
+                executable = (ExecutableFile)fso;
             }
             
             if (executable == null) {

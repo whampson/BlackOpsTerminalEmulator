@@ -39,16 +39,13 @@ public class User
     private final String username;
     private final String password;
     private final HomeDirectory homeDirectory;
-    private final List<File> files;
 //    public final Mailbox mailbox;
     
-    public User(String username, String password,
-            HomeDirectory homeDirectory, List<File> files)
+    public User(String username, String password, HomeDirectory homeDirectory)
     {
         this.username = username;
         this.password = password;
         this.homeDirectory = homeDirectory;
-        this.files = new ArrayList<>(files);
     }
     
     public String getUsername()

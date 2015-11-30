@@ -35,6 +35,8 @@ public interface FileSystemObject extends Comparable<FileSystemObject>
 {
     public static final char FILE_SEPARATOR_CHAR = '/';
     
+    public int getID();
+    
     public boolean hasParent();
     
     public FileSystemObject getParent();

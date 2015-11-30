@@ -24,23 +24,24 @@
 
 package thehambone.blackopsterminalemulator.filesystem.command;
 
-import thehambone.blackopsterminalemulator.filesystem.Executable;
+import thehambone.blackopsterminalemulator.Terminal;
+import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
 /**
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class DOACommand extends Executable
+public class DOACommand extends ExecutableFile
 {
     public DOACommand()
     {
-        super("doa");
+        super(103, "doa");
     }
 
     @Override
     public void exec(String[] args)
     {
-        // nop
+        Terminal.println("*** Launches Dead Ops Arcade ***");
     }
 }

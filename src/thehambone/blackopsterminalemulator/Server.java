@@ -50,7 +50,7 @@ public class Server
         Server server = null;
         
         for (Server s : SERVERS) {
-            if (s.getName().equals(name)) {
+            if (s.getName().equalsIgnoreCase(name)) {
                 server = s;
                 break;
             }
@@ -67,8 +67,7 @@ public class Server
     private final Directory commandDirectory;
     
     public Server(String name, String loginMessage,
-            List<User> users, List<File> files, FileSystem fileSystem,
-            Directory commandDirectory)
+            List<User> users, FileSystem fileSystem, Directory commandDirectory)
     {
         this.name = name;
         this.loginMessage = loginMessage;
@@ -103,7 +102,7 @@ public class Server
         User user = null;
         
         for (User u : users) {
-            if (u.getUsername().equals(username)) {
+            if (u.getUsername().equalsIgnoreCase(username)) {
                 user = u;
                 break;
             }
@@ -119,7 +118,9 @@ public class Server
     
     public LoginShell login()
     {
-        Terminal.println(getLoginMessage());
+        if (!loginMessage.isEmpty()) {
+            Terminal.println(getLoginMessage());
+        }
         
         Terminal.print("USER:");
         String username = Terminal.readLine();
@@ -128,7 +129,8 @@ public class Server
         
         LoginShell shell = null;
         User user = getUser(username);
-        if (user == null || !user.getPassword().equals(password)) {
+        if (user == null || !user.getPassword().equalsIgnoreCase(password)
+                || user.getHomeDirectory().isUnlisted()) {
             Terminal.println("Invalid Password");
         } else {
             shell = new LoginShell(this, user);

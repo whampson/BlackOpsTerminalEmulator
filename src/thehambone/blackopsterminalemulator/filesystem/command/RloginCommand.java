@@ -28,18 +28,18 @@ import thehambone.blackopsterminalemulator.LoginShell;
 import thehambone.blackopsterminalemulator.Server;
 import thehambone.blackopsterminalemulator.Stack;
 import thehambone.blackopsterminalemulator.Terminal;
-import thehambone.blackopsterminalemulator.filesystem.Executable;
+import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
 /**
  * Created on Nov 29, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class RloginCommand extends Executable
+public class RloginCommand extends ExecutableFile
 {
     public RloginCommand()
     {
-        super("rlogin");
+        super(112, "rlogin");
     }
     
     @Override

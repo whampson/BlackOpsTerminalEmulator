@@ -28,37 +28,24 @@ import thehambone.blackopsterminalemulator.LoginShell;
 import thehambone.blackopsterminalemulator.Server;
 import thehambone.blackopsterminalemulator.Stack;
 import thehambone.blackopsterminalemulator.Terminal;
-import thehambone.blackopsterminalemulator.filesystem.Executable;
+import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
 /**
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class LoginCommand extends Executable
+public class LoginCommand extends ExecutableFile
 {
     public LoginCommand()
     {
-        super("login");
+        super(109, "login");
     }
     
     @Override
     public void exec(String[] args)
     {
-        Stack<LoginShell> stack = Terminal.getLoginShellStack();
-        
-        if (stack.isFull()) {
-            Terminal.println("Error:  Too many logins - "
-                    + "Use exit to close open shells");
-            return;
-        }
-        
         Server server = Terminal.getActiveLoginShell().getServer();
-        LoginShell newShell = server.login();
-        
-        if (newShell != null) {
-            stack.push(newShell);
-            newShell.exec();
-        }
+        new RloginCommand().exec(new String[] {server.getName()});
     }
 }

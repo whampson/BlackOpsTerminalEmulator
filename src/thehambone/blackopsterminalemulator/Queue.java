@@ -24,12 +24,14 @@
 
 package thehambone.blackopsterminalemulator;
 
+import java.util.Iterator;
+
 /**
  * Created on Nov 29, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class Queue<T>
+public class Queue<T> implements Iterable<T>
 {
     private final T[] queue;
     
@@ -99,5 +101,32 @@ public class Queue<T>
         }
         itemCount--;
         return queue[front++];
+    }
+    
+    @Override
+    public Iterator<T> iterator()
+    {
+        return new Iterator<T>()
+        {
+            int itemsIterated = 0;
+            
+            int index = front;
+            
+            @Override
+            public boolean hasNext()
+            {
+                return itemsIterated != itemCount;
+            }
+
+            @Override
+            public T next()
+            {
+                if (index == queue.length) {
+                    index = 0;
+                }
+                itemsIterated++;
+                return queue[index++];
+            }
+        };
     }
 }

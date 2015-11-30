@@ -31,8 +31,27 @@ package thehambone.blackopsterminalemulator.filesystem;
  */
 public class HomeDirectory extends Directory
 {
-    public HomeDirectory(String name)
+    private boolean isUnlisted;
+    
+    public HomeDirectory(int id, String name)
     {
-        super(name);
+        this(id, name, false);
+    }
+    
+    public HomeDirectory(int id, String name, boolean isUnlisted)
+    {
+        super(id, name);
+        
+        this.isUnlisted = isUnlisted;
+    }
+    
+    public boolean isUnlisted()
+    {
+        return isUnlisted;
+    }
+    
+    public void setUnlisted(boolean isUnlisted)
+    {
+        this.isUnlisted = isUnlisted;
     }
 }
