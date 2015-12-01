@@ -73,7 +73,7 @@ public class Main
     public static void main(String[] args)
     {
         // TODO: caps lock, arrow keys, cd command arg parsing, documentation,
-        // logging
+        // logging; newlines to end of java files
         
         String title = PROGRAM_TITLE + " - " + PROGRAM_VERSION;
         Terminal.setTitle(title);

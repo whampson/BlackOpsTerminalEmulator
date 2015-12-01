@@ -24,9 +24,6 @@
 
 package thehambone.blackopsterminalemulator;
 
-import java.util.ArrayList;
-import java.util.List;
-import thehambone.blackopsterminalemulator.filesystem.File;
 import thehambone.blackopsterminalemulator.filesystem.HomeDirectory;
 
 /**
