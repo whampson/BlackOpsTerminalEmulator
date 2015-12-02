@@ -24,9 +24,7 @@
 
 package thehambone.blackopsterminalemulator.filesystem.command;
 
-import thehambone.blackopsterminalemulator.LoginShell;
 import thehambone.blackopsterminalemulator.Shell;
-import thehambone.blackopsterminalemulator.Stack;
 import thehambone.blackopsterminalemulator.Terminal;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
@@ -46,13 +44,11 @@ public class ExitCommand extends ExecutableFile
     @Override
     public void exec(String[] args)
     {
-        Stack<LoginShell> stack = Terminal.getLoginShellStack();
-        
-        if (stack.getItemCount() == 1) {
+        if (Terminal.getLoginShellCount() == 1) {
             Terminal.printMOTD();
-            Terminal.print(stack.peek().getPrompt());
+            Terminal.print(Terminal.getActiveLoginShell().getPrompt());
         } else {
-            Shell s = stack.pop();
+            Shell s = Terminal.popLoginShell();
             s.terminate();
         }
     }

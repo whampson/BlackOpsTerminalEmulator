@@ -72,8 +72,8 @@ public class Main
      */
     public static void main(String[] args)
     {
-        // TODO: caps lock, arrow keys, cd command arg parsing, documentation,
-        // logging; newlines to end of java files
+        // TODO: arrow keys, cd command arg parsing, documentation,
+        // logging
         
         String title = PROGRAM_TITLE + " - " + PROGRAM_VERSION;
         Terminal.setTitle(title);
@@ -200,7 +200,7 @@ public class Main
         Terminal.show();
         
         LoginShell loginShell = new LoginShell(cia, userAmason);
-        Terminal.getLoginShellStack().push(loginShell);
+        Terminal.pushLoginShell(loginShell);
         loginShell.exec();
     }
 }

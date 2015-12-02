@@ -25,6 +25,7 @@
 package thehambone.blackopsterminalemulator;
 
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -35,8 +36,6 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
@@ -50,56 +49,78 @@ public final class Terminal
     public static final int COLUMNS = 80;
     public static final int LINES = 27;
     
-    private static final Font FONT = new Font("Courier New", 0, 13);
-    
-    private static final int CURSOR_BLINK_RATE = 300;
     private static final int INPUT_BUFFER_LENGTH = 81;
     
-    private static final Screen.ScreenColor BACKGROUND
-            = Screen.ScreenColor.BLACK;
-    private static final Screen.ScreenColor FOREGROUND
-            = Screen.ScreenColor.WHITE;
+    // These characters won't be used anywhere else, so why not?
+    private static final char INPUT_HISTORY_CYCLE_UP = '\uFFFE';
+    private static final char INPUT_HISTORY_CYCLE_DOWN = '\uFFFF';
     
-    private static final JFrame FRAME = new JFrame();
-    private static final Screen SCREEN 
-            = new Screen(COLUMNS, LINES, BACKGROUND,
-            FOREGROUND, FONT, CURSOR_BLINK_RATE);
+    private static final Terminal TERMINAL_INSTANCE = new Terminal();
     
-    private static final InputMap INPUT_MAP = new InputMap();
-    private static final ActionMap ACTION_MAP = new ActionMap();
+    private final Object inputLock;
+    private final JFrame frame;
+    private final Screen screen;
+    private final InputMap inputMap;
+    private final ActionMap actionMap;
+    private final Stack<LoginShell> activeShells;
+    private final Queue<String> inputHistory;
     
-    private static final Object INPUT_LOCK = new Object();
+    private volatile char charTyped;
     
-    private static volatile char charTyped = 0;
+    private String motd;
     
-    private static final Stack<LoginShell> SHELL_STACK = new Stack<>(15);
-    
-    private static final Queue<String> PREVIOUS_INPUT_QUEUE = new Queue<>(8);
-    
-    private static final char VK_UP_CHAR = '\uFFFE';
-    private static final char VK_DOWN_CHAR = '\uFFFF';
-    
-    private static String motd = "";
-    
-    static
+    // Don't allow this class to be instantiated outside of this class
+    private Terminal()
     {
-        registerKeys();
+        inputLock = new Object();
         
-        SCREEN.getComponent().setInputMap(JComponent.WHEN_FOCUSED, INPUT_MAP);
-        SCREEN.getComponent().setActionMap(ACTION_MAP);
+        frame = new JFrame();
+        
+        Screen.ScreenColor bg = Screen.ScreenColor.BLACK;
+        Screen.ScreenColor fg = Screen.ScreenColor.WHITE;
+        Font font = new Font("Courier New", Font.PLAIN, 13);
+        int cursorBlinkRate = 300;
+        screen = new Screen(COLUMNS, LINES, bg, fg, font, cursorBlinkRate);
+        
+        inputMap = new InputMap();
+        actionMap = new ActionMap();
+        screen.getComponent().setInputMap(JComponent.WHEN_FOCUSED, inputMap);
+        screen.getComponent().setActionMap(actionMap);
+        
+        activeShells = new Stack<>(15);
+        
+        inputHistory = new Queue<>(8);
+        
+        charTyped = 0;
+        
+        motd = "";
+        
+        registerKeys();
     }
     
-    // Don't allow this class to be instantiated
-    private Terminal() { }
+    public static boolean isLoginShellStackFull()
+    {
+        return TERMINAL_INSTANCE.activeShells.isFull();
+    }
+    
+    public static int getLoginShellCount()
+    {
+        return TERMINAL_INSTANCE.activeShells.getItemCount();
+    }
     
     public static LoginShell getActiveLoginShell()
     {
-        return SHELL_STACK.peek();
+        return TERMINAL_INSTANCE.activeShells.peek();
     }
     
-    public static Stack<LoginShell> getLoginShellStack()
+    public static void pushLoginShell(LoginShell shell)
     {
-        return SHELL_STACK;
+        TERMINAL_INSTANCE.activeShells.push(shell);
+    }
+    
+    public static LoginShell popLoginShell()
+    {
+        return TERMINAL_INSTANCE.activeShells.pop();
     }
     
     /**
@@ -109,17 +130,17 @@ public final class Terminal
      */
     public static void setTitle(String title)
     {
-        FRAME.setTitle(title);
+        TERMINAL_INSTANCE.frame.setTitle(title);
     }
     
     public static void setMOTD(String motd)
     {
-        Terminal.motd = motd;
+        TERMINAL_INSTANCE.motd = motd;
     }
     
     public static void printMOTD()
     {
-        println(motd);
+        println(TERMINAL_INSTANCE.motd);
     }
     
     /**
@@ -129,7 +150,7 @@ public final class Terminal
      */
     public static void print(char c)
     {
-        SCREEN.print(c);
+        TERMINAL_INSTANCE.screen.print(c);
     }
     
     /**
@@ -145,7 +166,7 @@ public final class Terminal
         
         for (int i = 0; i < s.length(); i++) {
             c = s.charAt(i);
-            SCREEN.print(c);
+            print(c);
             lineIndex++;
             
             if (lineIndex > (COLUMNS - 1)
@@ -157,11 +178,11 @@ public final class Terminal
             if (linesPrinted == 22) {
                 String morePrompt = "--MORE--";
                 for (int j = 0; j < morePrompt.length(); j++) {
-                    SCREEN.print(morePrompt.charAt(j));
+                    print(morePrompt.charAt(j));
                 }
                 getChar(false);
                 for (int j = 0; j < morePrompt.length(); j++) {
-                    SCREEN.print('\b');
+                    print('\b');
                 }
                 linesPrinted = 0;
             }
@@ -200,7 +221,7 @@ public final class Terminal
      */
     public static void println(BufferedImage img)
     {
-        SCREEN.printImage(img);
+        TERMINAL_INSTANCE.screen.printImage(img);
         println();
     }
     
@@ -229,23 +250,23 @@ public final class Terminal
     public static char getChar(boolean printChar)
     {
         // Reset typed char
-        charTyped = 0;
+        TERMINAL_INSTANCE.charTyped = 0;
         
         // Wait until a character is typed
-        synchronized (INPUT_LOCK) {
+        synchronized (TERMINAL_INSTANCE.inputLock) {
             try {
-                INPUT_LOCK.wait();
+                TERMINAL_INSTANCE.inputLock.wait();
             } catch (InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
         }
         
         // Print the character
-        if (printChar && charTyped != 0) {
-            print(charTyped);
+        if (printChar && TERMINAL_INSTANCE.charTyped != 0) {
+            print(TERMINAL_INSTANCE.charTyped);
         }
         
-        return charTyped;
+        return TERMINAL_INSTANCE.charTyped;
     }
     
     /**
@@ -275,90 +296,26 @@ public final class Terminal
     {
         char c;
         char[] buf;
-        int pointer;
+        int bufPointer;
         boolean printDifferentChar;
         boolean isReadingInput;
+        int historyIndex;
         String input;
-        int previousInputIndex = 0;
-        Iterator<String> it;
+        Queue<String> inputHistory;
         
-        pointer = 0;
+        buf = new char[INPUT_BUFFER_LENGTH];
+        bufPointer = 0;
         printDifferentChar = charToPrint != 0;
         isReadingInput = true;
-        buf = new char[INPUT_BUFFER_LENGTH];
+        historyIndex = 0;
+        inputHistory = TERMINAL_INSTANCE.inputHistory;
         
         // Loop until <enter> is pressed
         do {
             // Get character
             c = getChar(false);
             
-            // Handle arrow keys
-            // TODO: ugly code, clean upls
-            if (c == VK_UP_CHAR) {
-                if (previousInputIndex + 1 > PREVIOUS_INPUT_QUEUE.getItemCount()) {
-                    continue;
-                }
-                previousInputIndex++;
-                System.out.println(previousInputIndex);
-                it = PREVIOUS_INPUT_QUEUE.iterator();
-                String previousInput = null;
-                int i = 0;
-                while (it.hasNext() && i < PREVIOUS_INPUT_QUEUE.getItemCount() + 1 - previousInputIndex) {
-                    previousInput = it.next();
-                    i++;
-                }
-                for (i = 0; i < buf.length; i++) {
-                    if (buf[i] == 0) {
-                        break;
-                    }
-                    print('\b');
-                }
-                buf = new char[INPUT_BUFFER_LENGTH];
-                pointer = 0;
-                for (i = 0; i < previousInput.length(); i++) {
-                    buf[i] = previousInput.charAt(i);
-                    pointer++;
-                }
-                print(previousInput);
-                continue;
-            } else if (c == VK_DOWN_CHAR) {
-                if (previousInputIndex - 1 < 0) {
-                    continue;
-                }
-                previousInputIndex--;
-                boolean wrapAround = false;
-                if (previousInputIndex == 0) {
-                    previousInputIndex = PREVIOUS_INPUT_QUEUE.getItemCount();
-                    wrapAround = true;
-                }
-                System.out.println(previousInputIndex);
-                it = PREVIOUS_INPUT_QUEUE.iterator();
-                String previousInput = null;
-                int i = 0;
-                while (it.hasNext() && i < PREVIOUS_INPUT_QUEUE.getItemCount() + 1 - previousInputIndex) {
-                    previousInput = it.next();
-                    i++;
-                }
-                pointer = 0;
-                for (i = 0; i < buf.length; i++) {
-                    if (buf[i] == 0) {
-                        break;
-                    }
-                    print('\b');
-                }
-                buf = new char[INPUT_BUFFER_LENGTH];
-                for (i = 0; i < previousInput.length(); i++) {
-                    buf[i] = previousInput.charAt(i);
-                    pointer++;
-                }
-                print(previousInput);
-                if (wrapAround) {
-                    previousInputIndex = 0;
-                }
-                continue;
-            }
-            
-            // Print character
+            // Determine the character to print
             if (!printDifferentChar) {
                 charToPrint = c;
             }
@@ -366,31 +323,104 @@ public final class Terminal
             // Handle control characters
             switch (c) {
                 case '\n':  // Newline (<enter>)
-                    isReadingInput = false;
+                    isReadingInput = false;     // End the loop
                     println();
                     break;
                 case '\b':  // Backspace
-                    if (pointer > 0) {
-                        buf[--pointer] = 0;
+                    if (bufPointer > 0) {
+                        buf[--bufPointer] = 0;
                         print('\b');
                     }
                     break;
-                default:
-                    if (pointer < buf.length) {
-                        buf[pointer++] = c;
+                case INPUT_HISTORY_CYCLE_UP:    // Up arrow
+                    if (historyIndex + 1 > inputHistory.getItemCount()) {
+                        continue;
+                    }
+                    historyIndex++;
+                    input = cycleInputHistory(historyIndex);
+                    if (input == null) {
+                        continue;
+                    }
+                    for (int i = 0; i < buf.length; i++) {
+                        if (buf[i] == 0) {
+                            break;
+                        }
+                        print('\b');
+                    }
+                    bufPointer = 0;
+                    buf = new char[INPUT_BUFFER_LENGTH];
+                    for (int i = 0; i < input.length(); i++) {
+                        buf[i] = input.charAt(i);
+                        bufPointer++;
+                    }
+                    print(input);
+                    break;
+                case INPUT_HISTORY_CYCLE_DOWN:
+                    if (historyIndex - 1 < 0) {
+                        continue;
+                    }
+                    historyIndex--;
+                    boolean wrapAround = false;
+                    if (historyIndex == 0) {
+                        historyIndex = inputHistory.getItemCount();
+                        wrapAround = true;
+                    }
+                    input = cycleInputHistory(historyIndex);
+                    if (input == null) {
+                        continue;
+                    }
+                    for (int i = 0; i < buf.length; i++) {
+                        if (buf[i] == 0) {
+                            break;
+                        }
+                        print('\b');
+                    }
+                    bufPointer = 0;
+                    buf = new char[INPUT_BUFFER_LENGTH];
+                    for (int i = 0; i < input.length(); i++) {
+                        buf[i] = input.charAt(i);
+                        bufPointer++;
+                    }
+                    print(input);
+                    if (wrapAround) {
+                        historyIndex = 0;
+                    }
+                    break;
+                default:    // Add character to buffer and print character
+                    if (bufPointer < buf.length) {
+                        buf[bufPointer++] = c;
                         print(charToPrint);
                     }
             }
         } while (isReadingInput);
         
-        input = new String(buf).trim();  // Trim to remove extra null characters
         
-        if (PREVIOUS_INPUT_QUEUE.isFull()) {
-            PREVIOUS_INPUT_QUEUE.remove();
+        // Create string from input buffer
+        // Trim to remove extra null characters
+        input = new String(buf).trim();
+        
+        // Add input string to the input history queue
+        if (inputHistory.isFull()) {
+            inputHistory.remove();
         }
-        PREVIOUS_INPUT_QUEUE.insert(input);
+        inputHistory.insert(input);
         
         return input;
+    }
+    
+    private static String cycleInputHistory(int index)
+    {
+        Queue<String> inputHistory = TERMINAL_INSTANCE.inputHistory;
+        Iterator<String> it = inputHistory.iterator();
+        String previousInput = null;
+        int i = 0;
+        
+        while (it.hasNext() && i < inputHistory.getItemCount() + 1 - index) {
+            previousInput = it.next();
+            i++;
+        }
+        
+        return previousInput;
     }
     
     /**
@@ -403,26 +433,28 @@ public final class Terminal
             @Override
             public void run()
             {
-                JComponent screenComponent = SCREEN.getComponent();
-                FRAME.add(screenComponent);
-                FRAME.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                FRAME.setResizable(false);
-                FRAME.setSize(screenComponent.getPreferredSize());
-                FRAME.setLocationRelativeTo(null);  // Center frame on screen
-                FRAME.setVisible(true);
+                JFrame frame = TERMINAL_INSTANCE.frame;
+                Screen screen = TERMINAL_INSTANCE.screen;
+                JComponent screenComponent = screen.getComponent();
+                frame.add(screenComponent);
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setResizable(false);
+                frame.setSize(screenComponent.getPreferredSize());
+                frame.setLocationRelativeTo(null);  // Center frame on screen
+                frame.setVisible(true);
             }
         });
         
         for (int i = 0; i < LINES; i++) {
             Terminal.println();
         }
-        Terminal.println(motd);
+        printMOTD();
     }
     
     /*
      * Registers all of the keystrokes that can be used with the terminal.
      */
-    private static void registerKeys()
+    private void registerKeys()
     {
         // Lowercase letters
         registerKey('a', KeyEvent.VK_A, 0);
@@ -518,6 +550,7 @@ public final class Terminal
         registerKey('-', KeyEvent.VK_SUBTRACT, 0);
         registerKey('+', KeyEvent.VK_ADD, 0);
         registerKey('.', KeyEvent.VK_DECIMAL, 0);
+        registerKey(' ', KeyEvent.VK_SPACE, 0);
         registerKey('!', KeyEvent.VK_1, KeyEvent.SHIFT_DOWN_MASK);
         registerKey('@', KeyEvent.VK_2, KeyEvent.SHIFT_DOWN_MASK);
         registerKey('#', KeyEvent.VK_3, KeyEvent.SHIFT_DOWN_MASK);
@@ -542,36 +575,52 @@ public final class Terminal
         registerKey('*', KeyEvent.VK_MULTIPLY, KeyEvent.SHIFT_DOWN_MASK);
         registerKey('-', KeyEvent.VK_SUBTRACT, KeyEvent.SHIFT_DOWN_MASK);
         registerKey('+', KeyEvent.VK_ADD, KeyEvent.SHIFT_DOWN_MASK);
+        registerKey(' ', KeyEvent.VK_SPACE, KeyEvent.SHIFT_DOWN_MASK);
         
         // Control characters
         registerKey('\b', KeyEvent.VK_BACK_SPACE, 0);
         registerKey('\b', KeyEvent.VK_BACK_SPACE, KeyEvent.SHIFT_DOWN_MASK);
         registerKey('\n', KeyEvent.VK_ENTER, 0);
         registerKey('\n', KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey(' ', KeyEvent.VK_SPACE, 0);
-        registerKey(' ', KeyEvent.VK_SPACE, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey(VK_UP_CHAR, KeyEvent.VK_UP, 0);
-        registerKey(VK_DOWN_CHAR, KeyEvent.VK_DOWN, 0);
+        registerKey(INPUT_HISTORY_CYCLE_UP, KeyEvent.VK_UP, 0);
+        registerKey(INPUT_HISTORY_CYCLE_DOWN, KeyEvent.VK_DOWN, 0);
     }
     
     /*
      * Registers a keystroke.
      */
-    private static void registerKey(final char ch, int keyChar, int modifiers)
+    private void registerKey(final char ch, int keyChar, int modifiers)
     {
         AbstractAction keyAction = new AbstractAction()
         {
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                synchronized (INPUT_LOCK) {
-                    charTyped = ch;
-                    INPUT_LOCK.notify();
+                synchronized (inputLock) {
+                    char c = ch;
+                    
+                    // Handle caps lock
+                    if (isCapsLockEnabled()) {
+                        if (c > 0x40 && c < 0x5B) {         // a-z
+                            c += 0x20;
+                        } else if (c > 0x60 && c < 0x7B) {  // A-Z
+                            c -= 0x20;
+                        }
+                    }
+                    
+                    charTyped = c;
+                    inputLock.notify();
                 }
             }
         };
         
-        INPUT_MAP.put(KeyStroke.getKeyStroke(keyChar, modifiers), ch);
-        ACTION_MAP.put(ch, keyAction);
+        inputMap.put(KeyStroke.getKeyStroke(keyChar, modifiers), ch);
+        actionMap.put(ch, keyAction);
+    }
+    
+    private boolean isCapsLockEnabled()
+    {
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        return tk.getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
     }
 }
