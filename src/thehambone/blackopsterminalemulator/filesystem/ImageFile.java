@@ -31,12 +31,21 @@ import javax.imageio.ImageIO;
 import thehambone.blackopsterminalemulator.Terminal;
 
 /**
+ * An {@code ImageFile} is a file containing image data.
+ * <p>
  * Created on Nov 30, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class ImageFile extends PrintableFile
+public final class ImageFile extends PrintableFile
 {
+    /**
+     * Creates a new {@code ImageFile}.
+     * 
+     * @param id the filesystem object id
+     * @param name the name of this file
+     * @param resourcePath the path to the resource containing the file data
+     */
     public ImageFile(int id, String name, String resourcePath)
     {
         super(id, name, resourcePath);
@@ -47,6 +56,7 @@ public class ImageFile extends PrintableFile
     {
         BufferedImage image;
         
+        // Load the image data
         try {
             image = ImageIO.read(new FileInputStream(getResourcePath()));
         } catch (IOException ex) {
@@ -55,10 +65,12 @@ public class ImageFile extends PrintableFile
             return;
         }
         
+        // Ignore and continue if no image data was loaded
         if (image == null) {
             return;
         }
         
+        // Output the image
         Terminal.println(image);
     }
 }

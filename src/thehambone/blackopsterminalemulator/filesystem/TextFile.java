@@ -30,12 +30,21 @@ import java.io.IOException;
 import thehambone.blackopsterminalemulator.Terminal;
 
 /**
+ * A {@code TextFile} is a file containing text data.
+ * <p>
  * Created on Nov 30, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class TextFile extends PrintableFile
+public final class TextFile extends PrintableFile
 {
+    /**
+     * Creates a new {@code TextFile}.
+     * 
+     * @param id the filesystem object id
+     * @param name the name of this file
+     * @param resourcePath the path to the resource containing the file data
+     */
     public TextFile(int id, String name, String resourcePath)
     {
         super(id, name, resourcePath);
@@ -50,7 +59,10 @@ public class TextFile extends PrintableFile
         
         textData = "";
         try {
+            // Load text data from resource
             reader = new BufferedReader(new FileReader(getResourcePath()));
+            
+            // Read text data line-by-line and concatenate it to a buffer string
             while ((line = reader.readLine()) != null) {
                 textData += line + "\n";
             }
@@ -60,8 +72,9 @@ public class TextFile extends PrintableFile
             return;
         }
         
-        /* Print entire file as a single string to allow for the "more" prompt
-           to show */
+        // Output the contents of the file
+        /* Print entire file as a single string to allow for the "--MORE--"
+           pager prompt to show */
         Terminal.print(textData);
     }
 }

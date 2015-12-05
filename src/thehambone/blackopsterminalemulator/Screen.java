@@ -38,7 +38,7 @@ import javax.swing.Timer;
 
 /**
  * This class represents the terminal screen. It is responsible for displaying
- * items such as text and images.
+ * text and images.
  * <p>
  * Created on Nov 18, 2015.
  *
@@ -57,7 +57,7 @@ public final class Screen
     
     private static final char COLOR_ESCAPE_CHAR = '^';
     
-    private final Object paintLock = new Object();
+    private final Object paintLock;
     
     private final ScreenBuffer screenBuffer;
     
@@ -93,6 +93,8 @@ public final class Screen
             ScreenColor background, ScreenColor foreground,
             Font font, int cursorBlinkRate)
     {
+        paintLock = new Object();
+        
         this.columns = columns;
         this.lines = lines;
         
@@ -114,8 +116,8 @@ public final class Screen
     }
     
     /**
-     * Gets the {@code ScreenBuffer} that contains all of the items displayed on
-     * the screen.
+     * Gets the {@code ScreenBuffer} that contains all of the items currently
+     * displayed on the screen.
      * 
      * @return the {@code ScreenBuffer} object associated with this screen
      */
@@ -127,7 +129,7 @@ public final class Screen
     /**
      * Returns the {@code JComponent} on which the screen data is drawn.
      * 
-     * @return the {@code JComponent} containing the screen data
+     * @return the {@code JComponent} containing the painted screen data
      */
     public JComponent getComponent()
     {
@@ -243,14 +245,6 @@ public final class Screen
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D)g;
                 
-                // Draw background
-                g2d.setColor(background);
-                g2d.fillRect(0, 0, getWidth(), getHeight());
-                
-                // Draw foreground
-                g2d.setColor(foreground);
-                g2d.setFont(font);
-                
                 ScreenItem item;
                 BufferedImage img;
                 char c;
@@ -264,9 +258,17 @@ public final class Screen
                 y = 0;
                 colorCharOffset = 0;
                 
+                // Draw background
+                g2d.setColor(background);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+                
+                // Draw foreground
+                g2d.setColor(foreground);
+                g2d.setFont(font);
+                
                 synchronized (paintLock) {
+                    // Draw each screen item
                     for (int i = 0; i < screenBuffer.getLength(); i++) {
-                        
                         // Get next item
                         item = screenBuffer.itemAt(i);
                         

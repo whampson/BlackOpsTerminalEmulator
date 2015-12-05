@@ -28,80 +28,85 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import thehambone.blackopsterminalemulator.filesystem.Directory;
-import thehambone.blackopsterminalemulator.filesystem.File;
 import thehambone.blackopsterminalemulator.filesystem.FileSystem;
 
 /**
+ * A {@code System} is a system that hosts files and and contains a set of users
+ * what have access to those files.
+ * <p>
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class Server
+public class System
 {
-    private static final List<Server> SERVERS = new ArrayList<>();
-    
-    public static void addServer(Server s)
-    {
-        SERVERS.add(s);
-    }
-    
-    public static Server getServer(String name)
-    {
-        Server server = null;
-        
-        for (Server s : SERVERS) {
-            if (s.getName().equalsIgnoreCase(name)) {
-                server = s;
-                break;
-            }
-        }
-        
-        return server;
-    }
-    
     private final String name;
     private final String loginMessage;
     
-    private final List<User> users;
+    private final List<UserAccount> users;
     private final FileSystem fileSystem;
-    private final Directory commandDirectory;
     
-    public Server(String name, String loginMessage,
-            List<User> users, FileSystem fileSystem, Directory commandDirectory)
+    /**
+     * Creates a new {@code System}.
+     * 
+     * @param name the name of the system
+     * @param loginMessage the message to be displayed when a user attempts to
+     *                     log in 
+     * @param fileSystem a {@code FileSystem} object containing containing the
+     *                   directories and files for the system
+     */
+    public System(String name, String loginMessage, FileSystem fileSystem)
     {
         this.name = name;
         this.loginMessage = loginMessage;
         
-        this.users = new ArrayList<>(users);
+        this.users = new ArrayList<>();
         this.fileSystem = fileSystem;
-        this.commandDirectory = commandDirectory;
     }
     
+    /**
+     * Gets the name of this system.
+     * 
+     * @return the system name
+     */
     public String getName()
     {
         return name;
     }
     
-    public String getLoginMessage()
-    {
-        return loginMessage;
-    }
-    
+    /**
+     * Gets the {@code FileSystem} object containing the files and directories
+     * on this system.
+     * 
+     * @return the {@code FileSystem} object associated with this system
+     */
     public FileSystem getFileSystem()
     {
         return fileSystem;
     }
     
-    public Directory getCommandDirectory()
+    /**
+     * Adds a user account to this system.
+     * 
+     * @param u the user account to add
+     */
+    public void addUser(UserAccount u)
     {
-        return commandDirectory;
+        users.add(u);
     }
     
-    public User getUser(String username)
+    /**
+     * Gets a user account on this system by its username.
+     * 
+     * @param username the username of the user account to search for
+     * @return the user account with the matching username, {@code null} if the
+     *         account is not found
+     */
+    public UserAccount getUser(String username)
     {
-        User user = null;
+        UserAccount user = null;
         
-        for (User u : users) {
+        for (UserAccount u : users) {
             if (u.getUsername().equalsIgnoreCase(username)) {
                 user = u;
                 break;
@@ -111,24 +116,48 @@ public class Server
         return user;
     }
     
-    public List<User> getUsers()
+    /**
+     * Returns a list containing all users that have accounts on this system.
+     * 
+     * @return a list of users on this system
+     */
+    public List<UserAccount> getUsers()
     {
         return Collections.unmodifiableList(users);
     }
     
+    /**
+     * Invokes the user login process for this system.
+     * <p>
+     * The login process is as follows:
+     *     1) The user is prompted to enter their username.
+     *     2) The user is prompted to enter their password.
+     *     3) The username and password are validated. If validation is
+     *        successful, a new {@code LoginShell} is returned starting in the
+     *        user's home directory.
+     * 
+     * @return a login shell for the user if the login attempt was successful, 
+     *         {@code null} if the login attempt was not successful
+     */
     public LoginShell login()
     {
+        // Show login message
         if (!loginMessage.isEmpty()) {
-            Terminal.println(getLoginMessage());
+            Terminal.println(loginMessage);
         }
         
+        // Prompt for username
         Terminal.print("USER:");
         String username = Terminal.readLine();
+        
+        // Prompt for password
         Terminal.print("PASSWORD:");
         String password = Terminal.readLine('*');
         
+        // Validate username and password
+        // If the user's homedir is unlisted, don't validate
         LoginShell shell = null;
-        User user = getUser(username);
+        UserAccount user = getUser(username);
         if (user == null || !user.getPassword().equalsIgnoreCase(password)
                 || user.getHomeDirectory().isUnlisted()) {
             Terminal.println("Invalid Password");

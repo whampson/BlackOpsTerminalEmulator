@@ -47,7 +47,7 @@ public class CdCommand extends ExecutableFile
     public void exec(String[] args)
     {
         LoginShell shell = Terminal.getActiveLoginShell();
-        FileSystem fileSystem = shell.getServer().getFileSystem();
+        FileSystem fileSystem = shell.getSystem().getFileSystem();
         FileSystemObject cd = shell.getCurrentDirectory();
         
         if (args.length == 0) {

@@ -25,16 +25,31 @@
 package thehambone.blackopsterminalemulator.filesystem;
 
 /**
+ * An {@code ExecutableFile} is a special type of file that contains code to
+ * perform various tasks. {@code ExecutableFiles} can be run, or "executed," by
+ * the user via use of the {@link thehambone.blackopsterminalemulator.Shell}.
+ * <p>
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
 public abstract class ExecutableFile extends File
 {
+    /**
+     * Creates a new {@code ExecutableFile}.
+     * 
+     * @param id the filesystem object id
+     * @param name the name of this file
+     */
     public ExecutableFile(int id, String name)
     {
         super(id, name);
     }
     
+    /**
+     * Executes the code contained within this file.
+     * 
+     * @param args execution arguments
+     */
     public abstract void exec(String[] args);
 }

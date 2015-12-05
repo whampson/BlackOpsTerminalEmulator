@@ -29,7 +29,10 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -38,7 +41,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-
+import thehambone.blackopsterminalemulator.util.FixedLengthQueue;
 /**
  * Created on Nov 18, 2015.
  *
@@ -55,21 +58,28 @@ public final class Terminal
     private static final char INPUT_HISTORY_CYCLE_UP = '\uFFFE';
     private static final char INPUT_HISTORY_CYCLE_DOWN = '\uFFFF';
     
+    private static final int MAX_LOGIN_SHELLS = 15;
+    
     private static final Terminal TERMINAL_INSTANCE = new Terminal();
     
     private final Object inputLock;
+    
     private final JFrame frame;
+    
     private final Screen screen;
+    
     private final InputMap inputMap;
     private final ActionMap actionMap;
+    
     private final Stack<LoginShell> activeShells;
-    private final Queue<String> inputHistory;
+    private final FixedLengthQueue<String> inputHistory;
+    private final List<System> systems;
     
     private volatile char charTyped;
     
     private String motd;
     
-    // Don't allow this class to be instantiated outside of this class
+    // Don't allow this class to be instantiated externally
     private Terminal()
     {
         inputLock = new Object();
@@ -87,25 +97,84 @@ public final class Terminal
         screen.getComponent().setInputMap(JComponent.WHEN_FOCUSED, inputMap);
         screen.getComponent().setActionMap(actionMap);
         
-        activeShells = new Stack<>(15);
+        activeShells = new Stack<>();
         
-        inputHistory = new Queue<>(8);
+        inputHistory = new FixedLengthQueue<>(8);
+        
+        systems = new ArrayList<>();
         
         charTyped = 0;
         
         motd = "";
         
-        registerKeys();
+        registerInputKeys();
     }
     
-    public static boolean isLoginShellStackFull()
+    /**
+     * Displays the terminal window.
+     * <p>
+     * The terminal window is displayed in a non-resizable JFrame that appears
+     * at the center of the screen when created.
+     */
+    public static void show()
     {
-        return TERMINAL_INSTANCE.activeShells.isFull();
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                JFrame frame = TERMINAL_INSTANCE.frame;
+                Screen screen = TERMINAL_INSTANCE.screen;
+                JComponent screenComponent = screen.getComponent();
+                frame.add(screenComponent);
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setResizable(false);
+                frame.setSize(screenComponent.getPreferredSize());
+                frame.setLocationRelativeTo(null);  // Center frame on screen
+                frame.setVisible(true);
+            }
+        });
+        
+        // Move cusor to bottom of screen
+        for (int i = 0; i < LINES; i++) {
+            Terminal.println();
+        }
     }
     
-    public static int getLoginShellCount()
+    /**
+     * Adds a system to the list of available systems.
+     * 
+     * @param s the system to add
+     */
+    public static void addSystem(System s)
     {
-        return TERMINAL_INSTANCE.activeShells.getItemCount();
+        TERMINAL_INSTANCE.systems.add(s);
+    }
+    
+    /**
+     * Gets a system from the list of available systems by name.
+     * 
+     * @param name the name of the system to be retrieved
+     * @return the desired system if found, {@code null} if the system is not
+     *         found
+     */
+    public static System getSystem(String name)
+    {
+        System system = null;
+        
+        for (System s : TERMINAL_INSTANCE.systems) {
+            if (s.getName().equalsIgnoreCase(name)) {
+                system = s;
+                break;
+            }
+        }
+        
+        return system;
+    }
+    
+    public static boolean maxLoginShellsReached()
+    {
+        return TERMINAL_INSTANCE.activeShells.size() == MAX_LOGIN_SHELLS;
     }
     
     public static LoginShell getActiveLoginShell()
@@ -133,11 +202,19 @@ public final class Terminal
         TERMINAL_INSTANCE.frame.setTitle(title);
     }
     
+    /**
+     * Sets the message of the day.
+     * 
+     * @param motd the new message of the day
+     */
     public static void setMOTD(String motd)
     {
         TERMINAL_INSTANCE.motd = motd;
     }
     
+    /**
+     * Prints the message of the day.
+     */
     public static void printMOTD()
     {
         println(TERMINAL_INSTANCE.motd);
@@ -164,26 +241,37 @@ public final class Terminal
         int lineIndex = 0;
         int linesPrinted = 0;
         
+        // Print string character by character
         for (int i = 0; i < s.length(); i++) {
+            // Get next char and print
             c = s.charAt(i);
             print(c);
-            lineIndex++;
             
+            // Increment number of lines printed
+            lineIndex++;
             if (lineIndex > (COLUMNS - 1)
                     || c == '\n') {
                 linesPrinted++;
                 lineIndex = 0;
             }
             
+            // Show "--MORE--" pager prompt
             if (linesPrinted == 22) {
+                // Print "--MORE--" prompt
                 String morePrompt = "--MORE--";
                 for (int j = 0; j < morePrompt.length(); j++) {
                     print(morePrompt.charAt(j));
                 }
+                
+                // Wait for keypress
                 getChar(false);
+                
+                // Backspace "--MORE--" prompt
                 for (int j = 0; j < morePrompt.length(); j++) {
                     print('\b');
                 }
+                
+                // Reset lines printed counter
                 linesPrinted = 0;
             }
             
@@ -287,8 +375,8 @@ public final class Terminal
      * <p>
      * This method blocks until the {@code <ENTER>} key is pressed.
      * 
-     * @param charToPrint the character to print in place of the typed
-     *                    characters; use 0 ({@code NUL}) to indicate that
+     * @param charToPrint the character to print to the screen in place of the
+     *                    typed characters; use 0 ({@code NUL}) to indicate that
      *                    characters should be printed exactly as they're typed
      * @return the string typed
      */
@@ -301,7 +389,7 @@ public final class Terminal
         boolean isReadingInput;
         int historyIndex;
         String input;
-        Queue<String> inputHistory;
+        FixedLengthQueue<String> inputHistory;
         
         buf = new char[INPUT_BUFFER_LENGTH];
         bufPointer = 0;
@@ -322,7 +410,7 @@ public final class Terminal
             
             // Handle control characters
             switch (c) {
-                case '\n':  // Newline (<enter>)
+                case '\n':
                     isReadingInput = false;     // End the loop
                     println();
                     break;
@@ -332,23 +420,33 @@ public final class Terminal
                         print('\b');
                     }
                     break;
-                case INPUT_HISTORY_CYCLE_UP:    // Up arrow
+                case INPUT_HISTORY_CYCLE_UP:
+                    // Ignore if historyIndex is out of range
                     if (historyIndex + 1 > inputHistory.getItemCount()) {
                         continue;
                     }
+                    
                     historyIndex++;
+                    
+                    // Get item from input history
                     input = cycleInputHistory(historyIndex);
                     if (input == null) {
                         continue;
                     }
+                    
+                    // Erase the current input
                     for (int i = 0; i < buf.length; i++) {
                         if (buf[i] == 0) {
                             break;
                         }
                         print('\b');
                     }
+                    
+                    // Reset the input buffer
                     bufPointer = 0;
                     buf = new char[INPUT_BUFFER_LENGTH];
+                    
+                    // Add the retrieved string to input buffer and print
                     for (int i = 0; i < input.length(); i++) {
                         buf[i] = input.charAt(i);
                         bufPointer++;
@@ -356,37 +454,60 @@ public final class Terminal
                     print(input);
                     break;
                 case INPUT_HISTORY_CYCLE_DOWN:
+                    // Ignore if historyIndex is out of range
                     if (historyIndex - 1 < 0) {
                         continue;
                     }
+                    
                     historyIndex--;
+                    
+                    /* Determine wheter the queue should wrap to the beginning
+                       after the item at the current index has been retrieved.
+                       This is used to replicate is what is presumed to be a bug
+                       in the actual terminal. When cycling down through the
+                       input history and the most recently typed item is reached
+                       (i.e. the end of the queue is reached), cycling down once
+                       more will cause the first item in the queue to be
+                       displayed.
+                    */
                     boolean wrapAround = false;
                     if (historyIndex == 0) {
                         historyIndex = inputHistory.getItemCount();
                         wrapAround = true;
                     }
+                    
+                    // Get item from input history
                     input = cycleInputHistory(historyIndex);
                     if (input == null) {
                         continue;
                     }
+                    
+                    // Erase the current input
                     for (int i = 0; i < buf.length; i++) {
                         if (buf[i] == 0) {
                             break;
                         }
                         print('\b');
                     }
+                    
+                    // Reset the input buffer
                     bufPointer = 0;
                     buf = new char[INPUT_BUFFER_LENGTH];
+                    
+                    // Add the retrieved string to input buffer and print
                     for (int i = 0; i < input.length(); i++) {
                         buf[i] = input.charAt(i);
                         bufPointer++;
                     }
                     print(input);
+                    
+                    // "Wrap" to the beginning of the queue
                     if (wrapAround) {
                         historyIndex = 0;
                     }
                     break;
-                default:    // Add character to buffer and print character
+                default:
+                    // Add character to buffer and print character
                     if (bufPointer < buf.length) {
                         buf[bufPointer++] = c;
                         print(charToPrint);
@@ -408,9 +529,13 @@ public final class Terminal
         return input;
     }
     
+    /*
+     * Returns the string at the specified index in the input history queue.
+     * If the index is out of range, null is returned.
+     */
     private static String cycleInputHistory(int index)
     {
-        Queue<String> inputHistory = TERMINAL_INSTANCE.inputHistory;
+        FixedLengthQueue<String> inputHistory = TERMINAL_INSTANCE.inputHistory;
         Iterator<String> it = inputHistory.iterator();
         String previousInput = null;
         int i = 0;
@@ -423,173 +548,145 @@ public final class Terminal
         return previousInput;
     }
     
-    /**
-     * Displays the terminal window.
-     */
-    public static void show()
-    {
-        SwingUtilities.invokeLater(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                JFrame frame = TERMINAL_INSTANCE.frame;
-                Screen screen = TERMINAL_INSTANCE.screen;
-                JComponent screenComponent = screen.getComponent();
-                frame.add(screenComponent);
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.setResizable(false);
-                frame.setSize(screenComponent.getPreferredSize());
-                frame.setLocationRelativeTo(null);  // Center frame on screen
-                frame.setVisible(true);
-            }
-        });
-        
-        for (int i = 0; i < LINES; i++) {
-            Terminal.println();
-        }
-        printMOTD();
-    }
-    
     /*
-     * Registers all of the keystrokes that can be used with the terminal.
+     * Registers all of the keystrokes that can be used for input.
      */
-    private void registerKeys()
+    private void registerInputKeys()
     {
         // Lowercase letters
-        registerKey('a', KeyEvent.VK_A, 0);
-        registerKey('b', KeyEvent.VK_B, 0);
-        registerKey('c', KeyEvent.VK_C, 0);
-        registerKey('d', KeyEvent.VK_D, 0);
-        registerKey('e', KeyEvent.VK_E, 0);
-        registerKey('f', KeyEvent.VK_F, 0);
-        registerKey('g', KeyEvent.VK_G, 0);
-        registerKey('h', KeyEvent.VK_H, 0);
-        registerKey('i', KeyEvent.VK_I, 0);
-        registerKey('j', KeyEvent.VK_J, 0);
-        registerKey('k', KeyEvent.VK_K, 0);
-        registerKey('l', KeyEvent.VK_L, 0);
-        registerKey('m', KeyEvent.VK_M, 0);
-        registerKey('n', KeyEvent.VK_N, 0);
-        registerKey('o', KeyEvent.VK_O, 0);
-        registerKey('p', KeyEvent.VK_P, 0);
-        registerKey('q', KeyEvent.VK_Q, 0);
-        registerKey('r', KeyEvent.VK_R, 0);
-        registerKey('s', KeyEvent.VK_S, 0);
-        registerKey('t', KeyEvent.VK_T, 0);
-        registerKey('u', KeyEvent.VK_U, 0);
-        registerKey('v', KeyEvent.VK_V, 0);
-        registerKey('w', KeyEvent.VK_W, 0);
-        registerKey('x', KeyEvent.VK_X, 0);
-        registerKey('y', KeyEvent.VK_Y, 0);
-        registerKey('z', KeyEvent.VK_Z, 0);
+        registerInputKey('a', KeyEvent.VK_A, 0);
+        registerInputKey('b', KeyEvent.VK_B, 0);
+        registerInputKey('c', KeyEvent.VK_C, 0);
+        registerInputKey('d', KeyEvent.VK_D, 0);
+        registerInputKey('e', KeyEvent.VK_E, 0);
+        registerInputKey('f', KeyEvent.VK_F, 0);
+        registerInputKey('g', KeyEvent.VK_G, 0);
+        registerInputKey('h', KeyEvent.VK_H, 0);
+        registerInputKey('i', KeyEvent.VK_I, 0);
+        registerInputKey('j', KeyEvent.VK_J, 0);
+        registerInputKey('k', KeyEvent.VK_K, 0);
+        registerInputKey('l', KeyEvent.VK_L, 0);
+        registerInputKey('m', KeyEvent.VK_M, 0);
+        registerInputKey('n', KeyEvent.VK_N, 0);
+        registerInputKey('o', KeyEvent.VK_O, 0);
+        registerInputKey('p', KeyEvent.VK_P, 0);
+        registerInputKey('q', KeyEvent.VK_Q, 0);
+        registerInputKey('r', KeyEvent.VK_R, 0);
+        registerInputKey('s', KeyEvent.VK_S, 0);
+        registerInputKey('t', KeyEvent.VK_T, 0);
+        registerInputKey('u', KeyEvent.VK_U, 0);
+        registerInputKey('v', KeyEvent.VK_V, 0);
+        registerInputKey('w', KeyEvent.VK_W, 0);
+        registerInputKey('x', KeyEvent.VK_X, 0);
+        registerInputKey('y', KeyEvent.VK_Y, 0);
+        registerInputKey('z', KeyEvent.VK_Z, 0);
         
         // Uppercase letters
-        registerKey('A', KeyEvent.VK_A, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('B', KeyEvent.VK_B, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('C', KeyEvent.VK_C, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('D', KeyEvent.VK_D, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('E', KeyEvent.VK_E, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('F', KeyEvent.VK_F, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('G', KeyEvent.VK_G, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('H', KeyEvent.VK_H, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('I', KeyEvent.VK_I, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('J', KeyEvent.VK_J, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('K', KeyEvent.VK_K, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('L', KeyEvent.VK_L, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('M', KeyEvent.VK_M, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('N', KeyEvent.VK_N, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('O', KeyEvent.VK_O, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('P', KeyEvent.VK_P, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('Q', KeyEvent.VK_Q, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('R', KeyEvent.VK_R, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('S', KeyEvent.VK_S, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('T', KeyEvent.VK_T, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('U', KeyEvent.VK_U, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('V', KeyEvent.VK_V, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('W', KeyEvent.VK_W, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('X', KeyEvent.VK_X, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('Y', KeyEvent.VK_Y, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('Z', KeyEvent.VK_Z, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('A', KeyEvent.VK_A, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('B', KeyEvent.VK_B, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('C', KeyEvent.VK_C, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('D', KeyEvent.VK_D, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('E', KeyEvent.VK_E, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('F', KeyEvent.VK_F, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('G', KeyEvent.VK_G, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('H', KeyEvent.VK_H, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('I', KeyEvent.VK_I, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('J', KeyEvent.VK_J, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('K', KeyEvent.VK_K, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('L', KeyEvent.VK_L, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('M', KeyEvent.VK_M, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('N', KeyEvent.VK_N, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('O', KeyEvent.VK_O, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('P', KeyEvent.VK_P, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('Q', KeyEvent.VK_Q, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('R', KeyEvent.VK_R, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('S', KeyEvent.VK_S, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('T', KeyEvent.VK_T, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('U', KeyEvent.VK_U, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('V', KeyEvent.VK_V, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('W', KeyEvent.VK_W, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('X', KeyEvent.VK_X, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('Y', KeyEvent.VK_Y, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('Z', KeyEvent.VK_Z, KeyEvent.SHIFT_DOWN_MASK);
         
         // Numbers
-        registerKey('0', KeyEvent.VK_0, 0);
-        registerKey('1', KeyEvent.VK_1, 0);
-        registerKey('2', KeyEvent.VK_2, 0);
-        registerKey('3', KeyEvent.VK_3, 0);
-        registerKey('4', KeyEvent.VK_4, 0);
-        registerKey('5', KeyEvent.VK_5, 0);
-        registerKey('6', KeyEvent.VK_6, 0);
-        registerKey('7', KeyEvent.VK_7, 0);
-        registerKey('8', KeyEvent.VK_8, 0);
-        registerKey('9', KeyEvent.VK_9, 0);
-        registerKey('0', KeyEvent.VK_NUMPAD0, 0);
-        registerKey('1', KeyEvent.VK_NUMPAD1, 0);
-        registerKey('2', KeyEvent.VK_NUMPAD2, 0);
-        registerKey('3', KeyEvent.VK_NUMPAD3, 0);
-        registerKey('4', KeyEvent.VK_NUMPAD4, 0);
-        registerKey('5', KeyEvent.VK_NUMPAD5, 0);
-        registerKey('6', KeyEvent.VK_NUMPAD6, 0);
-        registerKey('7', KeyEvent.VK_NUMPAD7, 0);
-        registerKey('8', KeyEvent.VK_NUMPAD8, 0);
-        registerKey('9', KeyEvent.VK_NUMPAD9, 0);
+        registerInputKey('0', KeyEvent.VK_0, 0);
+        registerInputKey('1', KeyEvent.VK_1, 0);
+        registerInputKey('2', KeyEvent.VK_2, 0);
+        registerInputKey('3', KeyEvent.VK_3, 0);
+        registerInputKey('4', KeyEvent.VK_4, 0);
+        registerInputKey('5', KeyEvent.VK_5, 0);
+        registerInputKey('6', KeyEvent.VK_6, 0);
+        registerInputKey('7', KeyEvent.VK_7, 0);
+        registerInputKey('8', KeyEvent.VK_8, 0);
+        registerInputKey('9', KeyEvent.VK_9, 0);
+        registerInputKey('0', KeyEvent.VK_NUMPAD0, 0);
+        registerInputKey('1', KeyEvent.VK_NUMPAD1, 0);
+        registerInputKey('2', KeyEvent.VK_NUMPAD2, 0);
+        registerInputKey('3', KeyEvent.VK_NUMPAD3, 0);
+        registerInputKey('4', KeyEvent.VK_NUMPAD4, 0);
+        registerInputKey('5', KeyEvent.VK_NUMPAD5, 0);
+        registerInputKey('6', KeyEvent.VK_NUMPAD6, 0);
+        registerInputKey('7', KeyEvent.VK_NUMPAD7, 0);
+        registerInputKey('8', KeyEvent.VK_NUMPAD8, 0);
+        registerInputKey('9', KeyEvent.VK_NUMPAD9, 0);
         
         // Symbols
-        registerKey('-', KeyEvent.VK_MINUS, 0);
-        registerKey('=', KeyEvent.VK_EQUALS, 0);
-        registerKey('[', KeyEvent.VK_OPEN_BRACKET, 0);
-        registerKey(']', KeyEvent.VK_CLOSE_BRACKET, 0);
-        registerKey('\\', KeyEvent.VK_BACK_SLASH, 0);
-        registerKey(';', KeyEvent.VK_SEMICOLON, 0);
-        registerKey('\'', KeyEvent.VK_QUOTE, 0);
-        registerKey(',', KeyEvent.VK_COMMA, 0);
-        registerKey('.', KeyEvent.VK_PERIOD, 0);
-        registerKey('/', KeyEvent.VK_SLASH, 0);
-        registerKey('/', KeyEvent.VK_DIVIDE, 0);
-        registerKey('*', KeyEvent.VK_MULTIPLY, 0);
-        registerKey('-', KeyEvent.VK_SUBTRACT, 0);
-        registerKey('+', KeyEvent.VK_ADD, 0);
-        registerKey('.', KeyEvent.VK_DECIMAL, 0);
-        registerKey(' ', KeyEvent.VK_SPACE, 0);
-        registerKey('!', KeyEvent.VK_1, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('@', KeyEvent.VK_2, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('#', KeyEvent.VK_3, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('$', KeyEvent.VK_4, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('%', KeyEvent.VK_5, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('^', KeyEvent.VK_6, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('&', KeyEvent.VK_7, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('*', KeyEvent.VK_8, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('(', KeyEvent.VK_9, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey(')', KeyEvent.VK_0, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('_', KeyEvent.VK_MINUS, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('+', KeyEvent.VK_EQUALS, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('{', KeyEvent.VK_OPEN_BRACKET, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('}', KeyEvent.VK_CLOSE_BRACKET, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('|', KeyEvent.VK_BACK_SLASH, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey(':', KeyEvent.VK_SEMICOLON, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('"', KeyEvent.VK_QUOTE, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('<', KeyEvent.VK_COMMA, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('>', KeyEvent.VK_PERIOD, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('?', KeyEvent.VK_SLASH, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('/', KeyEvent.VK_DIVIDE, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('*', KeyEvent.VK_MULTIPLY, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('-', KeyEvent.VK_SUBTRACT, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('+', KeyEvent.VK_ADD, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey(' ', KeyEvent.VK_SPACE, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('-', KeyEvent.VK_MINUS, 0);
+        registerInputKey('=', KeyEvent.VK_EQUALS, 0);
+        registerInputKey('[', KeyEvent.VK_OPEN_BRACKET, 0);
+        registerInputKey(']', KeyEvent.VK_CLOSE_BRACKET, 0);
+        registerInputKey('\\', KeyEvent.VK_BACK_SLASH, 0);
+        registerInputKey(';', KeyEvent.VK_SEMICOLON, 0);
+        registerInputKey('\'', KeyEvent.VK_QUOTE, 0);
+        registerInputKey(',', KeyEvent.VK_COMMA, 0);
+        registerInputKey('.', KeyEvent.VK_PERIOD, 0);
+        registerInputKey('/', KeyEvent.VK_SLASH, 0);
+        registerInputKey('/', KeyEvent.VK_DIVIDE, 0);
+        registerInputKey('*', KeyEvent.VK_MULTIPLY, 0);
+        registerInputKey('-', KeyEvent.VK_SUBTRACT, 0);
+        registerInputKey('+', KeyEvent.VK_ADD, 0);
+        registerInputKey('.', KeyEvent.VK_DECIMAL, 0);
+        registerInputKey(' ', KeyEvent.VK_SPACE, 0);
+        registerInputKey('!', KeyEvent.VK_1, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('@', KeyEvent.VK_2, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('#', KeyEvent.VK_3, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('$', KeyEvent.VK_4, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('%', KeyEvent.VK_5, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('^', KeyEvent.VK_6, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('&', KeyEvent.VK_7, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('*', KeyEvent.VK_8, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('(', KeyEvent.VK_9, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey(')', KeyEvent.VK_0, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('_', KeyEvent.VK_MINUS, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('+', KeyEvent.VK_EQUALS, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('{', KeyEvent.VK_OPEN_BRACKET, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('}', KeyEvent.VK_CLOSE_BRACKET,KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('|', KeyEvent.VK_BACK_SLASH, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey(':', KeyEvent.VK_SEMICOLON, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('"', KeyEvent.VK_QUOTE, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('<', KeyEvent.VK_COMMA, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('>', KeyEvent.VK_PERIOD, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('?', KeyEvent.VK_SLASH, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('/', KeyEvent.VK_DIVIDE, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('*', KeyEvent.VK_MULTIPLY, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('-', KeyEvent.VK_SUBTRACT, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('+', KeyEvent.VK_ADD, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey(' ', KeyEvent.VK_SPACE, KeyEvent.SHIFT_DOWN_MASK);
         
         // Control characters
-        registerKey('\b', KeyEvent.VK_BACK_SPACE, 0);
-        registerKey('\b', KeyEvent.VK_BACK_SPACE, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey('\n', KeyEvent.VK_ENTER, 0);
-        registerKey('\n', KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK);
-        registerKey(INPUT_HISTORY_CYCLE_UP, KeyEvent.VK_UP, 0);
-        registerKey(INPUT_HISTORY_CYCLE_DOWN, KeyEvent.VK_DOWN, 0);
+        registerInputKey('\b', KeyEvent.VK_BACK_SPACE, 0);
+        registerInputKey('\b', KeyEvent.VK_BACK_SPACE, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey('\n', KeyEvent.VK_ENTER, 0);
+        registerInputKey('\n', KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK);
+        registerInputKey(INPUT_HISTORY_CYCLE_UP, KeyEvent.VK_UP, 0);
+        registerInputKey(INPUT_HISTORY_CYCLE_DOWN, KeyEvent.VK_DOWN, 0);
     }
     
     /*
-     * Registers a keystroke.
+     * Registers a keystroke for input.
      */
-    private void registerKey(final char ch, int keyChar, int modifiers)
+    private void registerInputKey(final char ch, int keyChar, int modifiers)
     {
         AbstractAction keyAction = new AbstractAction()
         {
@@ -601,9 +698,11 @@ public final class Terminal
                     
                     // Handle caps lock
                     if (isCapsLockEnabled()) {
-                        if (c > 0x40 && c < 0x5B) {         // a-z
+                        if (c > 0x40 && c < 0x5B) {         // ASCII a-z
+                            // Make uppercase
                             c += 0x20;
-                        } else if (c > 0x60 && c < 0x7B) {  // A-Z
+                        } else if (c > 0x60 && c < 0x7B) {  // ASCII A-Z
+                            // Make lowercase
                             c -= 0x20;
                         }
                     }
@@ -618,6 +717,9 @@ public final class Terminal
         actionMap.put(ch, keyAction);
     }
     
+    /*
+     * Checks whether caps lock is enabled on the keyboard.
+     */
     private boolean isCapsLockEnabled()
     {
         Toolkit tk = Toolkit.getDefaultToolkit();

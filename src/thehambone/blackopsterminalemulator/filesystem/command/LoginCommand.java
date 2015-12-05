@@ -24,7 +24,7 @@
 
 package thehambone.blackopsterminalemulator.filesystem.command;
 
-import thehambone.blackopsterminalemulator.Server;
+import thehambone.blackopsterminalemulator.System;
 import thehambone.blackopsterminalemulator.Terminal;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
@@ -43,7 +43,7 @@ public class LoginCommand extends ExecutableFile
     @Override
     public void exec(String[] args)
     {
-        Server server = Terminal.getActiveLoginShell().getServer();
-        new RloginCommand().exec(new String[] {server.getName()});
+        System system = Terminal.getActiveLoginShell().getSystem();
+        new RloginCommand().exec(new String[] {system.getName()});
     }
 }

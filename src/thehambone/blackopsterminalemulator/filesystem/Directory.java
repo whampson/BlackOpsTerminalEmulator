@@ -29,6 +29,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * A {@code Directory} is a record in the filesystem that contains references
+ * to other filesystem objects like files or other directories. A directory has
+ * one parent and can contain any number of child objects.
+ * <p>
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
@@ -41,6 +45,12 @@ public class Directory implements FileSystemObject
     
     private FileSystemObject parent;
     
+    /**
+     * Creates a new {@code Directory}.
+     * 
+     * @param id the filesystem object id
+     * @param name the directory name
+     */
     public Directory(int id, String name)
     {
         this.id = id;
@@ -93,22 +103,31 @@ public class Directory implements FileSystemObject
             return null;
         }
         
+        // Search for the child with the given name
         for (FileSystemObject child : children) {
+            // Skip null children (I know, I'm a bad person)
             if (child == null) {
                 continue;
             }
+            
+            // Have we found what we're looking for?
             if (child.getName().equalsIgnoreCase(name)) {
+                // Yes we have!
                 return child;
-            }
-            if (!child.hasChildren()) {
-                continue;
-            }
-            child = child.getChild(name);
-            if (child != null && child.getName().equalsIgnoreCase(name)) {
-                return child;
+            } else {
+                // We have not found what we're looking for
+                // We must go deeper...
+                child = child.getChild(name);
+                
+                // OK, /now/ have we found what we're looking for?
+                if (child != null && child.getName().equalsIgnoreCase(name)) {
+                    // Yes we have!
+                    return child;
+                }
             }
         }
         
+        // Child not found
         return null;
     }
     
@@ -130,6 +149,8 @@ public class Directory implements FileSystemObject
         FileSystemObject obj = this;
         String path = "";
         
+        // Traverse tree up to root node
+        // Prepend the name of the parent node to the path
         while (obj != null) {
             path = obj.getName() + FILE_SEPARATOR_CHAR + path;
             obj = obj.getParent();

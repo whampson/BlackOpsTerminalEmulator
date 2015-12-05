@@ -25,6 +25,11 @@
 package thehambone.blackopsterminalemulator.filesystem;
 
 /**
+ * A {@code FileSystem} is a collection of records which contain information
+ * regarding files present on the system. A filesystem can also contain
+ * directories, which are used to group files and give the filesystem a
+ * hierarchal, tree-like structure.
+ * <p>
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
@@ -33,25 +38,53 @@ public class FileSystem
 {
     private final FileSystemObject root;
     
+    /**
+     * Creates a new {@code FileSystem}.
+     * 
+     * @param root the object to use as the filesystem root
+     */
     public FileSystem(FileSystemObject root)
     {
         this.root = root;
     }
     
+    /**
+     * Returns the topmost node in the filesystem tree.
+     * 
+     * @return the root object
+     */
     public FileSystemObject getRoot()
     {
         return root;
     }
     
+    // TODO: implement this
+    public FileSystemObject getFileSystemObject(int id)
+    {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+    
+    /**
+     * Gets an object from within the filesystem by name.
+     * 
+     * @param name the name of the filesystem object to retrieve
+     * @return the filesystem object if found, {@code null} if the object is not
+     *         found
+     */
     public FileSystemObject getFileSystemObject(String name)
     {
-        String rootName
-                = Character.toString(FileSystemObject.FILE_SEPARATOR_CHAR);
+        String rootName;
         
-        if (name.equals(rootName)) {
+        // Check if the root node was requested
+        /* If the root node is nameless, treat the file separator character (/)
+           as the root node name */
+        rootName = Character.toString(FileSystemObject.FILE_SEPARATOR_CHAR);
+        if ((root.getName() == null || root.getName().isEmpty())
+                && name.equals(rootName)) {
             return root;
         }
         
+        // Traverse the tree until the child with the matching name is found
         return root.getChild(name);
     }
 }

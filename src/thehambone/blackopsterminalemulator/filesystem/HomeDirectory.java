@@ -25,6 +25,10 @@
 package thehambone.blackopsterminalemulator.filesystem;
 
 /**
+ * A {@code HomeDirectory} is a special directory that is used to store a
+ * specific user's files. A home directory is only meant to be accessible by the
+ * user who "owns" it.
+ * <p>
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
@@ -33,11 +37,25 @@ public class HomeDirectory extends Directory
 {
     private boolean isUnlisted;
     
+    /**
+     * Creates a new {@code HomeDirectory}.
+     * 
+     * @param id the filesystem object id
+     * @param name the name of the directory
+     */
     public HomeDirectory(int id, String name)
     {
         this(id, name, false);
     }
     
+    /**
+     * Creates a new {@code HomeDirectory}.
+     * 
+     * @param id the filesystem object id
+     * @param name the name of the directory
+     * @param isUnlisted a boolean indicating whether this home directory should
+     *                   be unlisted
+     */
     public HomeDirectory(int id, String name, boolean isUnlisted)
     {
         super(id, name);
@@ -45,11 +63,33 @@ public class HomeDirectory extends Directory
         this.isUnlisted = isUnlisted;
     }
     
+    /**
+     * Checks whether this home directory is unlisted.
+     * <p>
+     * Users with unlisted home directories are not shown in the results when
+     * the system's list of users is queried, nor can they be logged in via the
+     * standard login process. However, the directory itself is not hidden and
+     * will be shown when the proper directory list is queried.
+     * 
+     * @return {@code true} if this home directory is marked as unlisted,
+     * {@code false} otherwise
+     */
     public boolean isUnlisted()
     {
         return isUnlisted;
     }
     
+    /**
+     * Marks or unmarks this directory as unlisted.
+     * <p>
+     * Users with unlisted home directories are not shown in the results when
+     * the system's list of users is queried, nor can they be logged in via the
+     * standard login process. However, the directory itself is not hidden and
+     * will be shown when the proper directory list is queried.
+     * 
+     * @param isUnlisted a boolean indicating whether the home directory as
+     *                   unlisted
+     */
     public void setUnlisted(boolean isUnlisted)
     {
         this.isUnlisted = isUnlisted;

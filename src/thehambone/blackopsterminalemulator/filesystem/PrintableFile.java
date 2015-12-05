@@ -25,6 +25,9 @@
 package thehambone.blackopsterminalemulator.filesystem;
 
 /**
+ * A {@code PrintableFile} is a type of file whose data is meant to be output to
+ * the user.
+ * <p>
  * Created on Nov 30, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
@@ -33,6 +36,13 @@ public abstract class PrintableFile extends File
 {
     private final String resourcePath;
     
+    /**
+     * Creates a new {@code PrintableFile}.
+     * 
+     * @param id the filesystem object id
+     * @param name the name of this file
+     * @param resourcePath the path to the resource containing the file data
+     */
     public PrintableFile(int id, String name, String resourcePath)
     {
         super(id, name);
@@ -40,10 +50,18 @@ public abstract class PrintableFile extends File
         this.resourcePath = resourcePath;
     }
     
-    public String getResourcePath()
+    /**
+     * Gets the path to the resource containing the file data.
+     * 
+     * @return the resource path
+     */
+    protected String getResourcePath()
     {
         return resourcePath;
     }
     
+    /**
+     * Outputs the contents of this file.
+     */
     public abstract void print();
 }

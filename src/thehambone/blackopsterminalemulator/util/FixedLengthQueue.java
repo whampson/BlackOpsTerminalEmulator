@@ -22,52 +22,84 @@
  * THE SOFTWARE.
  */
 
-package thehambone.blackopsterminalemulator;
+package thehambone.blackopsterminalemulator.util;
 
 import java.util.Iterator;
 
 /**
+ * A {@code FixedLengthQueue} represents a first-in-first-out (FIFO) collection
+ * of objects whose maximum capacity does not change. The class implements the
+ * Iterable interface so items in the queue can be iterated over.
+ * <p>
  * Created on Nov 29, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
+ * @param <E> the type of each element in the queue
  */
-public class Queue<T> implements Iterable<T>
+public class FixedLengthQueue<E> implements Iterable<E>
 {
-    private final T[] queue;
+    private final E[] queue;
     
     private int front;
     private int rear;
     private int itemCount;
     
-    @SuppressWarnings("unchecked")
-    public Queue(int capacity)
+    /**
+     * Creates an empty {@code Queue} with the specified capacity.
+     * 
+     * @param capacity the maximum number of elements the queue can hold
+     */
+    @SuppressWarnings("unchecked")      // Should be safe to cast Object to E
+    public FixedLengthQueue(int capacity)
     {
         if (capacity < 1) {
             throw new IllegalArgumentException(
                     "capacity must be a postive integer");
         }
-        queue = (T[])new Object[capacity];
+        
+        queue = (E[])new Object[capacity];
         front = 0;
         rear = -1;
         itemCount = 0;
     }
     
+    /**
+     * Checks whether the queue is empty.
+     * 
+     * @return {@code true} if the queue is empty, {@code false} otherwise
+     */
     public boolean isEmpty()
     {
         return itemCount == 0;
     }
     
+    /**
+     * Checks whether the maximum capacity of the queue has been reached.
+     * 
+     * @return {@code true} if the queue is full, {@code false} otherwise
+     */
     public boolean isFull()
     {
         return itemCount == queue.length;
     }
     
+    /**
+     * Returns the current number of items in the queue.
+     * 
+     * @return the number of items in the queue
+     */
     public int getItemCount()
     {
         return itemCount;
     }
     
-    public T peek()
+    /**
+     * Gets the item at the front of the queue.
+     * 
+     * @return the item at the front of the queue
+     * @throws QueueException if the queue is empty
+     */
+    public E peek()
     {
         if (isEmpty()) {
             throw new QueueException("queue is empty");
@@ -76,7 +108,13 @@ public class Queue<T> implements Iterable<T>
         return queue[front];
     }
     
-    public void insert(T item)
+    /**
+     * Adds an item to the rear of the queue.
+     * 
+     * @param item the item to be added
+     * @throws QueueException if the queue is full
+     */
+    public void insert(E item)
     {
         if (isFull()) {
             throw new QueueException("queue is full");
@@ -90,7 +128,13 @@ public class Queue<T> implements Iterable<T>
         itemCount++;
     }
     
-    public T remove()
+    /**
+     * Removes the item at the front of the queue.
+     * 
+     * @return the item removed
+     * @throws QueueException if the queue is empty
+     */
+    public E remove()
     {
         if (isEmpty()) {
             throw new QueueException("queue is empty");
@@ -104,12 +148,11 @@ public class Queue<T> implements Iterable<T>
     }
     
     @Override
-    public Iterator<T> iterator()
+    public Iterator<E> iterator()
     {
-        return new Iterator<T>()
+        return new Iterator<E>()
         {
             int itemsIterated = 0;
-            
             int index = front;
             
             @Override
@@ -119,7 +162,7 @@ public class Queue<T> implements Iterable<T>
             }
 
             @Override
-            public T next()
+            public E next()
             {
                 if (index == queue.length) {
                     index = 0;

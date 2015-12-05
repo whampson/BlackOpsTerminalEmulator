@@ -25,9 +25,9 @@
 package thehambone.blackopsterminalemulator.filesystem.command;
 
 import java.util.List;
-import thehambone.blackopsterminalemulator.Server;
+import thehambone.blackopsterminalemulator.System;
 import thehambone.blackopsterminalemulator.Terminal;
-import thehambone.blackopsterminalemulator.User;
+import thehambone.blackopsterminalemulator.UserAccount;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
 /**
@@ -45,11 +45,11 @@ public class WhoCommand extends ExecutableFile
     @Override
     public void exec(String[] args)
     {
-        Server server = Terminal.getActiveLoginShell().getServer();
+        System system = Terminal.getActiveLoginShell().getSystem();
         
-        List<User> users = server.getUsers();
+        List<UserAccount> users = system.getUsers();
         
-        for (User u : users) {
+        for (UserAccount u : users) {
             if (!u.getHomeDirectory().isUnlisted()) {
                 Terminal.println(u.getUsername());
             }

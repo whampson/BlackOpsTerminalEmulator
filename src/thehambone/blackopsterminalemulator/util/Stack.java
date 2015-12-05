@@ -22,32 +22,71 @@
  * THE SOFTWARE.
  */
 
-package thehambone.blackopsterminalemulator;
+package thehambone.blackopsterminalemulator.util;
 
 /**
- * Created on Nov 29, 2015.
+ * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
+ * @param <T>
+ * @deprecated this class will soon be removed
  */
-public class QueueException extends RuntimeException
+public final class Stack<T>
 {
-    public QueueException()
+    private final T[] stack;
+    
+    private int pointer;
+    
+    @SuppressWarnings("unchecked")
+    public Stack(int capacity)
     {
-        super();
+        if (capacity < 1) {
+            throw new IllegalArgumentException(
+                    "capacity must be a postive integer");
+        }
+        stack = (T[])new Object[capacity];
+        pointer = -1;
     }
     
-    public QueueException(String message)
+    public boolean isEmpty()
     {
-        super(message);
+        return pointer < 0;
     }
     
-    public QueueException(Throwable cause)
+    public boolean isFull()
     {
-        super(cause);
+        return pointer >= stack.length - 1;
     }
     
-    public QueueException(String message, Throwable cause)
+    public int getItemCount()
     {
-        super(message, cause);
+        return pointer + 1;
+    }
+    
+    public T peek()
+    {
+        if (isEmpty()) {
+            throw new StackException("stack is empty");
+        }
+        
+        return stack[pointer];
+    }
+    
+    public void push(T item)
+    {
+        if (isFull()) {
+            throw new StackException("stack is full");
+        }
+        
+        stack[++pointer] = item;
+    }
+    
+    public T pop()
+    {
+        if (isEmpty()) {
+            throw new StackException("stack is empty");
+        }
+        
+        return stack[pointer--];
     }
 }

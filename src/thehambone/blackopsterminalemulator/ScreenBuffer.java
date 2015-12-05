@@ -44,6 +44,9 @@ import java.util.ListIterator;
  */
 public final class ScreenBuffer
 {
+    /**
+     * The number of spaces the tab character occupies.
+     */
     public static final int TAB_LENGTH = 4;
     
     private static final float IMAGE_SCALE_FACTOR = 0.66f;
@@ -62,8 +65,8 @@ public final class ScreenBuffer
      * 
      * @param columns the number of columns that are visible on the screen
      * @param lines the number of lines that are visible on the screen
-     * @param charWidth the height of a character on the screen
-     * @param charHeight the width of a character on the screen
+     * @param charWidth the height of a character on the screen (in pixels)
+     * @param charHeight the width of a character on the screen (in pixels)
      */
     public ScreenBuffer(int columns, int lines, int charWidth, int charHeight)
     {
@@ -155,7 +158,7 @@ public final class ScreenBuffer
      */
     public void putChar(char c)
     {    
-        /* Due to the lazyness of Treyarch's programmers, I had to incorporate
+        /* Due to the lazyness of Black Ops's programmers, I had to incorporate
            some convoluted logic here in order to get some text output to behave
            in the same manner as is does on the actual terminal.
            
@@ -201,9 +204,9 @@ public final class ScreenBuffer
             // Delete the last item in the buffer
             buf.remove(item);
             
-            /* Treyarch screwed up right here -- the cursor should move up a
-               line if the cursor hits the left edge of the screen when there is
-               still more text to be removed. */
+            /* The Black Ops devs screwed up right here -- theoretically, the
+               cursor should move up a line if the cursor hits the left edge of
+               the screen when there is still more text to be removed. */
             // Move cursor back one space until it hits the left edge of screen
             if (cursorX > 0) {
                 cursorX--;
@@ -214,6 +217,7 @@ public final class ScreenBuffer
         
         // Handle tab
         if (c == '\t') {
+            // Tabs should always line up in the same place
             // Calculate number of spaces to add to buffer
             int spacesToAdd = TAB_LENGTH - (cursorX % TAB_LENGTH);
             

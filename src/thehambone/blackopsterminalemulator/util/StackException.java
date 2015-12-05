@@ -22,41 +22,33 @@
  * THE SOFTWARE.
  */
 
-package thehambone.blackopsterminalemulator;
-
-import thehambone.blackopsterminalemulator.filesystem.HomeDirectory;
+package thehambone.blackopsterminalemulator.util;
 
 /**
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
+ * @deprecated this class will soon be removed
  */
-public class User
+public class StackException extends RuntimeException
 {
-    private final String username;
-    private final String password;
-    private final HomeDirectory homeDirectory;
-//    public final Mailbox mailbox;
-    
-    public User(String username, String password, HomeDirectory homeDirectory)
+    public StackException()
     {
-        this.username = username;
-        this.password = password;
-        this.homeDirectory = homeDirectory;
+        super();
     }
     
-    public String getUsername()
+    public StackException(String message)
     {
-        return username;
+        super(message);
     }
     
-    public String getPassword()
+    public StackException(Throwable cause)
     {
-        return password;
+        super(cause);
     }
     
-    public HomeDirectory getHomeDirectory()
+    public StackException(String message, Throwable cause)
     {
-        return homeDirectory;
+        super(message, cause);
     }
 }

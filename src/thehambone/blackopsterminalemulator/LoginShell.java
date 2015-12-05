@@ -24,49 +24,78 @@
 
 package thehambone.blackopsterminalemulator;
 
-import thehambone.blackopsterminalemulator.filesystem.Directory;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 import thehambone.blackopsterminalemulator.filesystem.File;
 import thehambone.blackopsterminalemulator.filesystem.FileSystemObject;
 
 /**
+ * A {@code LoginShell} is a shell associated with a specific user account. It
+ * processes input through a text-based interface.
+ * <p>
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class LoginShell extends Shell
+public final class LoginShell extends Shell
 {
     private static final String DEFAULT_PROMPT = "$";
-    private final Server server;
-    private final User user;
+    
+    private final System system;
+    private final UserAccount user;
     
     private FileSystemObject currentDirectory;
     
-    public LoginShell(Server server, User user)
+    /**
+     * Creates a new {@code LoginShell}.
+     * 
+     * @param system the system on which this shell should be invoked
+     * @param user the user account associated with this shell
+     */
+    public LoginShell(System system, UserAccount user)
     {
         super(DEFAULT_PROMPT, "Error:  Unknown Command - try \"help\"");
         
-        this.server = server;
+        this.system = system;
         this.user = user;
         
         currentDirectory = user.getHomeDirectory();
     }
     
-    public Server getServer()
+    /**
+     * Returns the system that this shell is running on.
+     * 
+     * @return the system that this shell is running on 
+     */
+    public System getSystem()
     {
-        return server;
+        return system;
     }
     
-    public User getUser()
+    /**
+     * Gets the user account associated with this shell.
+     * 
+     * @return the user account associated with this shell
+     */
+    public UserAccount getUser()
     {
         return user;
     }
     
+    /**
+     * Returns the current working directory of the shell.
+     * 
+     * @return the current working directory
+     */
     public FileSystemObject getCurrentDirectory()
     {
         return currentDirectory;
     }
     
+    /**
+     * Sets the current working directory.
+     * 
+     * @param dir the new working directory
+     */
     public void setCurrentDirectory(FileSystemObject dir)
     {
         currentDirectory = dir;
@@ -75,26 +104,45 @@ public class LoginShell extends Shell
     @Override
     protected void onLaunch()
     {
+        // Nothing special to be done here
+    }
+    
+    @Override
+    protected void run()
+    {
         String input;
+        String prompt;
         String commandName;
         String[] args;
-        ExecutableFile executable;
+        ExecutableFile exe;
         FileSystemObject fso;
         
-        Directory commandDir = server.getCommandDirectory();
-        
-        while (isRunning) {
-            executable = null;
-            Terminal.print(prompt);
-            input = Terminal.readLine();
+        // Loop until shell is terminated
+        while (isRunning()) {
+            // Reset previous command
+            exe = null;
             
+            // Print prompt
+            prompt = getPrompt();
+            Terminal.print(prompt);
+            
+            /* Reset the prompt to default if it has changed since the last
+               command was executed */
             if (!prompt.equals(DEFAULT_PROMPT)) {
-                prompt = DEFAULT_PROMPT;
+                setPrompt(DEFAULT_PROMPT);
             }
             
+            // Read a line of text from the user
+            input = Terminal.readLine();
+            
+            // Re-prompt user if input is blank
             if (input.isEmpty()) {
                 continue;
             }
+            
+            // Separate command name and arguments
+            /* The input is tokenized -- first token is the command name,
+               remaining tokens are the arguments */
             if (input.contains(" ")) {
                 int spaceIndex = input.indexOf(' ');
                 commandName = input.substring(0, spaceIndex);
@@ -104,22 +152,28 @@ public class LoginShell extends Shell
                 args = new String[0];
             }
             
-            fso = commandDir.getChild(commandName);
-            if (fso instanceof File) {
+            // Search the filesystem for an executable matching the command name
+            fso = system.getFileSystem().getFileSystemObject(commandName);
+            
+            // Ckeck if the retrieved object is an exeutable
+            if (fso instanceof ExecutableFile) {
+                exe = (ExecutableFile)fso;
+            } else if (fso instanceof File) {
+                // Check if object is a symlink to an executable
                 File f = (File)fso;
                 if (f.isAlias() && f.getAliasTarget() instanceof ExecutableFile) {
-                    executable = (ExecutableFile)f.getAliasTarget();
+                    exe = (ExecutableFile)f.getAliasTarget();
                 }
             }
-            if (fso instanceof ExecutableFile) {
-                executable = (ExecutableFile)fso;
+            
+            // Print error message if an executable with matching name not found
+            if (exe == null) {
+                Terminal.println(getInvalidCommandMessage());
+                continue;
             }
             
-            if (executable == null) {
-                Terminal.println(errorMessage);
-            } else {
-                executable.exec(args);
-            }
+            // Run the command
+            exe.exec(args);
         }
     }
 }

@@ -180,27 +180,33 @@ public class Main
         FileSystem ciaFileSystem = new FileSystem(root);
         FileSystem dreamlandFileSystem = new FileSystem(root2);
         
-        List<User> ciaUsers = new ArrayList<>();
-        List<User> dreamlandUsers = new ArrayList<>();
-        User userAmason = new User("amason", "password", amason);
-        ciaUsers.add(new User("vbush", "manhattan", vbush));
-        ciaUsers.add(new User("jhudson", "bryant1950", jhudson));
-        ciaUsers.add(new User("hkissinger", "", hkissinger));
-        ciaUsers.add(new User("asmith", "roxy", asmith));
-        ciaUsers.add(userAmason);
-        dreamlandUsers.add(new User("vbush", "majestic1", vbush2));
-        Server cia = new Server("CIA", ciaLoginMessage, ciaUsers, ciaFileSystem, bin);
-        Server dreamland = new Server("Dreamland", dreamlandLoginMessage, dreamlandUsers, dreamlandFileSystem, bin);
-        Server dod = new Server("DoD", "", new ArrayList<User>(), null, bin);
-        Server derriese = new Server("DerRiese", "", new ArrayList<User>(), null, bin);
-        Server.addServer(cia);
-        Server.addServer(dreamland);
-        Server.addServer(dod);
-        Server.addServer(derriese);
+        System cia = new System("CIA", ciaLoginMessage, ciaFileSystem);
+        System dreamland = new System("Dreamland", dreamlandLoginMessage, dreamlandFileSystem);
+        System dod = new System("DoD", "", null);
+        System derriese = new System("DerRiese", "", null);
+        
+        UserAccount userAmason = new UserAccount("amason", "password", amason);
+        cia.addUser(new UserAccount("vbush", "manhattan", vbush));
+        cia.addUser(new UserAccount("jhudson", "bryant1950", jhudson));
+        cia.addUser(new UserAccount("hkissinger", "", hkissinger));
+        cia.addUser(new UserAccount("asmith", "roxy", asmith));
+        cia.addUser(userAmason);
+        dreamland.addUser(new UserAccount("vbush", "majestic1", vbush2));
+        
+        Terminal.addSystem(cia);
+        Terminal.addSystem(dreamland);
+        Terminal.addSystem(dod);
+        Terminal.addSystem(derriese);
         Terminal.show();
+        Terminal.printMOTD();
         
         LoginShell loginShell = new LoginShell(cia, userAmason);
-        Terminal.pushLoginShell(loginShell);
-        loginShell.exec();
+        
+        while (true) {
+            Terminal.pushLoginShell(loginShell);
+            loginShell.exec();
+            Terminal.printMOTD();
+            Terminal.print(loginShell.getPrompt());
+        }
     }
 }

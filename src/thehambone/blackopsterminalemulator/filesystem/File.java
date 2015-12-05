@@ -28,6 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A {@code File} is a an entry the filesystem that can contain data. A file is
+ * also the endpoint of a branch in the filesystem tree, also known as a "leaf."
+ * This means that a {@code File} can have no child filesystem objects.
+ * <p>
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
@@ -41,11 +45,25 @@ public class File implements FileSystemObject
     private boolean isHidden;
     private File aliasTarget;
     
+    /**
+     * Creates a new {@code File}.
+     * 
+     * @param id the filesystem object id
+     * @param name the file name
+     */
     public File(int id, String name)
     {
         this(id, name, false);
     }
     
+    /**
+     * Creates a new {@code File}.
+     * 
+     * @param id the filesystem object id
+     * @param name the file name
+     * @param isHidden a boolean value indicating whether the file should be
+     *                 marked as hidden
+     */
     public File(int id, String name, boolean isHidden)
     {
         this.id = id;
@@ -54,26 +72,54 @@ public class File implements FileSystemObject
         aliasTarget = null;
     }
     
+    /**
+     * Checks whether this file is marked as hidden.
+     * 
+     * @return {@code true} if this file is hidden, {@code false} otherwise
+     */
     public boolean isHidden()
     {
         return isHidden;
     }
     
+    /**
+     * Marks or unmarks this file as hidden.
+     * 
+     * @param isHidden a boolean value indicating whether the file should be
+     *                 marked as hidden
+     */
     public void setHidden(boolean isHidden)
     {
         this.isHidden = isHidden;
     }
     
+    /**
+     * Checks whether this file is a link to another file.
+     * 
+     * @return {@code true} if this file points to another file in the
+     *         filesystem, {@code false} otherwise
+     */
     public boolean isAlias()
     {
         return aliasTarget != null;
     }
     
+    /**
+     * Marks this file as a link to another file.
+     * 
+     * @param target the file to which this file should link to
+     */
     public void markAsAlias(File target)
     {
         aliasTarget = target;
     }
     
+    /**
+     * Returns the file that this file points to if this file is an alias. If
+     * this file is not an alias, {@code null} is returned.
+     * 
+     * @return the target file id this file is an alias
+     */
     public File getAliasTarget()
     {
         return aliasTarget;
@@ -119,6 +165,7 @@ public class File implements FileSystemObject
     @Override
     public FileSystemObject getChild(String name)
     {
+        // Files do not have children
         return null;
     }
     
@@ -140,6 +187,8 @@ public class File implements FileSystemObject
         FileSystemObject par = this;
         String path = "";
         
+        // Traverse tree up to root node
+        // Prepend the name of the parent node to the path
         while (par != null) {
             path = par.getName() + FILE_SEPARATOR_CHAR + path;
             par = par.getParent();

@@ -22,31 +22,31 @@
  * THE SOFTWARE.
  */
 
-package thehambone.blackopsterminalemulator;
+package thehambone.blackopsterminalemulator.util;
 
 /**
- * Created on Nov 28, 2015.
+ * Created on Nov 29, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class StackException extends RuntimeException
+public class QueueException extends RuntimeException
 {
-    public StackException()
+    public QueueException()
     {
         super();
     }
     
-    public StackException(String message)
+    public QueueException(String message)
     {
         super(message);
     }
     
-    public StackException(Throwable cause)
+    public QueueException(Throwable cause)
     {
         super(cause);
     }
     
-    public StackException(String message, Throwable cause)
+    public QueueException(String message, Throwable cause)
     {
         super(message, cause);
     }

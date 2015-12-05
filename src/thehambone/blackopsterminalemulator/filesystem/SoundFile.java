@@ -34,14 +34,23 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
+ * A {@code SoundFile} is a file containing audio data.
+ * <p>
  * Created on Nov 30, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class SoundFile extends PrintableFile
+public final class SoundFile extends PrintableFile
 {
     private static Clip activeSoundClip;
     
+    /**
+     * Creates a new {@code SoundFile}.
+     * 
+     * @param id the filesystem object id
+     * @param name the name of this file
+     * @param resourcePath the path to the resource containing the file data
+     */
     public SoundFile(int id, String name, String resourcePath)
     {
         super(id, name, resourcePath);
@@ -55,18 +64,23 @@ public class SoundFile extends PrintableFile
             AudioFormat format;
             DataLine.Info info;
             
-            stream = AudioSystem.getAudioInputStream(new java.io.File(getResourcePath()));
+            // Load sound data and get encoding information
+            stream = AudioSystem
+                    .getAudioInputStream(new java.io.File(getResourcePath()));
             format = stream.getFormat();
             info = new DataLine.Info(Clip.class, format);
             
+            // If a sound is already playing, stop it
             if (activeSoundClip != null && activeSoundClip.isActive()) {
                 activeSoundClip.stop();
             }
             
+            // Load the sound clip and play it
             activeSoundClip = (Clip)AudioSystem.getLine(info);
             activeSoundClip.open(stream);
             activeSoundClip.start();
-        } catch (IOException | UnsupportedAudioFileException | LineUnavailableException ex) {
+        } catch (UnsupportedAudioFileException | LineUnavailableException
+                | IOException ex) {
             // TODO: log
             ex.printStackTrace();
         }

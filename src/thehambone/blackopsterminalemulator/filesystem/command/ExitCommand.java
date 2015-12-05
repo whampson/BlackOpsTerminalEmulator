@@ -44,12 +44,7 @@ public class ExitCommand extends ExecutableFile
     @Override
     public void exec(String[] args)
     {
-        if (Terminal.getLoginShellCount() == 1) {
-            Terminal.printMOTD();
-            Terminal.print(Terminal.getActiveLoginShell().getPrompt());
-        } else {
             Shell s = Terminal.popLoginShell();
             s.terminate();
-        }
     }
 }

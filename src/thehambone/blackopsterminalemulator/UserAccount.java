@@ -24,68 +24,65 @@
 
 package thehambone.blackopsterminalemulator;
 
+import thehambone.blackopsterminalemulator.filesystem.HomeDirectory;
+
 /**
+ * A {@code UserAccount} is a record that stores a user's files and login
+ * credentials.
+ * <p>
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
- * @param <T>
  */
-public final class Stack<T>
+public final class UserAccount
 {
-    private final T[] stack;
+    private final String username;
+    private final String password;
+    private final HomeDirectory homeDirectory;
+//    public final Mailbox mailbox;
     
-    private int pointer;
-    
-    @SuppressWarnings("unchecked")
-    public Stack(int capacity)
+    /**
+     * Creates a new {@code UserAccount}.
+     * 
+     * @param username the login name
+     * @param password the login password
+     * @param homeDirectory the directory where files are located
+     */
+    public UserAccount(String username, String password,
+            HomeDirectory homeDirectory)
     {
-        if (capacity < 1) {
-            throw new IllegalArgumentException(
-                    "capacity must be a postive integer");
-        }
-        stack = (T[])new Object[capacity];
-        pointer = -1;
+        this.username = username;
+        this.password = password;
+        this.homeDirectory = homeDirectory;
     }
     
-    public boolean isEmpty()
+    /**
+     * Gets this user's login name.
+     * 
+     * @return the user's login name
+     */
+    public String getUsername()
     {
-        return pointer < 0;
+        return username;
     }
     
-    public boolean isFull()
+    /**
+     * Gets this user's login password.
+     * 
+     * @return the user's password
+     */
+    public String getPassword()
     {
-        return pointer >= stack.length - 1;
+        return password;
     }
     
-    public int getItemCount()
+    /**
+     * Returns the directory where all of the user's files are located.
+     * 
+     * @return the user's home directory
+     */
+    public HomeDirectory getHomeDirectory()
     {
-        return pointer + 1;
-    }
-    
-    public T peek()
-    {
-        if (isEmpty()) {
-            throw new StackException("stack is empty");
-        }
-        
-        return stack[pointer];
-    }
-    
-    public void push(T item)
-    {
-        if (isFull()) {
-            throw new StackException("stack is full");
-        }
-        
-        stack[++pointer] = item;
-    }
-    
-    public T pop()
-    {
-        if (isEmpty()) {
-            throw new StackException("stack is empty");
-        }
-        
-        return stack[pointer--];
+        return homeDirectory;
     }
 }

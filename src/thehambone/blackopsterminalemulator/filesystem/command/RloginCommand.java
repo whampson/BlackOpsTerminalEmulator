@@ -25,7 +25,7 @@
 package thehambone.blackopsterminalemulator.filesystem.command;
 
 import thehambone.blackopsterminalemulator.LoginShell;
-import thehambone.blackopsterminalemulator.Server;
+import thehambone.blackopsterminalemulator.System;
 import thehambone.blackopsterminalemulator.Terminal;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
@@ -49,19 +49,19 @@ public class RloginCommand extends ExecutableFile
             return;
         }
         
-        if (Terminal.isLoginShellStackFull()) {
+        if (Terminal.maxLoginShellsReached()) {
             Terminal.println("Error:  Too many logins - "
                     + "Use exit to close open shells");
             return;
         }
         
-        Server server = Server.getServer(args[0]);
+        System system = Terminal.getSystem(args[0]);
         
-        if (server == null) {
+        if (system == null) {
             Terminal.println("Error:  unknown system");
             return;
         }
-        LoginShell newShell = server.login();
+        LoginShell newShell = system.login();
         
         if (newShell != null) {
             Terminal.pushLoginShell(newShell);

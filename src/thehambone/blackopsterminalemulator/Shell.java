@@ -25,44 +25,100 @@
 package thehambone.blackopsterminalemulator;
 
 /**
+ * A {@code Shell} provides an interface that allows the user to interact with
+ * the terminal.
+ * <p>
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
 public abstract class Shell
 {
-    protected volatile boolean isRunning;
+    private volatile boolean isRunning;
     
-    protected String prompt;
-    protected String errorMessage;
+    private String prompt;
+    private String invalidCommandMessage;
     
-    protected Shell(String prompt, String errorMessage)
+    /**
+     * Creates a new {@code Shell}.
+     * 
+     * @param prompt the default command prompt
+     * @param invalidCommandMessage the message to show when an invalid command
+     *                              is entered
+     */
+    protected Shell(String prompt, String invalidCommandMessage)
     {
         this.prompt = prompt;
-        this.errorMessage = errorMessage;
+        this.invalidCommandMessage = invalidCommandMessage;
         isRunning = false;
     }
     
+    /**
+     * Returns the command prompt string.
+     * 
+     * @return the shell prompt
+     */
     public String getPrompt()
     {
         return prompt;
     }
     
+    /**
+     * Sets the command prompt string.
+     * 
+     * @param prompt the new command prompt
+     */
     public void setPrompt(String prompt)
     {
         this.prompt = prompt;
     }
     
+    /**
+     * Launches the shell session.
+     */
     public void exec()
     {
         isRunning = true;
         onLaunch();
+        run();
     }
     
+    /**
+     * Ends the shell session.
+     */
     public void terminate()
     {
         isRunning = false;
     }
     
+    /**
+     * Gets the message that should be displayed when an invalid command is
+     * entered.
+     * 
+     * @return the invalid command error message
+     */
+    protected String getInvalidCommandMessage()
+    {
+        return invalidCommandMessage;
+    }
+    
+    /**
+     * Checks whether a shell session is currently in progress.
+     * 
+     * @return {@code true} if a session is in progress, {@code false} otherwise
+     */
+    protected boolean isRunning()
+    {
+        return isRunning;
+    }
+    
+    /**
+     * This code runs when a shell session is launched.
+     */
     protected abstract void onLaunch();
+    
+    /**
+     * This code runs while a session is in progress.
+     */
+    protected abstract void run();
 }

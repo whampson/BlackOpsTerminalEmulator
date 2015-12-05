@@ -52,7 +52,7 @@ public class CatCommand extends ExecutableFile
         }
         
         LoginShell shell = Terminal.getActiveLoginShell();
-        FileSystem fileSystem = shell.getServer().getFileSystem();
+        FileSystem fileSystem = shell.getSystem().getFileSystem();
         
         FileSystemObject fso = fileSystem.getFileSystemObject(args[0]);
         if (fso == null) {
