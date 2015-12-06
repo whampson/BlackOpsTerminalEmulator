@@ -37,19 +37,15 @@ public abstract class Shell
     private volatile boolean isRunning;
     
     private String prompt;
-    private String invalidCommandMessage;
     
     /**
      * Creates a new {@code Shell}.
      * 
      * @param prompt the default command prompt
-     * @param invalidCommandMessage the message to show when an invalid command
-     *                              is entered
      */
-    protected Shell(String prompt, String invalidCommandMessage)
+    public Shell(String prompt)
     {
         this.prompt = prompt;
-        this.invalidCommandMessage = invalidCommandMessage;
         isRunning = false;
     }
     
@@ -89,17 +85,6 @@ public abstract class Shell
     public void terminate()
     {
         isRunning = false;
-    }
-    
-    /**
-     * Gets the message that should be displayed when an invalid command is
-     * entered.
-     * 
-     * @return the invalid command error message
-     */
-    protected String getInvalidCommandMessage()
-    {
-        return invalidCommandMessage;
     }
     
     /**

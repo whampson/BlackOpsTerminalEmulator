@@ -38,6 +38,7 @@ import thehambone.blackopsterminalemulator.filesystem.HomeDirectory;
 import thehambone.blackopsterminalemulator.filesystem.ImageFile;
 import thehambone.blackopsterminalemulator.filesystem.SoundFile;
 import thehambone.blackopsterminalemulator.filesystem.TextFile;
+import thehambone.blackopsterminalemulator.filesystem.command.AliciaCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.CatCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.CdCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.ClearCommand;
@@ -79,7 +80,7 @@ public class Main
     public static void main(String[] args)
     {
         // TODO: arrow keys, cd command arg parsing, documentation,
-        // logging, encode decode alicia mail cmds
+        // logging, mail
         
         String title = PROGRAM_TITLE + " - " + PROGRAM_VERSION;
         Terminal.setTitle(title);
@@ -115,6 +116,7 @@ public class Main
         
         Map<String, Class<? extends ExecutableFile>> executables = new HashMap<>();
         executables.put("3arc", ThreeArcCommand.class);
+        executables.put("alicia", AliciaCommand.class);
         executables.put("cat", CatCommand.class);
         executables.put("cd", CdCommand.class);
         executables.put("clear", ClearCommand.class);

@@ -53,7 +53,7 @@ public final class LoginShell extends Shell
      */
     public LoginShell(System system, UserAccount user)
     {
-        super(DEFAULT_PROMPT, "Error:  Unknown Command - try \"help\"");
+        super(DEFAULT_PROMPT);
         
         this.system = system;
         this.user = user;
@@ -168,7 +168,7 @@ public final class LoginShell extends Shell
             
             // Print error message if an executable with matching name not found
             if (exe == null) {
-                Terminal.println(getInvalidCommandMessage());
+                Terminal.println("Error:  Unknown Command - try \"help\"");
                 continue;
             }
             
