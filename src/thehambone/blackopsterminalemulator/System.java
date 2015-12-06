@@ -27,7 +27,6 @@ package thehambone.blackopsterminalemulator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import thehambone.blackopsterminalemulator.filesystem.Directory;
 import thehambone.blackopsterminalemulator.filesystem.FileSystem;
 
 /**
@@ -42,9 +41,9 @@ public class System
 {
     private final String name;
     private final String loginMessage;
-    
     private final List<UserAccount> users;
-    private final FileSystem fileSystem;
+    
+    private FileSystem fileSystem;
     
     /**
      * Creates a new {@code System}.
@@ -52,16 +51,13 @@ public class System
      * @param name the name of the system
      * @param loginMessage the message to be displayed when a user attempts to
      *                     log in 
-     * @param fileSystem a {@code FileSystem} object containing containing the
-     *                   directories and files for the system
      */
-    public System(String name, String loginMessage, FileSystem fileSystem)
+    public System(String name, String loginMessage)
     {
         this.name = name;
         this.loginMessage = loginMessage;
         
         this.users = new ArrayList<>();
-        this.fileSystem = fileSystem;
     }
     
     /**
@@ -83,6 +79,16 @@ public class System
     public FileSystem getFileSystem()
     {
         return fileSystem;
+    }
+    
+    /**
+     * 
+     * @param fileSystem a {@code FileSystem} object containing containing the
+     *                   directories and files for the system
+     */
+    public void setFileSystem(FileSystem fileSystem)
+    {
+        this.fileSystem = fileSystem;
     }
     
     /**

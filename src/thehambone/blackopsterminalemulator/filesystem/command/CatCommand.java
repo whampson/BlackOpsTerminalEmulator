@@ -38,9 +38,9 @@ import thehambone.blackopsterminalemulator.filesystem.PrintableFile;
  */
 public class CatCommand extends ExecutableFile
 {
-    public CatCommand()
+    public CatCommand(int id)
     {
-        super(116, "cat");
+        super(id, "cat");
     }
 
     @Override

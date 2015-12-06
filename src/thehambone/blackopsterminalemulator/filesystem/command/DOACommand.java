@@ -34,9 +34,9 @@ import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
  */
 public class DOACommand extends ExecutableFile
 {
-    public DOACommand()
+    public DOACommand(int id)
     {
-        super(103, "doa");
+        super(id, "doa");
     }
 
     @Override

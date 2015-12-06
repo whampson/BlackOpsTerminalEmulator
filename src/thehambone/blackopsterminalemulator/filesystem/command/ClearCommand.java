@@ -34,9 +34,9 @@ import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
  */
 public class ClearCommand extends ExecutableFile
 {
-    public ClearCommand()
+    public ClearCommand(int id)
     {
-        super(102, "clear");
+        super(id, "clear");
     }
     
     @Override

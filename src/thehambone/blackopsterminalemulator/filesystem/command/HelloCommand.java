@@ -34,9 +34,9 @@ import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
  */
 public class HelloCommand extends ExecutableFile
 {
-    public HelloCommand()
+    public HelloCommand(int id)
     {
-        super(107, "hello");
+        super(id, "hello");
     }
     
     @Override
@@ -46,7 +46,8 @@ public class HelloCommand extends ExecutableFile
             Terminal.println("Error:  Invalid Input - common usages include:");
             Terminal.println("hello brother, hello nurse, and hello sailor");
         } else if (args[0].equals("sailor")) {
-            new ZorkCommand().exec(args);
+            // TODO: invoke zork
+            //new ZorkCommand().exec(args);
         }
     }
 }

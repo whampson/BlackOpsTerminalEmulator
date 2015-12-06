@@ -34,9 +34,9 @@ import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
  */
 public class FoobarCommand extends ExecutableFile
 {
-    public FoobarCommand()
+    public FoobarCommand(int id)
     {
-        super(106, "foobar");
+        super(id, "foobar");
     }
     
     @Override

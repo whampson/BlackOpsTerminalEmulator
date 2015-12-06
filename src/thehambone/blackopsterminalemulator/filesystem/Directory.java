@@ -97,6 +97,32 @@ public class Directory implements FileSystemObject
     }
     
     @Override
+    public FileSystemObject getChild(int id)
+    {
+        if (!hasChildren()) {
+            return null;
+        }
+        
+        for (FileSystemObject child : children) {
+            if (child == null) {
+                continue;
+            }
+            
+            if (child.getID() == id) {
+                return child;
+            } else {
+                child = child.getChild(id);
+                
+                if (child != null && child.getID() == id) {
+                    return child;
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    @Override
     public FileSystemObject getChild(String name)
     {
         if (!hasChildren()) {

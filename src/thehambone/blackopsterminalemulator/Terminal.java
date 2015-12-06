@@ -172,21 +172,46 @@ public final class Terminal
         return system;
     }
     
+    /**
+     * Checks whether the maximum number of active login shells has been
+     * reached.
+     * 
+     * @return {@code true} if the limit has been reached, {@code false}
+     *         otherwise
+     */
     public static boolean maxLoginShellsReached()
     {
         return TERMINAL_INSTANCE.activeShells.size() == MAX_LOGIN_SHELLS;
     }
     
+    /**
+     * Gets the LoginShell instance currently in use. The active login shell is
+     * located at the top of the login shell stack.
+     * 
+     * @return the LoginShell instance currently in use
+     */
     public static LoginShell getActiveLoginShell()
     {
         return TERMINAL_INSTANCE.activeShells.peek();
     }
     
+    /**
+     * Pushes a login shell to the top of the login shell stack and marks it as
+     * the active shell.
+     * 
+     * @param shell the shell to be added to the login shell stack
+     */
     public static void pushLoginShell(LoginShell shell)
     {
         TERMINAL_INSTANCE.activeShells.push(shell);
     }
     
+    /**
+     * Removes the top login shell from the login shell stack. The shell
+     * immediately below the popped shell will become the new active shell.
+     * 
+     * @return the popped login shell
+     */
     public static LoginShell popLoginShell()
     {
         return TERMINAL_INSTANCE.activeShells.pop();

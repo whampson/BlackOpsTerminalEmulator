@@ -34,9 +34,9 @@ import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
  */
 public class ZorkCommand extends ExecutableFile
 {
-    public ZorkCommand()
+    public ZorkCommand(int id)
     {
-        super(115, "zork");
+        super(id, "zork");
     }
     
     @Override

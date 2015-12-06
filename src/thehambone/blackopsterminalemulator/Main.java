@@ -24,22 +24,27 @@
 
 package thehambone.blackopsterminalemulator;
 
-import thehambone.blackopsterminalemulator.filesystem.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import thehambone.blackopsterminalemulator.filesystem.Directory;
-import thehambone.blackopsterminalemulator.filesystem.FileSystem;
-import thehambone.blackopsterminalemulator.filesystem.HomeDirectory;
-import thehambone.blackopsterminalemulator.filesystem.command.CdCommand;
-import thehambone.blackopsterminalemulator.filesystem.command.DirCommand;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
+import thehambone.blackopsterminalemulator.filesystem.File;
+import thehambone.blackopsterminalemulator.filesystem.FileSystem;
+import thehambone.blackopsterminalemulator.filesystem.FileSystemObject;
+import thehambone.blackopsterminalemulator.filesystem.HomeDirectory;
 import thehambone.blackopsterminalemulator.filesystem.ImageFile;
-import thehambone.blackopsterminalemulator.filesystem.PrintableFile;
 import thehambone.blackopsterminalemulator.filesystem.SoundFile;
 import thehambone.blackopsterminalemulator.filesystem.TextFile;
 import thehambone.blackopsterminalemulator.filesystem.command.CatCommand;
+import thehambone.blackopsterminalemulator.filesystem.command.CdCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.ClearCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.DOACommand;
+import thehambone.blackopsterminalemulator.filesystem.command.DirCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.ExitCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.FoobarCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.HelloCommand;
@@ -50,6 +55,7 @@ import thehambone.blackopsterminalemulator.filesystem.command.RloginCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.ThreeArcCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.WhoCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.ZorkCommand;
+import thehambone.blackopsterminalemulator.io.CSVFileReader;
 
 /**
  * This class handles program initialization.
@@ -73,7 +79,7 @@ public class Main
     public static void main(String[] args)
     {
         // TODO: arrow keys, cd command arg parsing, documentation,
-        // logging
+        // logging, encode decode alicia mail cmds
         
         String title = PROGRAM_TITLE + " - " + PROGRAM_VERSION;
         Terminal.setTitle(title);
@@ -83,6 +89,7 @@ public class Main
         String ciaLoginMessage = "Central Intelligence Agency Data system\n\n"
                 + "Unauthorized use of this system is against the law.\n\n"
                 + "Security Privileges Required";
+        
         String dreamlandLoginMessage = "Dreamland Server 12\n\n\n"
                 + "***MJ12 Clearance Required***";
         
@@ -90,117 +97,163 @@ public class Main
                 + "USER:amason\n"
                 + "PASSWORD:********\n");
         
-        Directory root = new Directory(1, "");
-        Directory bin = new Directory(2, "bin");
-        Directory home = new Directory(3, "home");
-        HomeDirectory amason = new HomeDirectory(4, "amason");
-        HomeDirectory asmith = new HomeDirectory(5, "asmith");
-        HomeDirectory hkissinger = new HomeDirectory(6, "hkissinger", true);
-        HomeDirectory jhudson = new HomeDirectory(7, "jhudson");
-        HomeDirectory vbush = new HomeDirectory(33, "vbush");
+        System s = null;
+        try {
+            CSVFileReader reader = new CSVFileReader("res/systems.csv");
+            reader.setCommentChar('#');
+            reader.ignoreWhitespaces(true);
+            while (reader.loadNextLine()) {
+                String systemName = reader.nextField();
+                String loginMessage = reader.nextField();
+                java.lang.System.out.println("loading system " + systemName);
+                s = new System(systemName, loginMessage);
+                Terminal.addSystem(s);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
         
-        root.addChild(bin);
-        root.addChild(home);
-        home.addChild(amason);
-        home.addChild(asmith);
-        home.addChild(hkissinger);
-        home.addChild(jhudson);
-        home.addChild(vbush);
+        Map<String, Class<? extends ExecutableFile>> executables = new HashMap<>();
+        executables.put("3arc", ThreeArcCommand.class);
+        executables.put("cat", CatCommand.class);
+        executables.put("cd", CdCommand.class);
+        executables.put("clear", ClearCommand.class);
+        executables.put("doa", DOACommand.class);
+        executables.put("dir", DirCommand.class);
+        executables.put("exit", ExitCommand.class);
+        executables.put("foobar", FoobarCommand.class);
+        executables.put("hello", HelloCommand.class);
+        executables.put("help", HelpCommand.class);
+        executables.put("login", LoginCommand.class);
+        executables.put("more", MoreCommand.class);
+        executables.put("rlogin", RloginCommand.class);
+        executables.put("who", WhoCommand.class);
+        executables.put("zork", ZorkCommand.class);
         
-        ExecutableFile cd = new CdCommand();
-        ExecutableFile help = new HelpCommand();
-        ExecutableFile dir = new DirCommand();
-        ExecutableFile login = new LoginCommand();
-        ExecutableFile exit = new ExitCommand();
-        ExecutableFile clear = new ClearCommand();
-        ExecutableFile foobar = new FoobarCommand();
-        ExecutableFile hello = new HelloCommand();
-        ExecutableFile doa = new DOACommand();
-        ExecutableFile threearc = new ThreeArcCommand();
-        ExecutableFile zork = new ZorkCommand();
-        ExecutableFile more = new MoreCommand();
-        ExecutableFile who = new WhoCommand();
-        ExecutableFile rlogin = new RloginCommand();
-        ExecutableFile cat = new CatCommand();
-        File ls = new File(8, "ls");
-        ls.markAsAlias(dir);
-        File cls = new File(9, "cls");
-        cls.markAsAlias(clear);
-        bin.addChild(cd);
-        bin.addChild(help);
-        bin.addChild(dir);
-        bin.addChild(ls);
-        bin.addChild(login);
-        bin.addChild(exit);
-        bin.addChild(clear);
-        bin.addChild(cls);
-        bin.addChild(foobar);
-        bin.addChild(hello);
-        bin.addChild(doa);
-        bin.addChild(threearc);
-        bin.addChild(zork);
-        bin.addChild(more);
-        bin.addChild(who);
-        bin.addChild(rlogin);
-        bin.addChild(cat);
+        FileSystem tempFileSystem = new FileSystem(new Directory(0, ""));
+        try {
+            CSVFileReader reader = new CSVFileReader("res/files.csv");
+            reader.setCommentChar('#');
+            reader.ignoreWhitespaces(true);
+            while (reader.loadNextLine()) {
+                int id = Integer.parseInt(reader.nextField());
+                String fileName = reader.nextField();
+                boolean isHidden = Boolean.parseBoolean(reader.nextField());
+                String resourcePath = reader.nextField();
+                if (!resourcePath.isEmpty()) {
+                    resourcePath = "res/files/" + resourcePath;
+                }
+                String aliasIDStr = "";
+                if (reader.hasNextField()) {
+                    aliasIDStr = reader.nextField();
+                }
+                java.lang.System.out.println("loading file " + fileName + " (" + id + ")");
+                File f;
+                if (!aliasIDStr.isEmpty()) {
+                    f = new File(id, fileName);
+                    int aliasID = Integer.parseInt(aliasIDStr);
+                    File aliasTarget = (File)tempFileSystem.getFileSystemObject(aliasID);
+                    f.markAsAlias(aliasTarget);
+                } else if (id > 100 && id < 200) {
+                    Class<? extends ExecutableFile> clazz = executables.get(fileName);
+                    if (clazz == null) {
+                        continue;
+                    }
+                    Constructor<? extends ExecutableFile> constructor = clazz.getConstructor(int.class);
+                    f = constructor.newInstance(id);
+                } else if (id > 300 && id < 400) {
+                    f = new TextFile(id, fileName, resourcePath);
+                } else if (id > 400 && id < 500) {
+                    f = new ImageFile(id, fileName, resourcePath);
+                } else if (id > 500 && id < 600) {
+                    f = new SoundFile(id, fileName, resourcePath);
+                } else {
+                    f = new File(id, fileName);
+                }
+                f.setHidden(isHidden);
+                tempFileSystem.getRoot().addChild(f);
+            }
+        } catch (IOException | InstantiationException | IllegalAccessException ex) {
+            ex.printStackTrace();
+        } catch (NoSuchMethodException | SecurityException ex) {
+            ex.printStackTrace();
+        } catch (IllegalArgumentException | InvocationTargetException ex) {
+            ex.printStackTrace();
+        }
         
-        File motd = new File(19, "_motd.txt", true);
-        PrintableFile battleberlin = new TextFile(11, "BattleBerlin.txt", "res/files/bb77b895.txt");
-        PrintableFile gknovamemo = new TextFile(11, "GK-NovaMemo.txt", "res/files/c5be8bb9.txt");
-        PrintableFile thewolf = new ImageFile(20, "thewolf.pic", "res/files/reznov1.png");
-        PrintableFile barhavana = new ImageFile(20, "barhavana.pic", "res/files/sp_bop1.png");
-        PrintableFile anvil = new SoundFile(21, "anvil.snd", "res/files/mus_anvil_trippy.wav");
-        PrintableFile reznov = new SoundFile(23, "reznov.snd", "res/files/mus_rapture_intro_radio.wav");
-        PrintableFile doa1 = new ImageFile(34, "doa1.pic", "res/files/doa1.png");
-        PrintableFile doa2 = new ImageFile(34, "doa2.pic", "res/files/doa2.png");
-        PrintableFile doa3 = new ImageFile(34, "doa3.pic", "res/files/doa3.png");
-        File masonbio = new File(12, "MasonBio.txt");
-        root.addChild(motd);
-        asmith.addChild(battleberlin);
-        asmith.addChild(masonbio);
-        amason.addChild(battleberlin);
-        amason.addChild(thewolf);
-        amason.addChild(anvil);
-        amason.addChild(reznov);
-        amason.addChild(barhavana);
-        jhudson.addChild(gknovamemo);
-        amason.addChild(gknovamemo);
-        vbush.addChild(doa1);
-        vbush.addChild(doa2);
-        vbush.addChild(doa3);
-
-        Directory root2 = new Directory(13, "");
-        Directory home2 = new Directory(14, "home");
-        HomeDirectory vbush2 = new HomeDirectory(15, "vbush");
+        try {
+            CSVFileReader reader = new CSVFileReader("res/filesystem.csv");
+            reader.setCommentChar('#');
+            reader.ignoreWhitespaces(true);
+            while (reader.loadNextLine()) {
+                int id = Integer.parseInt(reader.nextField());
+                String systemName = reader.nextField();
+                String dirName = reader.nextField();
+                int parentID = Integer.parseInt(reader.nextField());
+                String files = "";
+                if (reader.hasNextField()) {
+                    files = reader.nextField();
+                }
+                java.lang.System.out.println("loading directory " + dirName + " (" + id + ")");
+                System system = Terminal.getSystem(systemName);
+                Directory dir;
+                if (parentID == -1 || (id > 600 && id < 700)) {
+                    dir = new Directory(id, dirName);
+                    system.setFileSystem(new FileSystem(dir));
+                } else if (id > 800 && id < 900) {
+                    dir = new HomeDirectory(id, dirName);
+                } else {
+                    dir = new Directory(id, dirName);
+                }
+                FileSystemObject parent = system.getFileSystem().getFileSystemObject(parentID);
+                if (parent != null) {
+                    parent.addChild(dir);
+                }
+                
+                String[] fileIDList = files.split(" ");
+                for (String fileIDStr : fileIDList) {
+                    if (fileIDStr.isEmpty()) {
+                        continue;
+                    }
+                    int fileID = Integer.parseInt(fileIDStr);
+                    File file = (File)tempFileSystem.getFileSystemObject(fileID);
+                    if (file == null) {
+                        java.lang.System.out.println("null id: " + fileID);
+                        continue;
+                    }
+                    dir.addChild(file);
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
         
-        root2.addChild(bin);
-        root2.addChild(home2);
-        home2.addChild(vbush2);
+        UserAccount u = null;
+        try {
+            CSVFileReader reader = new CSVFileReader("res/users.csv");
+            reader.setCommentChar('#');
+            reader.ignoreWhitespaces(true);
+            while (reader.loadNextLine()) {
+                String systemName = reader.nextField();
+                String username = reader.nextField();
+                String password = reader.nextField();
+                java.lang.System.out.println("loading user " + username + " on system " + systemName);
+                int homeDirID = Integer.parseInt(reader.nextField());
+                boolean isUnlisted = Boolean.parseBoolean(reader.nextField());
+                System system = Terminal.getSystem(systemName);
+                HomeDirectory homeDir = (HomeDirectory)system.getFileSystem().getFileSystemObject(homeDirID);
+                homeDir.setUnlisted(isUnlisted);
+                u = new UserAccount(username, password, homeDir);
+                system.addUser(u);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
         
-        FileSystem ciaFileSystem = new FileSystem(root);
-        FileSystem dreamlandFileSystem = new FileSystem(root2);
+        LoginShell loginShell = new LoginShell(s, u);
         
-        System cia = new System("CIA", ciaLoginMessage, ciaFileSystem);
-        System dreamland = new System("Dreamland", dreamlandLoginMessage, dreamlandFileSystem);
-        System dod = new System("DoD", "", null);
-        System derriese = new System("DerRiese", "", null);
-        
-        UserAccount userAmason = new UserAccount("amason", "password", amason);
-        cia.addUser(new UserAccount("vbush", "manhattan", vbush));
-        cia.addUser(new UserAccount("jhudson", "bryant1950", jhudson));
-        cia.addUser(new UserAccount("hkissinger", "", hkissinger));
-        cia.addUser(new UserAccount("asmith", "roxy", asmith));
-        cia.addUser(userAmason);
-        dreamland.addUser(new UserAccount("vbush", "majestic1", vbush2));
-        
-        Terminal.addSystem(cia);
-        Terminal.addSystem(dreamland);
-        Terminal.addSystem(dod);
-        Terminal.addSystem(derriese);
         Terminal.show();
         Terminal.printMOTD();
-        
-        LoginShell loginShell = new LoginShell(cia, userAmason);
         
         while (true) {
             Terminal.pushLoginShell(loginShell);

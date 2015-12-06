@@ -42,9 +42,9 @@ import thehambone.blackopsterminalemulator.filesystem.FileSystemObject;
  */
 public class DirCommand extends ExecutableFile
 {
-    public DirCommand()
+    public DirCommand(int id)
     {
-        super(104, "dir");
+        super(id, "dir");
     }
     
     private double roundHalfDown(double d)

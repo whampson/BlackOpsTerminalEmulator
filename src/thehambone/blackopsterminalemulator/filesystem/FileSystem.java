@@ -61,7 +61,11 @@ public class FileSystem
     // TODO: implement this
     public FileSystemObject getFileSystemObject(int id)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        if (id == root.getID()) {
+            return root;
+        }
+        
+        return root.getChild(id);
     }
     
     /**

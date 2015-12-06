@@ -37,9 +37,9 @@ import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
  */
 public class WhoCommand extends ExecutableFile
 {
-    public WhoCommand()
+    public WhoCommand(int id)
     {
-        super(114, "who");
+        super(id, "who");
     }
     
     @Override

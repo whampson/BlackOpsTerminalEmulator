@@ -36,9 +36,9 @@ import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
  */
 public class RloginCommand extends ExecutableFile
 {
-    public RloginCommand()
+    public RloginCommand(int id)
     {
-        super(112, "rlogin");
+        super(id, "rlogin");
     }
     
     @Override

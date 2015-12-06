@@ -34,9 +34,9 @@ import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
  */
 public class MoreCommand extends ExecutableFile
 {
-    public MoreCommand()
+    public MoreCommand(int id)
     {
-        super(111, "more");
+        super(id, "more");
     }
     
     @Override

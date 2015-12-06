@@ -34,9 +34,9 @@ import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
  */
 public class HelpCommand extends ExecutableFile
 {
-    public HelpCommand()
+    public HelpCommand(int id)
     {
-        super(108, "help");
+        super(id, "help");
     }
     
     @Override

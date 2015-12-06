@@ -34,10 +34,9 @@ import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
  */
 public class ThreeArcCommand extends ExecutableFile
 {
-    public ThreeArcCommand()
+    public ThreeArcCommand(int id)
     {
-        super(113, "3arc");
-//        isHidden = true;
+        super(id, "3arc");
     }
     
     @Override

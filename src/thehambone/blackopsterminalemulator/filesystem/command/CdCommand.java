@@ -38,9 +38,9 @@ import thehambone.blackopsterminalemulator.filesystem.HomeDirectory;
  */
 public class CdCommand extends ExecutableFile
 {
-    public CdCommand()
+    public CdCommand(int id)
     {
-        super(101, "cd");
+        super(id, "cd");
     }
     
     @Override

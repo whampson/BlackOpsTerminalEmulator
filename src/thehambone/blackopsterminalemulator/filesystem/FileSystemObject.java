@@ -95,6 +95,8 @@ public interface FileSystemObject extends Comparable<FileSystemObject>
      */
     public void addChild(FileSystemObject child);
     
+    public FileSystemObject getChild(int id);
+    
     /**
      * Gets a child of this filesystem object by name.
      * 

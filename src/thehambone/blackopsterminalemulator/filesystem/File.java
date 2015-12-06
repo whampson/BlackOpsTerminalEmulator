@@ -163,6 +163,13 @@ public class File implements FileSystemObject
     }
     
     @Override
+    public FileSystemObject getChild(int id)
+    {
+        // Files do not have children
+        return null;
+    }
+    
+    @Override
     public FileSystemObject getChild(String name)
     {
         // Files do not have children

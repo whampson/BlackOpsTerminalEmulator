@@ -1,9 +1,9 @@
 # users
 
 # system        name            password        homedir_id      is_unlisted
-Dreamland,      vbush,          majestic1,      901,            false
-Dreamland,      twalker,        thanksdad,      902,            false
-Dreamland,      roppen,         trinity,        903,            false
+Dreamland,      vbush,          majestic1,      801,            false
+Dreamland,      twalker,        thanksdad,      802,            false
+Dreamland,      roppen,         trinity,        803,            false
 # DoD,            rnixon,         ,               rnixon,         true
 # DoD,            rmcnamara,      ,               rmcnamara,      true
 # DoD,            jfkennedy,      ,               jfkennedy,      true
@@ -18,26 +18,26 @@ Dreamland,      roppen,         trinity,        903,            false
 # DerRiese,       erichtofen,     ,               erichtofen,     true
 # DerRiese,       edward,         ,               edward,         true
 # DerRiese,       drmaxis,        ,               drmaxis,        true
-CIA,            wraborn,        bromlow,        904,            false
-CIA,            vbush,          manhattan,      905,            false
-CIA,            twalker,        radi0,          906,            false
-CIA,            tbrooks,        lauren,         907,            false
-CIA,            sagnew,         ,               908,            true
-CIA,            rnixon,         checkers,       909,            false
-CIA,            rkain,          sunwu,          910,            false
-CIA,            rjackson,       saintbridget,   911,            false
-CIA,            rhelms,         lerosey,        912,            false
-CIA,            lbjohnson,      ladybird,       913,            false
-CIA,            jturner,        condor75,       914,            false
-CIA,            jmccone,        Berkley22,      915,            false
-CIA,            jhudson,        bryant1950,     916,            false
-CIA,            jfkennedy,      lancer,         917,            false
-CIA,            jehoover,       ,               918,            true
-CIA,            jbowman,        uwd,            919,            false
-CIA,            hkissinger,     ,               920,            true
-CIA,            gweaver,        gedeon,         921,            false
-CIA,            fwoods,         philly,         922,            false
-CIA,            dking,          mfk,            923,            false
-CIA,            bharris,        goskins,        924,            false
-CIA,            asmith,         roxy,           925,            false
-CIA,            amason,         password,       926,            false
+CIA,            wraborn,        bromlow,        804,            false
+CIA,            vbush,          manhattan,      805,            false
+CIA,            twalker,        radi0,          806,            false
+CIA,            tbrooks,        lauren,         807,            false
+CIA,            sagnew,         ,               808,            true
+CIA,            rnixon,         checkers,       809,            false
+CIA,            rkain,          sunwu,          810,            false
+CIA,            rjackson,       saintbridget,   811,            false
+CIA,            rhelms,         lerosey,        812,            false
+CIA,            lbjohnson,      ladybird,       813,            false
+CIA,            jturner,        condor75,       814,            false
+CIA,            jmccone,        Berkley22,      815,            false
+CIA,            jhudson,        bryant1950,     816,            false
+CIA,            jfkennedy,      lancer,         817,            false
+CIA,            jehoover,       ,               818,            true
+CIA,            jbowman,        uwd,            819,            false
+CIA,            hkissinger,     ,               820,            true
+CIA,            gweaver,        gedeon,         821,            false
+CIA,            fwoods,         philly,         822,            false
+CIA,            dking,          mfk,            823,            false
+CIA,            bharris,        goskins,        824,            false
+CIA,            asmith,         roxy,           825,            false
+CIA,            amason,         password,       826,            false

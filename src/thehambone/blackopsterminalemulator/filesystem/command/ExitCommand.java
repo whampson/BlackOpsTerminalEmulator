@@ -35,10 +35,9 @@ import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
  */
 public class ExitCommand extends ExecutableFile
 {
-    public ExitCommand()
+    public ExitCommand(int id)
     {
-        super(105, "exit");
-//        isHidden = true;
+        super(id, "exit");
     }
     
     @Override
