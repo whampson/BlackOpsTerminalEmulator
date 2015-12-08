@@ -278,6 +278,8 @@ public final class Screen
                         */
                         // TODO: Investigate null items (concurrency issue?)
                         if (item == null) {
+                            // TODO: log
+                            java.lang.System.err.println("null screen item");
                             continue;
                         }
                         

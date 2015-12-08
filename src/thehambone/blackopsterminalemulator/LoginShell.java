@@ -101,6 +101,25 @@ public final class LoginShell extends Shell
         currentDirectory = dir;
     }
     
+    // Internal command "3arc"
+    private void cmd3arc(String[] args)
+    {
+        if (args.length == 0) {
+            return;
+        }
+        
+        if (args[0].equals("intel") || args[0].equals("unlock")) {
+            Terminal.println("Cheat Enabled!");
+        }
+    }
+    
+    // Internal command "exit"
+    private void cmdExit(String[] args)
+    {
+        Terminal.popLoginShell();
+        terminate();
+    }
+    
     @Override
     protected void onLaunch()
     {
@@ -150,6 +169,16 @@ public final class LoginShell extends Shell
             } else {
                 commandName = input;
                 args = new String[0];
+            }
+            
+            // Check if an internal command was called
+            switch (commandName) {
+                case "3arc":
+                    cmd3arc(args);
+                    continue;
+                case "exit":
+                    cmdExit(args);
+                    continue;
             }
             
             // Search the filesystem for an executable matching the command name

@@ -24,16 +24,13 @@
 
 package thehambone.blackopsterminalemulator;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import thehambone.blackopsterminalemulator.filesystem.Directory;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 import thehambone.blackopsterminalemulator.filesystem.File;
@@ -51,7 +48,6 @@ import thehambone.blackopsterminalemulator.filesystem.command.DOACommand;
 import thehambone.blackopsterminalemulator.filesystem.command.DecodeCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.DirCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.EncodeCommand;
-import thehambone.blackopsterminalemulator.filesystem.command.ExitCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.FoobarCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.HelloCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.HelpCommand;
@@ -59,7 +55,6 @@ import thehambone.blackopsterminalemulator.filesystem.command.LoginCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.MailCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.MoreCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.RloginCommand;
-import thehambone.blackopsterminalemulator.filesystem.command.ThreeArcCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.WhoCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.ZorkCommand;
 import thehambone.blackopsterminalemulator.io.DATFileReader;
@@ -86,23 +81,24 @@ public class Main
     public static void main(String[] args)
     {
         // TODO: arrow keys, cd command arg parsing, documentation,
-        // logging, mail
+        // logging, add resources, TESTING
         
         String title = PROGRAM_TITLE + " - " + PROGRAM_VERSION;
         Terminal.setTitle(title);
         
         // TEMPORARY CODE FOR TESTING
-        // ALL CONTENT WILL BE DEFINED EXTERNALLY
-        String ciaLoginMessage = "Central Intelligence Agency Data system\n\n"
-                + "Unauthorized use of this system is against the law.\n\n"
-                + "Security Privileges Required";
+        String motd = "";
+        String line;
+        try {
+            BufferedReader fileReader = new BufferedReader(new FileReader("res/files/_motd"));
+            while ((line = fileReader.readLine()) != null) {
+                motd += line + "\n";
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
         
-        String dreamlandLoginMessage = "Dreamland Server 12\n\n\n"
-                + "***MJ12 Clearance Required***";
-        
-        Terminal.setMOTD(ciaLoginMessage + "\n"
-                + "USER:amason\n"
-                + "PASSWORD:********\n");
+        Terminal.setMOTD(motd);
         
         System s = null;
         try {
@@ -121,7 +117,6 @@ public class Main
         }
         
         Map<String, Class<? extends ExecutableFile>> executables = new HashMap<>();
-        executables.put("3arc", ThreeArcCommand.class);
         executables.put("alicia", AliciaCommand.class);
         executables.put("cat", CatCommand.class);
         executables.put("cd", CdCommand.class);
@@ -130,7 +125,6 @@ public class Main
         executables.put("decode", DecodeCommand.class);
         executables.put("dir", DirCommand.class);
         executables.put("encode", EncodeCommand.class);
-        executables.put("exit", ExitCommand.class);
         executables.put("foobar", FoobarCommand.class);
         executables.put("hello", HelloCommand.class);
         executables.put("help", HelpCommand.class);

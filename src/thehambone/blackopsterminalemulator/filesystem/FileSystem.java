@@ -58,7 +58,6 @@ public class FileSystem
         return root;
     }
     
-    // TODO: implement this
     public FileSystemObject getFileSystemObject(int id)
     {
         if (id == root.getID()) {

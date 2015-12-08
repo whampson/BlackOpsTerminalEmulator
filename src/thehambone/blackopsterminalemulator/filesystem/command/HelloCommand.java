@@ -46,8 +46,9 @@ public class HelloCommand extends ExecutableFile
             Terminal.println("Error:  Invalid Input - common usages include:");
             Terminal.println("hello brother, hello nurse, and hello sailor");
         } else if (args[0].equals("sailor")) {
-            // TODO: invoke zork
-            //new ZorkCommand().exec(args);
+            ExecutableFile zork = (ExecutableFile)Terminal.getActiveLoginShell()
+                    .getSystem().getFileSystem().getFileSystemObject("zork");
+            zork.exec(new String[0]);
         }
     }
 }

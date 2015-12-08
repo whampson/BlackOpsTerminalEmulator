@@ -4,20 +4,20 @@
 Dreamland,      vbush,          majestic1,      801,            false
 Dreamland,      twalker,        thanksdad,      802,            false
 Dreamland,      roppen,         trinity,        803,            false
-# DoD,            rnixon,         ,               rnixon,         true
-# DoD,            rmcnamara,      ,               rmcnamara,      true
-# DoD,            jfkennedy,      ,               jfkennedy,      true
-# DoD,            jbowman,        ,               jbowman,        true
-# DoD,            fwoods,         ,               fwoods,         true
-# DerRiese,       tmasaki,        ,               tmasaki,        true
-# DerRiese,       tdempsey,       ,               tdempsey,       true
-# DerRiese,       sophia,         ,               sophia,         true
-# DerRiese,       samantha,       ,               samantha,       true
-# DerRiese,       peter,          ,               peter,          true
-# DerRiese,       nbelinksi,      ,               nbelinksi,      true
-# DerRiese,       erichtofen,     ,               erichtofen,     true
-# DerRiese,       edward,         ,               edward,         true
-# DerRiese,       drmaxis,        ,               drmaxis,        true
+# DoD,            rnixon,         ,               ,               true
+# DoD,            rmcnamara,      ,               ,               true
+# DoD,            jfkennedy,      ,               ,               true
+# DoD,            jbowman,        ,               ,               true
+# DoD,            fwoods,         ,               ,               true
+# DerRiese,       tmasaki,        ,               ,               true
+# DerRiese,       tdempsey,       ,               ,               true
+# DerRiese,       sophia,         ,               ,               true
+# DerRiese,       samantha,       ,               ,               true
+# DerRiese,       peter,          ,               ,               true
+# DerRiese,       nbelinksi,      ,               ,               true
+# DerRiese,       erichtofen,     ,               ,               true
+# DerRiese,       edward,         ,               ,               true
+# DerRiese,       drmaxis,        ,               ,               true
 CIA,            wraborn,        bromlow,        804,            false
 CIA,            vbush,          manhattan,      805,            false
 CIA,            twalker,        radi0,          806,            false

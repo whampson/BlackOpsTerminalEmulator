@@ -2,29 +2,27 @@
 
 # executables
 # id    name                    is_hidden       resource_name                   alias_target_id
-101,    3arc,                   true,           ,
-102,    alicia,                 false,          ,
-103,    cat,                    false,          ,
-104,    cd,                     false,          ,
-105,    clear,                  false,          ,
-106,    cls,                    false,          ,                               105
-107,    decode,                 false,          ,
-108,    dir,                    false,          ,
-109,    doa,                    false,          ,
-110,    encode,                 false,          ,
-111,    exit,                   true,           ,
-112,    foobar,                 false,          ,
-113,    hello,                  false,          ,
-114,    help,                   false,          ,
-115,    login,                  false,          ,
-116,    ls,                     false,          ,                               108
-117,    mail,                   false,          ,
-118,    more,                   false,          ,
-119,    print,                  false,          ,                               103
-120,    rlogin,                 false,          ,
-121,    type,                   false,          ,                               103
-122,    who,                    false,          ,
-123,    zork,                   false,          ,
+101,    alicia,                 false,          ,
+102,    cat,                    false,          ,
+103,    cd,                     false,          ,
+104,    clear,                  false,          ,
+105,    cls,                    false,          ,                               104
+106,    decode,                 false,          ,
+107,    dir,                    false,          ,
+108,    doa,                    false,          ,
+119,    encode,                 false,          ,
+110,    foobar,                 false,          ,
+111,    hello,                  false,          ,
+112,    help,                   false,          ,
+113,    login,                  false,          ,
+114,    ls,                     false,          ,                               107
+115,    mail,                   false,          ,
+116,    more,                   false,          ,
+117,    print,                  false,          ,                               102
+128,    rlogin,                 false,          ,
+129,    type,                   false,          ,                               102
+120,    who,                    false,          ,
+121,    zork,                   false,          ,
 
 # system files
 # id    name                    is_hidden       resource_name                   alias_target_id
@@ -136,7 +134,7 @@
 # id    name                    is_hidden       resource_name                   alias_target_id
 401,    Vozrozhdeniya1.pic,     false,          sp_reb1,
 402,    Vozrozhdeniya2.pic,     false,          sp_reb2,
-403,    Vozrozhdeniya3.pic,     false,          sp_reb1,
+403,    Vozrozhdeniya3.pic,     false,          sp_reb3,
 404,    Yamantau1.pic,          false,          sp_wmd1,
 405,    Yamantau2.pic,          false,          sp_wmd2,
 406,    Yamantau3.pic,          false,          sp_wmd3,
