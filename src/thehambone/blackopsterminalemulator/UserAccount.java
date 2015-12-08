@@ -39,7 +39,7 @@ public final class UserAccount
     private final String username;
     private final String password;
     private final HomeDirectory homeDirectory;
-//    public final Mailbox mailbox;
+    private final Mailbox mailbox;
     
     /**
      * Creates a new {@code UserAccount}.
@@ -54,6 +54,7 @@ public final class UserAccount
         this.username = username;
         this.password = password;
         this.homeDirectory = homeDirectory;
+        mailbox = new Mailbox();
     }
     
     /**
@@ -84,5 +85,10 @@ public final class UserAccount
     public HomeDirectory getHomeDirectory()
     {
         return homeDirectory;
+    }
+    
+    public Mailbox getMailbox()
+    {
+        return mailbox;
     }
 }

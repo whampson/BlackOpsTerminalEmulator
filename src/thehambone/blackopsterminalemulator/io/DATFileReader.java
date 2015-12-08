@@ -34,7 +34,7 @@ import java.io.IOException;
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class CSVFileReader
+public class DATFileReader
 {
     private final BufferedReader reader;
     
@@ -44,7 +44,7 @@ public class CSVFileReader
     private String[] currentLine;
     private int fieldIndex;
     
-    public CSVFileReader(String fileName) throws FileNotFoundException
+    public DATFileReader(String fileName) throws FileNotFoundException
     {
         reader = new BufferedReader(new FileReader(fileName));
         

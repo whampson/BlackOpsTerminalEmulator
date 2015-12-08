@@ -89,6 +89,7 @@ public class AliciaCommand extends ExecutableFile
         protected void run()
         {
             String input;
+            
             while (isRunning()) {
                 Terminal.print(getPrompt());
                 input = Terminal.readLine();

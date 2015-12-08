@@ -1,0 +1,14 @@
+# mail
+
+# system    recipient       sender              date                    subject             resource_name
+CIA,        amason,         Jason Hudson,       Sat Nov 10 1963,        New Tech,           a56b90fc
+CIA,        amason,         Jake Reach,         Fri Nov 17 1963,        WC,                 a5a1da7f
+CIA,        amason,         Greg Weaver,        Sun Nov 24  1963,       Thanks,             a5b3f300
+CIA,        amason,         Jason Hudson,       Fri Sep 17 1965,        Slow Down,          a5c60b81
+CIA,        amason,         Greg Weaver,        Mon Feb 14 1966,        Proposition,        52db6eec
+CIA,        amason,         Frank Woods,        Mon Jan 2 1967,         ,                   52ed876d
+CIA,        amason,         Jason Hudson,       Tue Jan 10 1967,        Frank,              a5d82402
+CIA,        amason,         Ryan Jackson,       Mon Aug 12 1968,        Cupcakes,           a58fc1fe
+CIA,        amason,         Dr. Adrienne Smith, Mon Dec 23 1968,        Migraines,          a57da97d
+CIA,        amason,         Dr. Adrienne Smith, Mon Dec 23 1968,        RE: Migraines,      a5ea3c83
+CIA,        amason,         Jason Hudson,       Tue Jul 4 1978,         Don' Do It,         a5fc5504

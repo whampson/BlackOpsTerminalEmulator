@@ -27,8 +27,13 @@ package thehambone.blackopsterminalemulator;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import thehambone.blackopsterminalemulator.filesystem.Directory;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 import thehambone.blackopsterminalemulator.filesystem.File;
@@ -51,12 +56,13 @@ import thehambone.blackopsterminalemulator.filesystem.command.FoobarCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.HelloCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.HelpCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.LoginCommand;
+import thehambone.blackopsterminalemulator.filesystem.command.MailCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.MoreCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.RloginCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.ThreeArcCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.WhoCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.ZorkCommand;
-import thehambone.blackopsterminalemulator.io.CSVFileReader;
+import thehambone.blackopsterminalemulator.io.DATFileReader;
 
 /**
  * This class handles program initialization.
@@ -100,7 +106,7 @@ public class Main
         
         System s = null;
         try {
-            CSVFileReader reader = new CSVFileReader("res/systems.csv");
+            DATFileReader reader = new DATFileReader("res/systems.dat");
             reader.setCommentChar('#');
             reader.ignoreWhitespaces(true);
             while (reader.loadNextLine()) {
@@ -128,6 +134,7 @@ public class Main
         executables.put("foobar", FoobarCommand.class);
         executables.put("hello", HelloCommand.class);
         executables.put("help", HelpCommand.class);
+        executables.put("mail", MailCommand.class);
         executables.put("login", LoginCommand.class);
         executables.put("more", MoreCommand.class);
         executables.put("rlogin", RloginCommand.class);
@@ -136,7 +143,7 @@ public class Main
         
         FileSystem tempFileSystem = new FileSystem(new Directory(0, ""));
         try {
-            CSVFileReader reader = new CSVFileReader("res/files.csv");
+            DATFileReader reader = new DATFileReader("res/files.dat");
             reader.setCommentChar('#');
             reader.ignoreWhitespaces(true);
             while (reader.loadNextLine()) {
@@ -186,7 +193,7 @@ public class Main
         }
         
         try {
-            CSVFileReader reader = new CSVFileReader("res/filesystem.csv");
+            DATFileReader reader = new DATFileReader("res/filesystem.dat");
             reader.setCommentChar('#');
             reader.ignoreWhitespaces(true);
             while (reader.loadNextLine()) {
@@ -198,7 +205,7 @@ public class Main
                 if (reader.hasNextField()) {
                     files = reader.nextField();
                 }
-                java.lang.System.out.println("loading directory " + dirName + " (" + id + ")");
+                java.lang.System.out.println("loading directory " + dirName + " (" + id + ") on system " + systemName);
                 System system = Terminal.getSystem(systemName);
                 Directory dir;
                 if (parentID == -1 || (id > 600 && id < 700)) {
@@ -234,7 +241,7 @@ public class Main
         
         UserAccount u = null;
         try {
-            CSVFileReader reader = new CSVFileReader("res/users.csv");
+            DATFileReader reader = new DATFileReader("res/users.dat");
             reader.setCommentChar('#');
             reader.ignoreWhitespaces(true);
             while (reader.loadNextLine()) {
@@ -249,6 +256,28 @@ public class Main
                 homeDir.setUnlisted(isUnlisted);
                 u = new UserAccount(username, password, homeDir);
                 system.addUser(u);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        
+        try {
+            DATFileReader reader = new DATFileReader("res/mail.dat");
+            reader.setCommentChar('#');
+            reader.ignoreWhitespaces(true);
+            while (reader.loadNextLine()) {
+                String systemName = reader.nextField();
+                String userName = reader.nextField();
+                String sender = reader.nextField();
+                String date = reader.nextField();
+                String subject = reader.nextField();
+                String resourceName = reader.nextField();
+                String resourcePath = "res/files/" + resourceName;
+                java.lang.System.out.println("loading mail " + subject + " for user " + userName + " on system " + systemName);
+                System system = Terminal.getSystem(systemName);
+                UserAccount user = system.getUser(userName);
+                Mail m = new Mail(sender, date, subject, resourcePath);
+                user.getMailbox().addMail(m);
             }
         } catch (IOException ex) {
             ex.printStackTrace();

@@ -36,6 +36,7 @@ import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
  */
 public class DecodeCommand extends ExecutableFile
 {
+    // TODO: find a way to decode mathematically
     private static final Map<String, String> CIPHER = new HashMap<>();
     static
     {
