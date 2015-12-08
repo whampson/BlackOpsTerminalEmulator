@@ -90,7 +90,8 @@ public class Main
         String motd = "";
         String line;
         try {
-            BufferedReader fileReader = new BufferedReader(new FileReader("res/files/_motd"));
+            BufferedReader fileReader = new BufferedReader(new FileReader("data/_motd"));
+            java.lang.System.out.println("loading motd");
             while ((line = fileReader.readLine()) != null) {
                 motd += line + "\n";
             }
@@ -102,7 +103,7 @@ public class Main
         
         System s = null;
         try {
-            DATFileReader reader = new DATFileReader("res/systems.dat");
+            DATFileReader reader = new DATFileReader("data/systems.dat");
             reader.setCommentChar('#');
             reader.ignoreWhitespaces(true);
             while (reader.loadNextLine()) {
@@ -137,22 +138,32 @@ public class Main
         
         FileSystem tempFileSystem = new FileSystem(new Directory(0, ""));
         try {
-            DATFileReader reader = new DATFileReader("res/files.dat");
+            DATFileReader reader = new DATFileReader("data/files.dat");
             reader.setCommentChar('#');
             reader.ignoreWhitespaces(true);
             while (reader.loadNextLine()) {
                 int id = Integer.parseInt(reader.nextField());
                 String fileName = reader.nextField();
                 boolean isHidden = Boolean.parseBoolean(reader.nextField());
-                String resourcePath = reader.nextField();
-                if (!resourcePath.isEmpty()) {
-                    resourcePath = "res/files/" + resourcePath;
+                String resourceName = reader.nextField();
+                String resourcePath = "";
+                java.lang.System.out.println("loading file " + fileName + " (" + id + ")");
+                if (!resourceName.isEmpty()) {
+                    if (id > 300 && id < 400) {
+                        resourcePath = "data/txt/" + resourceName;
+                        java.lang.System.out.println("\t" + resourcePath);
+                    } else if (id > 400 && id < 500) {
+                        resourcePath = "data/img/" + resourceName;
+                        java.lang.System.out.println("\t" + resourcePath);
+                    } else if (id > 500 && id < 600) {
+                        resourcePath = "data/aud/" + resourceName;
+                        java.lang.System.out.println("\t" + resourcePath);
+                    }
                 }
                 String aliasIDStr = "";
                 if (reader.hasNextField()) {
                     aliasIDStr = reader.nextField();
                 }
-                java.lang.System.out.println("loading file " + fileName + " (" + id + ")");
                 File f;
                 if (!aliasIDStr.isEmpty()) {
                     f = new File(id, fileName);
@@ -187,7 +198,7 @@ public class Main
         }
         
         try {
-            DATFileReader reader = new DATFileReader("res/filesystem.dat");
+            DATFileReader reader = new DATFileReader("data/filesystem.dat");
             reader.setCommentChar('#');
             reader.ignoreWhitespaces(true);
             while (reader.loadNextLine()) {
@@ -235,7 +246,7 @@ public class Main
         
         UserAccount u = null;
         try {
-            DATFileReader reader = new DATFileReader("res/users.dat");
+            DATFileReader reader = new DATFileReader("data/users.dat");
             reader.setCommentChar('#');
             reader.ignoreWhitespaces(true);
             while (reader.loadNextLine()) {
@@ -256,7 +267,7 @@ public class Main
         }
         
         try {
-            DATFileReader reader = new DATFileReader("res/mail.dat");
+            DATFileReader reader = new DATFileReader("data/mail.dat");
             reader.setCommentChar('#');
             reader.ignoreWhitespaces(true);
             while (reader.loadNextLine()) {
@@ -266,7 +277,7 @@ public class Main
                 String date = reader.nextField();
                 String subject = reader.nextField();
                 String resourceName = reader.nextField();
-                String resourcePath = "res/files/" + resourceName;
+                String resourcePath = "data/txt/" + resourceName;
                 java.lang.System.out.println("loading mail " + subject + " for user " + userName + " on system " + systemName);
                 System system = Terminal.getSystem(systemName);
                 UserAccount user = system.getUser(userName);

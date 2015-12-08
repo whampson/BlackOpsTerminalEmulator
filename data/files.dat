@@ -10,7 +10,7 @@
 106,    decode,                 false,          ,
 107,    dir,                    false,          ,
 108,    doa,                    false,          ,
-119,    encode,                 false,          ,
+109,    encode,                 false,          ,
 110,    foobar,                 false,          ,
 111,    hello,                  false,          ,
 112,    help,                   false,          ,
@@ -19,8 +19,8 @@
 115,    mail,                   false,          ,
 116,    more,                   false,          ,
 117,    print,                  false,          ,                               102
-128,    rlogin,                 false,          ,
-129,    type,                   false,          ,                               102
+118,    rlogin,                 false,          ,
+119,    type,                   false,          ,                               102
 120,    who,                    false,          ,
 121,    zork,                   false,          ,
 
