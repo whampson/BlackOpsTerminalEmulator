@@ -49,8 +49,11 @@ public class DirCommand extends ExecutableFile
     
     private double roundHalfDown(double d)
     {
-        return new BigDecimal(d).setScale(0, RoundingMode.HALF_DOWN)
-                .doubleValue();
+        if (d % 0.5 == 0) {
+            return (double)(int)d;  // Round down by casting to int (truncate)
+        } else {
+            return Math.round(d);   // Round as usual
+        }
     }
     
     @Override

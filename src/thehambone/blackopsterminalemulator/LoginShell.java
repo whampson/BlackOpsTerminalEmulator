@@ -171,7 +171,7 @@ public final class LoginShell extends Shell
                 args = new String[0];
             }
             
-            // Check if an internal command was called
+            // Check if an "internal" command was called
             switch (commandName) {
                 case "3arc":
                     cmd3arc(args);

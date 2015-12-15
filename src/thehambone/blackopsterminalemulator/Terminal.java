@@ -28,6 +28,8 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -39,6 +41,7 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import thehambone.blackopsterminalemulator.util.FixedLengthQueue;
@@ -108,6 +111,8 @@ public final class Terminal
         motd = "";
         
         registerInputKeys();
+        
+        initWindowClosePrompt();
     }
     
     /**
@@ -127,7 +132,7 @@ public final class Terminal
                 Screen screen = TERMINAL_INSTANCE.screen;
                 JComponent screenComponent = screen.getComponent();
                 frame.add(screenComponent);
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
                 frame.setResizable(false);
                 frame.setSize(screenComponent.getPreferredSize());
                 frame.setLocationRelativeTo(null);  // Center frame on screen
@@ -257,6 +262,11 @@ public final class Terminal
     
     /**
      * Appends a string of characters to the screen.
+     * <p>
+     * If more than 22 lines are printed on the screen by the same string, the
+     * output will be stopped until a key is pressed and "--MORE--" will be
+     * printed on screen. This creates a screen paging effect and its purpose is
+     * to allow the user to read the output one "screen-full" at a time.
      * 
      * @param s the string to be printed
      */
@@ -571,6 +581,33 @@ public final class Terminal
         }
         
         return previousInput;
+    }
+    
+    private void initWindowClosePrompt()
+    {
+        frame.addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent evt)
+            {
+                String[] options = { "Yes", "No" };
+                int option = JOptionPane.showOptionDialog(frame,
+                        "Are you sure you want to exit?\n\n"
+                                + "Your current session will be lost.",
+                        "Confirm Exit",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        options,
+                        options[1]);
+                
+                // "Yes" selected
+                if (option == 0) {
+                    frame.dispose();
+                    java.lang.System.exit(0);
+                }
+            }
+        });
     }
     
     /*

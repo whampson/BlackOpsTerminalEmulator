@@ -29,6 +29,9 @@ import java.io.FileReader;
 import java.io.IOException;
 
 /**
+ * This class represents an email that can be found on many of the user's
+ * accounts accessible via the "mail" command.
+ * <p>
  * Created on Dec 6, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
@@ -40,6 +43,14 @@ public final class Mail
     private final String subject;
     private final String resourcePath;
     
+    /**
+     * Creates a new {@code Mail} object.
+     * 
+     * @param sender the sender of the mail
+     * @param date the date the mail was received
+     * @param subject the subject of the mail
+     * @param resourcPath the path pointing to the file containing the mail body
+     */
     public Mail(String sender, String date, String subject, String resourcPath)
     {
         this.sender = sender;
@@ -48,26 +59,49 @@ public final class Mail
         this.resourcePath = resourcPath;
     }
     
+    /**
+     * Gets the sender of this mail item.
+     * 
+     * @return the mail sender
+     */
     public String getSender()
     {
         return sender;
     }
     
+    /**
+     * Gets the date that this mail was received.
+     * 
+     * @return the mail received date as a String
+     */
     public String getDate()
     {
         return date;
     }
     
+    /**
+     * Gets the subject of this mail.
+     * 
+     * @return the mail subject
+     */
     public String getSubject()
     {
         return subject;
     }
     
+    /**
+     * Gets the path to the resource containing the mail body.
+     * 
+     * @return the path to the mail body resource
+     */
     public String getResourcePath()
     {
         return resourcePath;
     }
     
+    /**
+     * Loads the mail body from the resource file and prints it to the screen.
+     */
     public void open()
     {
         String textData;
@@ -79,7 +113,7 @@ public final class Mail
             // Load text data from resource
             reader = new BufferedReader(new FileReader(resourcePath));
             
-            // Read text data line-by-line and concatenate it to a buffer string
+            // Read text data line-by-line and concatenate it to a string buffer
             while ((line = reader.readLine()) != null) {
                 textData += line + "\n";
             }
@@ -89,9 +123,8 @@ public final class Mail
             return;
         }
         
-        // Output the contents of the file
-        /* Print entire file as a single string to allow for the "--MORE--"
-           pager prompt to show */
+        /* Output the contents of the file. Print entire file as a single string
+           to allow for the "--MORE--" pager prompt to show. */
         Terminal.print(textData);
     }
 }

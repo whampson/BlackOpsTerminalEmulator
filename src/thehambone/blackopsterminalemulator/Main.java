@@ -31,6 +31,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import thehambone.blackopsterminalemulator.filesystem.Directory;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 import thehambone.blackopsterminalemulator.filesystem.File;
@@ -58,6 +61,7 @@ import thehambone.blackopsterminalemulator.filesystem.command.RloginCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.WhoCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.ZorkCommand;
 import thehambone.blackopsterminalemulator.io.DATFileReader;
+import thehambone.blackopsterminalemulator.io.Logger;
 
 /**
  * This class handles program initialization.
@@ -73,6 +77,8 @@ public class Main
     public static final String PROGRAM_VERSION
             = "1.0-alpha";
     
+    public static final boolean DEBUG = true;
+    
     /**
      * Program entry point.
      * 
@@ -81,7 +87,10 @@ public class Main
     public static void main(String[] args)
     {
         // TODO: arrow keys, cd command arg parsing, documentation,
+        // class for file IO, exit warning/confirmation,
         // logging, add resources, TESTING
+        
+        initLookAndFeel();
         
         String title = PROGRAM_TITLE + " - " + PROGRAM_VERSION;
         Terminal.setTitle(title);
@@ -91,7 +100,8 @@ public class Main
         String line;
         try {
             BufferedReader fileReader = new BufferedReader(new FileReader("data/_motd"));
-            java.lang.System.out.println("loading motd");
+//            java.lang.System.out.println("loading motd");
+            Logger.info("loading motd");
             while ((line = fileReader.readLine()) != null) {
                 motd += line + "\n";
             }
@@ -109,7 +119,8 @@ public class Main
             while (reader.loadNextLine()) {
                 String systemName = reader.nextField();
                 String loginMessage = reader.nextField();
-                java.lang.System.out.println("loading system " + systemName);
+                Logger.info("loading system " + systemName);
+//                java.lang.System.out.println("loading system " + systemName);
                 s = new System(systemName, loginMessage);
                 Terminal.addSystem(s);
             }
@@ -147,17 +158,21 @@ public class Main
                 boolean isHidden = Boolean.parseBoolean(reader.nextField());
                 String resourceName = reader.nextField();
                 String resourcePath = "";
-                java.lang.System.out.println("loading file " + fileName + " (" + id + ")");
+                Logger.info("loading file " + fileName + " (" + id + ")");
+//                java.lang.System.out.println("loading file " + fileName + " (" + id + ")");
                 if (!resourceName.isEmpty()) {
                     if (id > 300 && id < 400) {
                         resourcePath = "data/txt/" + resourceName;
-                        java.lang.System.out.println("\t" + resourcePath);
+//                        java.lang.System.out.println("\t" + resourcePath);
+                        Logger.info("\t" + resourcePath);
                     } else if (id > 400 && id < 500) {
                         resourcePath = "data/img/" + resourceName;
-                        java.lang.System.out.println("\t" + resourcePath);
+//                        java.lang.System.out.println("\t" + resourcePath);
+                        Logger.info("\t" + resourcePath);
                     } else if (id > 500 && id < 600) {
                         resourcePath = "data/aud/" + resourceName;
-                        java.lang.System.out.println("\t" + resourcePath);
+//                        java.lang.System.out.println("\t" + resourcePath);
+                        Logger.info("\t" + resourcePath);
                     }
                 }
                 String aliasIDStr = "";
@@ -210,7 +225,8 @@ public class Main
                 if (reader.hasNextField()) {
                     files = reader.nextField();
                 }
-                java.lang.System.out.println("loading directory " + dirName + " (" + id + ") on system " + systemName);
+//                java.lang.System.out.println("loading directory " + dirName + " (" + id + ") on system " + systemName);
+                Logger.info("loading directory " + dirName + " (" + id + ") on system " + systemName);
                 System system = Terminal.getSystem(systemName);
                 Directory dir;
                 if (parentID == -1 || (id > 600 && id < 700)) {
@@ -234,7 +250,8 @@ public class Main
                     int fileID = Integer.parseInt(fileIDStr);
                     File file = (File)tempFileSystem.getFileSystemObject(fileID);
                     if (file == null) {
-                        java.lang.System.out.println("null id: " + fileID);
+//                        java.lang.System.out.println("null id: " + fileID);
+                        Logger.error("null id: " + fileID);
                         continue;
                     }
                     dir.addChild(file);
@@ -253,7 +270,8 @@ public class Main
                 String systemName = reader.nextField();
                 String username = reader.nextField();
                 String password = reader.nextField();
-                java.lang.System.out.println("loading user " + username + " on system " + systemName);
+//                java.lang.System.out.println("loading user " + username + " on system " + systemName);
+                Logger.info("loading user " + username + " on system " + systemName);
                 int homeDirID = Integer.parseInt(reader.nextField());
                 boolean isUnlisted = Boolean.parseBoolean(reader.nextField());
                 System system = Terminal.getSystem(systemName);
@@ -278,7 +296,8 @@ public class Main
                 String subject = reader.nextField();
                 String resourceName = reader.nextField();
                 String resourcePath = "data/txt/" + resourceName;
-                java.lang.System.out.println("loading mail " + subject + " for user " + userName + " on system " + systemName);
+//                java.lang.System.out.println("loading mail " + subject + " for user " + userName + " on system " + systemName);
+                Logger.info("loading mail " + subject + " for user " + userName + " on system " + systemName);
                 System system = Terminal.getSystem(systemName);
                 UserAccount user = system.getUser(userName);
                 Mail m = new Mail(sender, date, subject, resourcePath);
@@ -298,6 +317,16 @@ public class Main
             loginShell.exec();
             Terminal.printMOTD();
             Terminal.print(loginShell.getPrompt());
+        }
+    }
+    
+    private static void initLookAndFeel()
+    {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException
+                | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            throw new RuntimeException(ex);
         }
     }
 }
