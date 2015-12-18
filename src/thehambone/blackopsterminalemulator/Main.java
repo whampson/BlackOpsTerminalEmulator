@@ -86,9 +86,9 @@ public class Main
      */
     public static void main(String[] args)
     {
-        // TODO: arrow keys, cd command arg parsing, documentation,
-        // class for file IO, exit warning/confirmation,
-        // logging, add resources, TESTING
+        // TODO: class for file io,
+        // unchaught exception handler, documentation, logging, add resources,
+        // arrow keys
         
         initLookAndFeel();
         

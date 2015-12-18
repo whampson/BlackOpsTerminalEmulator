@@ -44,6 +44,11 @@ public interface FileSystemObject extends Comparable<FileSystemObject>
     public static final char FILE_SEPARATOR_CHAR = '/';
     
     /**
+     * The character used to separate filesystem object names as a String.
+     */
+    public static final String FILE_SEPARATOR = "/";
+    
+    /**
      * Gets unique identifier of this filesystem object.
      * 
      * @return the filesystem object id

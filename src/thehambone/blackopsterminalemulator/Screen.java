@@ -35,6 +35,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 import javax.swing.Timer;
+import thehambone.blackopsterminalemulator.io.Logger;
 
 /**
  * This class represents the terminal screen. It is responsible for displaying
@@ -273,13 +274,14 @@ public final class Screen
                         item = screenBuffer.itemAt(i);
                         
                         /* For some reason, a null item is retrieved every once
-                           in a while and causes a NullPointerException. I'll
-                           investigate this in the future. For now, ignore it.
+                           in a while, which can cause a NullPointerException.
+                           I'll investigate this in the future. For now, log it
+                           and ignore it.
                         */
                         // TODO: Investigate null items (concurrency issue?)
                         if (item == null) {
-                            // TODO: log
-                            java.lang.System.err.println("null screen item");
+                            Logger.error("null screen item at screen buffer "
+                                    + "index %d: (x: %d, y: %d)\n", i, x, y);
                             continue;
                         }
                         

@@ -30,6 +30,7 @@ import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 import thehambone.blackopsterminalemulator.filesystem.FileSystem;
 import thehambone.blackopsterminalemulator.filesystem.FileSystemObject;
 import thehambone.blackopsterminalemulator.filesystem.HomeDirectory;
+import thehambone.blackopsterminalemulator.io.Logger;
 
 /**
  * Created on Nov 28, 2015.
@@ -43,43 +44,107 @@ public class CdCommand extends ExecutableFile
         super(id, "cd");
     }
     
+    private void printCurrentDirectory()
+    {
+        LoginShell shell = Terminal.getActiveLoginShell();
+        Terminal.println(shell.getCurrentDirectory().getPath());
+    }
+    
+    private String[] tokenizePath(String path)
+    {
+        int tokenCount = 1;
+        for (int i = 0; i < path.length(); i++) {
+            if (path.charAt(i) == FILE_SEPARATOR_CHAR) {
+                tokenCount++;
+            }
+        }
+        
+        String[] tokens = new String[tokenCount];
+        
+        int tokenIndex = 0;
+        String tokenBuffer = "";
+        char c;
+        for (int i = 0; i < path.length(); i++) {
+            c = path.charAt(i);
+            if (c == FILE_SEPARATOR_CHAR) {
+                tokens[tokenIndex++] = tokenBuffer;
+                tokenBuffer = "";
+            } else {
+                tokenBuffer += c;
+            }
+        }
+        
+        tokens[tokenIndex] = tokenBuffer;
+        
+        return tokens;
+    }
+    
     @Override
     public void exec(String[] args)
     {
         LoginShell shell = Terminal.getActiveLoginShell();
         FileSystem fileSystem = shell.getSystem().getFileSystem();
-        FileSystemObject cd = shell.getCurrentDirectory();
+        HomeDirectory currentUserHomeDir = shell.getUser().getHomeDirectory();
         
         if (args.length == 0) {
-            Terminal.println(cd.getPath());
+            printCurrentDirectory();
             return;
         }
         
-        if (args[0].equals(".")) {
+        String path = args[0];
+        String[] pathNodes = tokenizePath(path);
+        
+        FileSystemObject cd = shell.getCurrentDirectory();
+        
+        if (pathNodes.length > 2
+                && (pathNodes[0].isEmpty() && pathNodes[1].isEmpty())) {
+            printCurrentDirectory();
             return;
         }
         
-        if (args[0].equals("..")) {
-            if (cd.getParent() == null) {
-                return;     // root node; do nothing
+        FileSystemObject fso;
+        String node;
+        boolean wasLastNodePopOperator = false;
+       
+        for (int i = 0; i < pathNodes.length; i++) {
+            node = pathNodes[i];
+            
+            if (node.isEmpty()) {
+                if (i == 0) {
+                    cd = fileSystem.getRoot();
+                    continue;
+                } else if (i == pathNodes.length - 1) {
+                    continue;
+                }
+                Terminal.println("Error:  Invalid Path");
+                return;
             }
-            shell.setCurrentDirectory(cd.getParent());
-            return;
-        }
-        
-        FileSystemObject fso = fileSystem.getFileSystemObject(args[0]);
-        if (fso == null || (fso instanceof ExecutableFile && ((ExecutableFile)fso).isHidden())) {
-            Terminal.println("Error:  Invalid Path");
-            return;
-        }
-
-        if (fso instanceof HomeDirectory) {
-            HomeDirectory homeDir = (HomeDirectory)fso;
-            if (!homeDir.isUnlisted() && !homeDir.getName().equals(shell.getUser().getUsername())) {
+            if (node.equals(".")) {
+                continue;
+            } else if (node.equals("..")) {
+                if (wasLastNodePopOperator) {
+                    continue;
+                }
+                if (cd.hasParent()) {
+                    cd = cd.getParent();
+                }
+                wasLastNodePopOperator = true;
+                continue;
+            }
+            fso = fileSystem.getFileSystemObject(node);
+            if (fso == null) {
+                Terminal.println("Error:  Invalid Path");
+                return;
+            } else if (fso instanceof HomeDirectory
+                    && fso != currentUserHomeDir) {
                 Terminal.println("Error:  Insufficient Permissions");
                 return;
             }
+            cd = fso;
+            wasLastNodePopOperator = false;
         }
-        shell.setCurrentDirectory(fso);
+        
+        shell.setCurrentDirectory(cd);
+        Logger.debug("working directory set to %s\n", cd.getPath());
     }
 }
