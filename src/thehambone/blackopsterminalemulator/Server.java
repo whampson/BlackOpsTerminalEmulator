@@ -30,14 +30,14 @@ import java.util.List;
 import thehambone.blackopsterminalemulator.filesystem.FileSystem;
 
 /**
- * A {@code System} is a system that hosts files and and contains a set of users
+ * A {@code Server} is a system that hosts files and and contains a set of users
  * what have access to those files.
  * <p>
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class System
+public class Server
 {
     private final String name;
     private final String loginMessage;
@@ -46,13 +46,13 @@ public class System
     private FileSystem fileSystem;
     
     /**
-     * Creates a new {@code System}.
+     * Creates a new {@code Server}.
      * 
-     * @param name the name of the system
+     * @param name the name of the server
      * @param loginMessage the message to be displayed when a user attempts to
      *                     log in 
      */
-    public System(String name, String loginMessage)
+    public Server(String name, String loginMessage)
     {
         this.name = name;
         this.loginMessage = loginMessage;
@@ -61,9 +61,9 @@ public class System
     }
     
     /**
-     * Gets the name of this system.
+     * Gets the name of this server.
      * 
-     * @return the system name
+     * @return the server name
      */
     public String getName()
     {
@@ -92,7 +92,7 @@ public class System
     }
     
     /**
-     * Adds a user account to this system.
+     * Adds a user account to this server.
      * 
      * @param u the user account to add
      */
@@ -102,7 +102,7 @@ public class System
     }
     
     /**
-     * Gets a user account on this system by its username.
+     * Gets a user account on this server by its username.
      * 
      * @param username the username of the user account to search for
      * @return the user account with the matching username, {@code null} if the
@@ -123,9 +123,9 @@ public class System
     }
     
     /**
-     * Returns a list containing all users that have accounts on this system.
+     * Returns a list containing all users that have accounts on this server.
      * 
-     * @return a list of users on this system
+     * @return a list of users on this server
      */
     public List<UserAccount> getUsers()
     {
@@ -133,7 +133,7 @@ public class System
     }
     
     /**
-     * Invokes the user login process for this system.
+     * Invokes the user login process for this server.
      * <p>
      * The login process is as follows:
      *     1) The user is prompted to enter their username.

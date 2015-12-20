@@ -24,8 +24,6 @@
 
 package thehambone.blackopsterminalemulator.filesystem.command;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import thehambone.blackopsterminalemulator.Mail;
 import thehambone.blackopsterminalemulator.Mailbox;

@@ -24,9 +24,14 @@
 
 package thehambone.blackopsterminalemulator.io;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import thehambone.blackopsterminalemulator.Main;
+import thehambone.blackopsterminalemulator.filesystem.File;
 
 /**
  * Created on Dec 14, 2015.
@@ -38,24 +43,43 @@ public class Logger
     private static final StringBuilder LOG = new StringBuilder();
     
     private static final String TIMESTAMP_FORMAT = "HH:mm:ss";
+    private static final String CRASH_DUMP_TIMESTAMP_FORMAT = "yyyyMMddHHmmss";
     
     private static final String DEBUG_PREFIX_FORMAT = "<%s> [DEBUG]: %s";
     private static final String INFO_PREFIX_FORMAT = "<%s> [INFO]: %s";
     private static final String ERROR_PREFIX_FORMAT = "<%s> [ERROR]: %s";
     
-    public static void debug(String s)
+    public static String generateCrashDump() throws IOException
     {
-        debug("%s\n", s);
+        String timestamp = new SimpleDateFormat(CRASH_DUMP_TIMESTAMP_FORMAT)
+                .format(new Date());
+        
+        String fileName = "crash-dump_" + timestamp + ".log";
+        
+        PrintWriter pw = new PrintWriter(new FileOutputStream(fileName), true);
+        
+//        Terminal.crashDump(pw);
+        
+        pw.println(LOG.toString().replaceAll("\\\n",
+                System.getProperty("line.separator")));
+        pw.flush();
+        
+        return fileName;
     }
     
-    public static void debug(String format, Object... args)
-    {
-        if (!Main.DEBUG) {
-            return;
-        }
-        
-        formatAndOutput(DEBUG_PREFIX_FORMAT, format, args);
-    }
+//    public static void debug(String s)
+//    {
+//        debug("%s\n", s);
+//    }
+//    
+//    public static void debug(String format, Object... args)
+//    {
+//        if (!Main.DEBUG) {
+//            return;
+//        }
+//        
+//        formatAndOutput(DEBUG_PREFIX_FORMAT, format, args);
+//    }
     
     public static void info(String s)
     {
@@ -75,6 +99,26 @@ public class Logger
     public static void error(String format, Object... args)
     {
         formatAndOutput(ERROR_PREFIX_FORMAT, format, args);
+    }
+    
+//    public static void error(Throwable cause)
+//    {
+//        if (Main.DEBUG) {
+//            stackTrace(cause);
+//        } else {
+//            error("%s: %s\n", cause.getClass().getName(), cause.getMessage());
+//        }
+//    }
+    
+    public static void stackTrace(Throwable cause)
+    {
+        StringWriter writer = new StringWriter();
+        PrintWriter pw = new PrintWriter(writer);
+        cause.printStackTrace(pw);
+        
+        formatAndOutput(ERROR_PREFIX_FORMAT, "%s\n",
+                writer.getBuffer().toString());
+        
     }
     
     private static void formatAndOutput(String messagePrefixFormat,

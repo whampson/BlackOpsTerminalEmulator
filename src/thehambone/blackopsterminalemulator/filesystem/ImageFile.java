@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import thehambone.blackopsterminalemulator.Terminal;
+import thehambone.blackopsterminalemulator.io.ResourceLoader;
 
 /**
  * An {@code ImageFile} is a file containing image data.
@@ -54,23 +55,15 @@ public final class ImageFile extends PrintableFile
     @Override
     public void print()
     {
-        BufferedImage image;
-        
-        // Load the image data
-        try {
-            image = ImageIO.read(new FileInputStream(getResourcePath()));
-        } catch (IOException ex) {
-            // TODO: log
-            ex.printStackTrace();
-            return;
-        }
+        // Load file data
+        BufferedImage image = ResourceLoader.loadImageFile(getResourceName());
         
         // Ignore and continue if no image data was loaded
         if (image == null) {
             return;
         }
         
-        // Output the image
+        // Output the image to the terminal
         Terminal.println(image);
     }
 }

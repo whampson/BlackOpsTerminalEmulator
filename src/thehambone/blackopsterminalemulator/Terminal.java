@@ -41,6 +41,9 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -76,7 +79,7 @@ public final class Terminal
     
     private final Stack<LoginShell> activeShells;
     private final FixedLengthQueue<String> inputHistory;
-    private final List<System> systems;
+    private final List<Server> servers;
     
     private volatile char charTyped;
     
@@ -104,7 +107,7 @@ public final class Terminal
         
         inputHistory = new FixedLengthQueue<>(8);
         
-        systems = new ArrayList<>();
+        servers = new ArrayList<>();
         
         charTyped = 0;
         
@@ -113,6 +116,12 @@ public final class Terminal
         registerInputKeys();
         
         initWindowClosePrompt();
+        
+//        JMenuBar bar = new JMenuBar();
+//        JMenu fileMenu = new JMenu("File");
+//        fileMenu.add(new JMenuItem("Exit"));
+//        bar.add(fileMenu);
+//        frame.setJMenuBar(bar);
     }
     
     /**
@@ -147,34 +156,34 @@ public final class Terminal
     }
     
     /**
-     * Adds a system to the list of available systems.
+     * Adds a server to the list of available servers.
      * 
-     * @param s the system to add
+     * @param s the server to add
      */
-    public static void addSystem(System s)
+    public static void addServer(Server s)
     {
-        TERMINAL_INSTANCE.systems.add(s);
+        TERMINAL_INSTANCE.servers.add(s);
     }
     
     /**
-     * Gets a system from the list of available systems by name.
+     * Gets a server from the list of available servers by name.
      * 
-     * @param name the name of the system to be retrieved
-     * @return the desired system if found, {@code null} if the system is not
+     * @param name the name of the server to be retrieved
+     * @return the desired server if found, {@code null} if the server is not
      *         found
      */
-    public static System getSystem(String name)
+    public static Server getServer(String name)
     {
-        System system = null;
+        Server server = null;
         
-        for (System s : TERMINAL_INSTANCE.systems) {
+        for (Server s : TERMINAL_INSTANCE.servers) {
             if (s.getName().equalsIgnoreCase(name)) {
-                system = s;
+                server = s;
                 break;
             }
         }
         
-        return system;
+        return server;
     }
     
     /**
@@ -590,21 +599,17 @@ public final class Terminal
             @Override
             public void windowClosing(WindowEvent evt)
             {
-                String[] options = { "Yes", "No" };
-                int option = JOptionPane.showOptionDialog(frame,
+                int option = JOptionPane.showConfirmDialog(frame,
                         "Are you sure you want to exit?\n\n"
                                 + "Your current session will be lost.",
                         "Confirm Exit",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        options,
-                        options[1]);
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE);
                 
                 // "Yes" selected
-                if (option == 0) {
+                if (option == JOptionPane.YES_OPTION) {
                     frame.dispose();
-                    java.lang.System.exit(0);
+                    System.exit(0);
                 }
             }
         });
@@ -743,6 +748,8 @@ public final class Terminal
         registerInputKey('\n', KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK);
         registerInputKey(INPUT_HISTORY_CYCLE_UP, KeyEvent.VK_UP, 0);
         registerInputKey(INPUT_HISTORY_CYCLE_DOWN, KeyEvent.VK_DOWN, 0);
+        
+        registerESCKey();
     }
     
     /*
@@ -777,6 +784,22 @@ public final class Terminal
         
         inputMap.put(KeyStroke.getKeyStroke(keyChar, modifiers), ch);
         actionMap.put(ch, keyAction);
+    }
+    
+    private void registerESCKey()
+    {
+        AbstractAction keyAction = new AbstractAction()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                frame.dispatchEvent(
+                        new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+            }
+        };
+        
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "ESC");
+        actionMap.put("ESC", keyAction);
     }
     
     /*

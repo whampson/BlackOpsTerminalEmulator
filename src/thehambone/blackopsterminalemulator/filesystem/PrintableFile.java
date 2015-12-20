@@ -34,30 +34,30 @@ package thehambone.blackopsterminalemulator.filesystem;
  */
 public abstract class PrintableFile extends File
 {
-    private final String resourcePath;
+    private final String resourceName;
     
     /**
      * Creates a new {@code PrintableFile}.
      * 
      * @param id the filesystem object id
      * @param name the name of this file
-     * @param resourcePath the path to the resource containing the file data
+     * @param resourceName the name of the resource containing the file data
      */
-    public PrintableFile(int id, String name, String resourcePath)
+    public PrintableFile(int id, String name, String resourceName)
     {
         super(id, name);
         
-        this.resourcePath = resourcePath;
+        this.resourceName = resourceName;
     }
     
     /**
-     * Gets the path to the resource containing the file data.
+     * Gets the name of the resource containing the file data.
      * 
      * @return the resource path
      */
-    protected String getResourcePath()
+    protected String getResourceName()
     {
-        return resourcePath;
+        return resourceName;
     }
     
     /**

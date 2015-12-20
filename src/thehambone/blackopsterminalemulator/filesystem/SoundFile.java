@@ -31,7 +31,8 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
+import thehambone.blackopsterminalemulator.io.Logger;
+import thehambone.blackopsterminalemulator.io.ResourceLoader;
 
 /**
  * A {@code SoundFile} is a file containing audio data.
@@ -59,30 +60,31 @@ public final class SoundFile extends PrintableFile
     @Override
     public void print()
     {
+        // If a sound is already playing, stop it
+        if (activeSoundClip != null && activeSoundClip.isActive()) {
+            activeSoundClip.stop();
+        }
+        
+        // Load sound file
+        AudioInputStream stream
+                = ResourceLoader.loadSoundFile(getResourceName());
+        
+        // Ignore and continue if the file failed to load
+        if (stream == null) {
+            return;
+        }
+        
         try {
-            AudioInputStream stream;
-            AudioFormat format;
-            DataLine.Info info;
-            
-            // Load sound data and get encoding information
-            stream = AudioSystem
-                    .getAudioInputStream(new java.io.File(getResourcePath()));
-            format = stream.getFormat();
-            info = new DataLine.Info(Clip.class, format);
-            
-            // If a sound is already playing, stop it
-            if (activeSoundClip != null && activeSoundClip.isActive()) {
-                activeSoundClip.stop();
-            }
+            // Get encoding information
+            AudioFormat format = stream.getFormat();
+            DataLine.Info info = new DataLine.Info(Clip.class, format);
             
             // Load the sound clip and play it
             activeSoundClip = (Clip)AudioSystem.getLine(info);
             activeSoundClip.open(stream);
             activeSoundClip.start();
-        } catch (UnsupportedAudioFileException | LineUnavailableException
-                | IOException ex) {
-            // TODO: log
-            ex.printStackTrace();
+        } catch (LineUnavailableException | IOException ex) {
+            Logger.stackTrace(ex);
         }
     }
 }

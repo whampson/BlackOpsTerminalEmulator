@@ -145,6 +145,6 @@ public class CdCommand extends ExecutableFile
         }
         
         shell.setCurrentDirectory(cd);
-        Logger.debug("working directory set to %s\n", cd.getPath());
+//        Logger.debug("working directory set to %s\n", cd.getPath());
     }
 }

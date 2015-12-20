@@ -25,7 +25,7 @@
 package thehambone.blackopsterminalemulator.filesystem.command;
 
 import thehambone.blackopsterminalemulator.LoginShell;
-import thehambone.blackopsterminalemulator.System;
+import thehambone.blackopsterminalemulator.Server;
 import thehambone.blackopsterminalemulator.Terminal;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
@@ -44,7 +44,7 @@ public class LoginCommand extends ExecutableFile
     @Override
     public void exec(String[] args)
     {
-        System system = Terminal.getActiveLoginShell().getSystem();
+        Server system = Terminal.getActiveLoginShell().getSystem();
         
         if (system == null) {
             Terminal.println("Error:  unknown system");

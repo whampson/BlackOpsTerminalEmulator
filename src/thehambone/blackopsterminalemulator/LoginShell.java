@@ -40,7 +40,7 @@ public final class LoginShell extends Shell
 {
     private static final String DEFAULT_PROMPT = "$";
     
-    private final System system;
+    private final Server system;
     private final UserAccount user;
     
     private FileSystemObject currentDirectory;
@@ -51,7 +51,7 @@ public final class LoginShell extends Shell
      * @param system the system on which this shell should be invoked
      * @param user the user account associated with this shell
      */
-    public LoginShell(System system, UserAccount user)
+    public LoginShell(Server system, UserAccount user)
     {
         super(DEFAULT_PROMPT);
         
@@ -66,7 +66,7 @@ public final class LoginShell extends Shell
      * 
      * @return the system that this shell is running on 
      */
-    public System getSystem()
+    public Server getSystem()
     {
         return system;
     }

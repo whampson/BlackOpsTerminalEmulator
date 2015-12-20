@@ -24,9 +24,7 @@
 
 package thehambone.blackopsterminalemulator;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import thehambone.blackopsterminalemulator.io.ResourceLoader;
 
 /**
  * This class represents an email that can be found on many of the user's
@@ -41,7 +39,7 @@ public final class Mail
     private final String sender;
     private final String date;
     private final String subject;
-    private final String resourcePath;
+    private final String resourceName;
     
     /**
      * Creates a new {@code Mail} object.
@@ -49,14 +47,14 @@ public final class Mail
      * @param sender the sender of the mail
      * @param date the date the mail was received
      * @param subject the subject of the mail
-     * @param resourcPath the path pointing to the file containing the mail body
+     * @param resourcePath the path pointing to the file containing the mail body
      */
-    public Mail(String sender, String date, String subject, String resourcPath)
+    public Mail(String sender, String date, String subject, String resourcePath)
     {
         this.sender = sender;
         this.date = date;
         this.subject = subject;
-        this.resourcePath = resourcPath;
+        this.resourceName = resourcePath;
     }
     
     /**
@@ -94,9 +92,9 @@ public final class Mail
      * 
      * @return the path to the mail body resource
      */
-    public String getResourcePath()
+    public String getResourceName()
     {
-        return resourcePath;
+        return resourceName;
     }
     
     /**
@@ -104,27 +102,12 @@ public final class Mail
      */
     public void open()
     {
-        String textData;
-        BufferedReader reader;
-        String line;
+        // Load file data
+        String fileData = ResourceLoader.loadTextFile(getResourceName());
         
-        textData = "";
-        try {
-            // Load text data from resource
-            reader = new BufferedReader(new FileReader(resourcePath));
-            
-            // Read text data line-by-line and concatenate it to a string buffer
-            while ((line = reader.readLine()) != null) {
-                textData += line + "\n";
-            }
-        } catch (IOException ex) {
-            // TODO: log
-            ex.printStackTrace();
-            return;
-        }
-        
-        /* Output the contents of the file. Print entire file as a single string
-           to allow for the "--MORE--" pager prompt to show. */
-        Terminal.print(textData);
+        // Output the contents of the file
+        /* Print entire file as a single string to allow for the "--MORE--"
+           pager prompt to show */
+        Terminal.print(fileData);
     }
 }

@@ -24,10 +24,8 @@
 
 package thehambone.blackopsterminalemulator.filesystem;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import thehambone.blackopsterminalemulator.Terminal;
+import thehambone.blackopsterminalemulator.io.ResourceLoader;
 
 /**
  * A {@code TextFile} is a file containing text data.
@@ -53,28 +51,12 @@ public final class TextFile extends PrintableFile
     @Override
     public void print()
     {
-        String textData;
-        BufferedReader reader;
-        String line;
-        
-        textData = "";
-        try {
-            // Load text data from resource
-            reader = new BufferedReader(new FileReader(getResourcePath()));
-            
-            // Read text data line-by-line and concatenate it to a buffer string
-            while ((line = reader.readLine()) != null) {
-                textData += line + "\n";
-            }
-        } catch (IOException ex) {
-            // TODO: log
-            ex.printStackTrace();
-            return;
-        }
+        // Load file data
+        String fileData = ResourceLoader.loadTextFile(getResourceName());
         
         // Output the contents of the file
         /* Print entire file as a single string to allow for the "--MORE--"
            pager prompt to show */
-        Terminal.print(textData);
+        Terminal.print(fileData);
     }
 }
