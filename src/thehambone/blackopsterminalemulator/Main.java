@@ -73,9 +73,8 @@ public class Main
      */
     public static void main(String[] args)
     {
-        // TODO: class for file io, cat command should
-        // resolve path like CD command does,
-        // unchaught exception handler, documentation, logging, add resources,
+        // TODO:
+        // documentation, logging, add resources,
         // arrow keys, menu bar
         
         Logger.info("%s version %s\n", PROGRAM_TITLE, PROGRAM_VERSION);
@@ -93,7 +92,7 @@ public class Main
         UserAccount lastUser;
         
         /* Must load data in the following order:
-          servers, filesystem, users, mail
+           servers, filesystem, users, mail
         */
         ResourceLoader.loadMOTD();
         lastServer = ResourceLoader.loadServers();

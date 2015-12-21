@@ -93,7 +93,7 @@ public class EncodeCommand extends ExecutableFile
             if (Math.round(Math.random()) == 1) {
                 permutation += (char)(c + 13);
             } else {
-                encodedLetter += c;
+                permutation += c;
             }
         }
         

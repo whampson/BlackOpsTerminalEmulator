@@ -94,7 +94,7 @@ public class CdCommand extends ExecutableFile
         String path = args[0];
         String[] pathNodes = tokenizePath(path);
         
-        FileSystemObject cd = shell.getCurrentDirectory();
+        FileSystemObject currentObj = shell.getCurrentDirectory();
         
         if (pathNodes.length > 2
                 && (pathNodes[0].isEmpty() && pathNodes[1].isEmpty())) {
@@ -111,7 +111,7 @@ public class CdCommand extends ExecutableFile
             
             if (node.isEmpty()) {
                 if (i == 0) {
-                    cd = fileSystem.getRoot();
+                    currentObj = fileSystem.getRoot();
                     continue;
                 } else if (i == pathNodes.length - 1) {
                     continue;
@@ -125,8 +125,8 @@ public class CdCommand extends ExecutableFile
                 if (wasLastNodePopOperator) {
                     continue;
                 }
-                if (cd.hasParent()) {
-                    cd = cd.getParent();
+                if (currentObj.hasParent()) {
+                    currentObj = currentObj.getParent();
                 }
                 wasLastNodePopOperator = true;
                 continue;
@@ -140,11 +140,10 @@ public class CdCommand extends ExecutableFile
                 Terminal.println("Error:  Insufficient Permissions");
                 return;
             }
-            cd = fso;
+            currentObj = fso;
             wasLastNodePopOperator = false;
         }
         
-        shell.setCurrentDirectory(cd);
-//        Logger.debug("working directory set to %s\n", cd.getPath());
+        shell.setCurrentDirectory(currentObj);
     }
 }

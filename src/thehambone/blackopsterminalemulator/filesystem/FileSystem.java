@@ -24,6 +24,10 @@
 
 package thehambone.blackopsterminalemulator.filesystem;
 
+import thehambone.blackopsterminalemulator.LoginShell;
+import thehambone.blackopsterminalemulator.Terminal;
+import static thehambone.blackopsterminalemulator.filesystem.FileSystemObject.FILE_SEPARATOR_CHAR;
+
 /**
  * A {@code FileSystem} is a collection of records which contain information
  * regarding files present on the system. A filesystem can also contain

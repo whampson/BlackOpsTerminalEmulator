@@ -29,6 +29,7 @@ import thehambone.blackopsterminalemulator.Terminal;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 import thehambone.blackopsterminalemulator.filesystem.FileSystem;
 import thehambone.blackopsterminalemulator.filesystem.FileSystemObject;
+import thehambone.blackopsterminalemulator.filesystem.HomeDirectory;
 import thehambone.blackopsterminalemulator.filesystem.PrintableFile;
 
 /**
@@ -42,27 +43,109 @@ public class CatCommand extends ExecutableFile
     {
         super(id, "cat");
     }
+    
+    private String[] tokenizePath(String path)
+    {
+        int tokenCount = 1;
+        for (int i = 0; i < path.length(); i++) {
+            if (path.charAt(i) == FILE_SEPARATOR_CHAR) {
+                tokenCount++;
+            }
+        }
+        
+        String[] tokens = new String[tokenCount];
+        
+        int tokenIndex = 0;
+        String tokenBuffer = "";
+        char c;
+        for (int i = 0; i < path.length(); i++) {
+            c = path.charAt(i);
+            if (c == FILE_SEPARATOR_CHAR) {
+                tokens[tokenIndex++] = tokenBuffer;
+                tokenBuffer = "";
+            } else {
+                tokenBuffer += c;
+            }
+        }
+        
+        tokens[tokenIndex] = tokenBuffer;
+        
+        return tokens;
+    }
 
     @Override
     public void exec(String[] args)
     {
-        if (args.length == 0) {
-            Terminal.println("Error:  Invalid Path");
-            return;
-        }
-        
         LoginShell shell = Terminal.getActiveLoginShell();
         FileSystem fileSystem = shell.getSystem().getFileSystem();
+        HomeDirectory currentUserHomeDir = shell.getUser().getHomeDirectory();
         
-        FileSystemObject fso = fileSystem.getFileSystemObject(args[0]);
-        if (fso == null) {
-            Terminal.println("Error:  Invalid Path");
-            return;
-        } else if (!(fso instanceof PrintableFile)) {
+        if (args.length == 0) {
+            Terminal.println("Error:  Invalid Input");
             return;
         }
         
-        PrintableFile pf = (PrintableFile)fso;
-        pf.print();
+        String path = args[0];
+        String[] pathNodes = tokenizePath(path);
+        
+        FileSystemObject currentObj = shell.getCurrentDirectory();
+        
+        if (pathNodes.length > 2
+                && (pathNodes[0].isEmpty() && pathNodes[1].isEmpty())) {
+            Terminal.println("Error:  Invalid Input");
+            return;
+        }
+        
+        FileSystemObject fso;
+        String node;
+        boolean wasLastNodePopOperator = false;
+       
+        for (int i = 0; i < pathNodes.length; i++) {
+            node = pathNodes[i];
+            
+            if (node.isEmpty()) {
+                if (i == 0) {
+                    currentObj = fileSystem.getRoot();
+                    continue;
+                } else if (i == pathNodes.length - 1) {
+                    continue;
+                }
+                Terminal.println("Error:  Invalid Path");
+                return;
+            }
+            if (node.equals(".")) {
+                continue;
+            } else if (node.equals("..")) {
+                if (wasLastNodePopOperator) {
+                    continue;
+                }
+                if (currentObj.hasParent()) {
+                    currentObj = currentObj.getParent();
+                }
+                wasLastNodePopOperator = true;
+                continue;
+            }
+            fso = fileSystem.getFileSystemObject(node);
+            if (fso == null) {
+                Terminal.println("Error:  Invalid Path");
+                return;
+            } else if (fso instanceof HomeDirectory
+                    && fso != currentUserHomeDir) {
+                Terminal.println("Error:  Insufficient Permissions");
+                return;
+            }
+            currentObj = fso;
+            wasLastNodePopOperator = false;
+        }
+        
+        if (!currentObj.hasParent()) {
+            Terminal.println("Error:  File Not Found");
+            return;
+        }
+        
+        if (currentObj instanceof PrintableFile) {
+            PrintableFile pf = (PrintableFile)currentObj;
+            pf.print();
+        }
     }
 }
