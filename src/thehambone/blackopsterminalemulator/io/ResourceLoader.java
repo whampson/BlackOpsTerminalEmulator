@@ -32,13 +32,9 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
-import java.util.logging.Level;
 import javax.imageio.ImageIO;
-import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.DataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JOptionPane;
 import thehambone.blackopsterminalemulator.Mail;
@@ -64,6 +60,7 @@ import thehambone.blackopsterminalemulator.filesystem.TextFile;
  */
 public class ResourceLoader
 {
+    // Configuration file paths
     private static final String FILES_PATH = "data/files.dat";
     private static final String FILESYSTEM_PATH = "data/filesystem.dat";
     private static final String MAIL_PATH = "data/mail.dat";
@@ -71,10 +68,17 @@ public class ResourceLoader
     private static final String SERVERS_PATH = "data/systems.dat";
     private static final String USERS_PATH = "data/users.dat";
     
+    // Resource directory paths
     private static final String TEXT_FILE_PATH = "data/txt/";
     private static final String IMAGE_FILE_PATH = "data/img/";
     private static final String SOUND_FILE_PATH = "data/aud/";
     
+    /**
+     * Loads a text resource.
+     * 
+     * @param resourceName the name of the resource to load
+     * @return the text data
+     */
     public static String loadTextFile(String resourceName)
     {
         String textData = "";
@@ -95,6 +99,12 @@ public class ResourceLoader
         return textData;
     }
     
+    /**
+     * Loads an image resource.
+     * 
+     * @param resourceName the name of the resource to load
+     * @return the image data
+     */
     public static BufferedImage loadImageFile(String resourceName)
     {
         BufferedImage image = null;
@@ -109,12 +119,17 @@ public class ResourceLoader
         return image;
     }
     
+    /**
+     * Loads an audio resource.
+     * 
+     * @param resourceName the name of the resource to load
+     * @return the audio stream
+     */
     public static AudioInputStream loadSoundFile(String resourceName)
     {
         AudioInputStream stream = null;
         
         try {
-            // Load sound data
             String resourcePath = SOUND_FILE_PATH + resourceName;
             stream = AudioSystem
                     .getAudioInputStream(new java.io.File(resourcePath));
@@ -124,9 +139,15 @@ public class ResourceLoader
         
         return stream;
     }
-        
-    public static
-    void loadFileSystem(Map<String, Class<? extends ExecutableFile>> exes)
+    
+    /**
+     * Loads the filesystem configuration.
+     * 
+     * @param exes a Map containing classes representing executable files and
+     *             their corresponding names
+     */
+    public static void loadFileSystemConfiguration(
+            Map<String, Class<? extends ExecutableFile>> exes)
     {
         /* Load files into temporary filesystem. The temporary filesytem is used
            to access files while the actual filesystem is being built.
@@ -206,6 +227,9 @@ public class ResourceLoader
         }
     }
     
+    /*
+     * Loads the list of files.
+     */
     private static
     FileSystem loadFiles(Map<String, Class<? extends ExecutableFile>> exes)
     {
@@ -285,7 +309,10 @@ public class ResourceLoader
         return tempFileSystem;
     }
     
-    public static void loadMail()
+    /**
+     * Loads the mail configuration.
+     */
+    public static void loadMailConfiguration()
     {
         try {
             DATFileReader reader = new DATFileReader(MAIL_PATH);
@@ -319,28 +346,12 @@ public class ResourceLoader
         }
     }
     
-    public static void loadMOTD()
-    {
-        String motd = "";
-        String line;
-        
-        try {
-            BufferedReader fileReader
-                    = new BufferedReader(new FileReader(MOTD_PATH));
-            
-            while ((line = fileReader.readLine()) != null) {
-                motd += line + "\n";
-            }
-            
-            Terminal.setMOTD(motd);
-            Logger.info("Loaded MOTD");
-        } catch (IOException ex) {
-            Logger.stackTrace(ex);
-            showConfigFileErrorMessage(ex);
-        }
-    }
-    
-    public static Server loadServers()
+    /**
+     * Loads server configuration.
+     * 
+     * @return the last loaded server
+     */
+    public static Server loadServerConfiguration()
     {
         Server s = null;
         
@@ -368,7 +379,12 @@ public class ResourceLoader
         return s;
     }
     
-    public static UserAccount loadUsers()
+    /**
+     * Loads user configuration
+     * 
+     * @return the last loaded user account
+     */
+    public static UserAccount loadUserConfiguration()
     {
         UserAccount u = null;
         
@@ -404,8 +420,39 @@ public class ResourceLoader
         return u;
     }
     
+    /**
+     * Loads the message of the day (MOTD). This is displayed when the terminal
+     * is first opened.
+     */
+    public static void loadMOTD()
+    {
+        String motd = "";
+        String line;
+        
+        try {
+            BufferedReader fileReader
+                    = new BufferedReader(new FileReader(MOTD_PATH));
+            
+            while ((line = fileReader.readLine()) != null) {
+                motd += line + "\n";
+            }
+            
+            Terminal.setMOTD(motd);
+            Logger.info("Loaded MOTD");
+        } catch (IOException ex) {
+            Logger.stackTrace(ex);
+            showConfigFileErrorMessage(ex);
+        }
+    }
+    
+    // TODO: Remove in favor of unchecked exception?
+    /*
+     * Displays an error message indicating that a config file loading operation
+     * has failed.
+     */
     private static void showConfigFileErrorMessage(Throwable cause)
     {
+        // Attempts to create a crash dump
         String crashReportFileName = null;
         try {
             crashReportFileName = Logger.generateCrashDump();
@@ -413,6 +460,7 @@ public class ResourceLoader
             Logger.stackTrace(ex);
         }
         
+        // Create error message
         String message = String.format("<html><p style='width: 300px;'>"
                 + "An error occured while loading a configuration file:"
                 + "<br><br>%s: %s<br><br>"
@@ -426,11 +474,13 @@ public class ResourceLoader
                                 + "(" + crashReportFileName + ")."
                         : "A crash report failed to generate.");
         
+        // Show error message
         JOptionPane.showMessageDialog(null,
                 message,
                 "I/O Error",
                 JOptionPane.ERROR_MESSAGE);
         
+        // Exit JVM with a nonzero exit code to indicate an error as occured
         System.exit(1);
     }
 }

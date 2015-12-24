@@ -30,6 +30,11 @@ import java.io.FileReader;
 import java.io.IOException;
 
 /**
+ * This class provides a means to read the terminal configuration files (.dat)
+ * files. .dat files are basically CSV files, but support comments and ignore
+ * whitespaces between cells. Comments must be on their own lines and cannot
+ * occur after data on the same line.
+ * <p>
  * Created on Dec 5, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
@@ -44,6 +49,12 @@ public class DATFileReader
     private String[] currentLine;
     private int fieldIndex;
     
+    /**
+     * Creates a new {@code DATFileReader} object.
+     * 
+     * @param fileName the file to read
+     * @throws FileNotFoundException if the specified file doesn't exist
+     */
     public DATFileReader(String fileName) throws FileNotFoundException
     {
         reader = new BufferedReader(new FileReader(fileName));
@@ -56,63 +67,104 @@ public class DATFileReader
         fieldIndex = -1;
     }
     
+    /**
+     * Sets the character used to separate fields. A comma (,) is the default
+     * character.
+     * 
+     * @param c the character to use as the field separator
+     */
     public void setFieldSeparatorChar(char c)
     {
         fieldSeparator = c;
     }
     
+    /**
+     * Sets the character used to denote comments in the file. The hash symbol
+     * (#) is the default comment character.
+     * 
+     * @param c the character to use to denote comments
+     */
     public void setCommentChar(char c)
     {
         commentChar = c;
     }
     
+    /**
+     * Marks whether whitespaces between fields should be ignored.
+     * 
+     * @param ignoreWhitespaces a boolean value indicating whether to ignore
+     *                          whitespaces between fields
+     */
     public void ignoreWhitespaces(boolean ignoreWhitespaces)
     {
         this.ignoreWhitespaces = ignoreWhitespaces;
     }
     
+    /**
+     * Reads the next line in the file.
+     * 
+     * @return a boolean value indicating whether there exists another line to
+     *         be read, {@code true} means a there is another line to be read,
+     *         {@code false} indicates that the end of the file has been reached
+     * @throws IOException if an I/O error occurs
+     */
     public boolean loadNextLine() throws IOException
     {
+        // Read the next line in the file, skip comments
         String line = "";
         do {
             line = reader.readLine();
             if (line == null) {
+                // End of file reached
                 return false;
             }
         } while (line.isEmpty()
                 || line.startsWith(Character.toString(commentChar)));
         
+        // Replace all instances of the string "\n" with the newline character
         line = line.replaceAll("\\\\n", "\n");
         
+        // Tokenize the line by the field separator char
         String[] temp = line.split(Character.toString(fieldSeparator));
-//        String[] temp = line.split("(?!\\B\"[^\"]*),(?![^\"]*\"\\B)");
+        currentLine = new String[temp.length];
         
+        // Trim whitespaces if parser is set to do so
         if (ignoreWhitespaces) {
             for (int i = 0; i < temp.length; i++) {
-                temp[i] = temp[i].trim();
+                currentLine[i] = temp[i].trim();
             }
         }
         
-        currentLine = new String[temp.length];
-        System.arraycopy(temp, 0, currentLine, 0, temp.length);
-        
+        // Reset field index
         fieldIndex = -1;
         
         return true;
     }
     
-    public String[] getLineAsArray()
-    {
-        return new String[0];
-    }
-    
+    /**
+     * Checks whether another field is available to be read from the current
+     * line.
+     * 
+     * @return {@code true} if there is another field to read, {@code false} if
+     *         the end of the line has been reached
+     */
     public boolean hasNextField()
     {
         return currentLine.length > (fieldIndex  + 1);
     }
     
+    /**
+     * Gets the next field in the line.
+     * 
+     * @return the next field if one exists, {@code null} if the end of the line
+     *         has been reached
+     */
     public String nextField()
     {
-        return currentLine[++fieldIndex].replaceAll("\"", "");
+        if (hasNextField()) {
+            return currentLine[++fieldIndex].replaceAll("\"", "");
+        } else {
+            return null;
+        }
     }
 }

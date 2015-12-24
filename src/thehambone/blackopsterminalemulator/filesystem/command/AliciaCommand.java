@@ -29,12 +29,18 @@ import thehambone.blackopsterminalemulator.Terminal;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
 /**
+ * The "alicia" command.
+ * <p>
+ * Alicia is a virtual therapist designed to help those in need of someone to
+ * talk to about their problems.
+ * <p>
  * Created on Dec 6, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
 public class AliciaCommand extends ExecutableFile
 {
+    // Alicia is a well-versed computerwoman with a whopping 10 phrases!
     private static final String[] RESPONSES = new String[]
     {
         "Can you go into greater detail?",
@@ -49,11 +55,19 @@ public class AliciaCommand extends ExecutableFile
         "This is very interesting."
     };
     
+    /**
+     * Creates a new instance of the {@code AliciaCommand} class.
+     * 
+     * @param id the filesystem object id
+     */
     public AliciaCommand(int id)
     {
         super(id, "alicia");
     }
     
+    /*
+     * Gets a random response from the list of responses.
+     */
     private String getRandomResponse()
     {
         int min = 0;
@@ -71,9 +85,16 @@ public class AliciaCommand extends ExecutableFile
         shell.exec();
     }
     
+    /*
+     * This extension of the {@code Shell} class provies an interface for
+     * interacting with Alicia.
+     */
     private class AliciaShell extends Shell
     {
-        public AliciaShell()
+        /*
+         * Creates a new {@code AlicaShell} object.
+         */
+        private AliciaShell()
         {
             super(">");
         }
@@ -90,6 +111,7 @@ public class AliciaCommand extends ExecutableFile
         {
             String input;
             
+            // Simple input loop
             while (isRunning()) {
                 Terminal.print(getPrompt());
                 input = Terminal.readLine();
@@ -98,6 +120,9 @@ public class AliciaCommand extends ExecutableFile
                             + "Goodbye!");
                     terminate();
                 } else {
+                    /* Alicia gives a random response regardless of what the
+                       user types. What a great listener!
+                    */
                     Terminal.println(getRandomResponse());
                 }
             }

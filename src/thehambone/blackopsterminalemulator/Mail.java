@@ -47,14 +47,14 @@ public final class Mail
      * @param sender the sender of the mail
      * @param date the date the mail was received
      * @param subject the subject of the mail
-     * @param resourcePath the path pointing to the file containing the mail body
+     * @param resourceName the name of the file containing the mail body
      */
-    public Mail(String sender, String date, String subject, String resourcePath)
+    public Mail(String sender, String date, String subject, String resourceName)
     {
         this.sender = sender;
         this.date = date;
         this.subject = subject;
-        this.resourceName = resourcePath;
+        this.resourceName = resourceName;
     }
     
     /**
@@ -88,9 +88,9 @@ public final class Mail
     }
     
     /**
-     * Gets the path to the resource containing the mail body.
+     * Gets the name of the resource containing the mail body.
      * 
-     * @return the path to the mail body resource
+     * @return the name of the mail body resource
      */
     public String getResourceName()
     {

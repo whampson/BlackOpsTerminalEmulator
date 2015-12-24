@@ -30,12 +30,21 @@ import thehambone.blackopsterminalemulator.Terminal;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
 /**
+ * The "login" command.
+ * <p>
+ * This command invokes the login sequence on the current server.
+ * <p>
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
 public class LoginCommand extends ExecutableFile
 {
+    /**
+     * Creates a new instance of the {@code LoginCommand} class.
+     * 
+     * @param id the filesystem object id
+     */
     public LoginCommand(int id)
     {
         super(id, "login");
@@ -46,6 +55,7 @@ public class LoginCommand extends ExecutableFile
     {
         Server system = Terminal.getActiveLoginShell().getSystem();
         
+        // Shouldn't ever happen, but in the rare event that it does...
         if (system == null) {
             Terminal.println("Error:  unknown system");
             return;
@@ -53,6 +63,7 @@ public class LoginCommand extends ExecutableFile
         
         LoginShell newShell = system.login();
         
+        // Execute new shell if the login was successful
         if (newShell != null) {
             Terminal.pushLoginShell(newShell);
             newShell.exec();

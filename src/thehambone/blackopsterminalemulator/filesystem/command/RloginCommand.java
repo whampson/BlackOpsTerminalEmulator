@@ -30,12 +30,21 @@ import thehambone.blackopsterminalemulator.Terminal;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
 /**
+ * The "rlogin" command.
+ * <p>
+ * This command invokes the login sequence on a remote system.
+ * <p>
  * Created on Nov 29, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
 public class RloginCommand extends ExecutableFile
 {
+    /**
+     * Creates a new instance of the {@code RloginCommand} class.
+     * 
+     * @param id the filesystem object id
+     */
     public RloginCommand(int id)
     {
         super(id, "rlogin");
@@ -61,8 +70,11 @@ public class RloginCommand extends ExecutableFile
             Terminal.println("Error:  unknown system");
             return;
         }
+        
+        // Attempt to log in to the system
         LoginShell newShell = system.login();
         
+        // Invoke new shell if login attempt successful
         if (newShell != null) {
             Terminal.pushLoginShell(newShell);
             newShell.exec();

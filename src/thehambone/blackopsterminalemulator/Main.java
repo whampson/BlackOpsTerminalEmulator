@@ -63,8 +63,8 @@ public class Main
             = "Call of Duty: Black Ops Terminal Emulator";
     public static final String PROGRAM_VERSION
             = "1.0-alpha";
-    
-//    public static final boolean DEBUG = true;
+    public static final String PROGRAM_AUTHOR = "thehambone";
+    public static final String PROGRAM_AUTHOR_EMAIL = "thehambone93@gmail.com";
     
     /**
      * Program entry point.
@@ -73,17 +73,18 @@ public class Main
      */
     public static void main(String[] args)
     {
-        // TODO:
+        // TODO: Terminal crashdump
         // documentation, logging, add resources,
         // arrow keys, menu bar
         
-        Logger.info("%s version %s\n", PROGRAM_TITLE, PROGRAM_VERSION);
+        Logger.info(PROGRAM_TITLE);
+        Logger.info("Version %s\n", PROGRAM_VERSION);
+        Logger.info("Created by %s\n", PROGRAM_AUTHOR);
         
         initUncaughtExceptionHandler();
         initLookAndFeel();
         
-        String title = PROGRAM_TITLE + " - " + PROGRAM_VERSION;
-        Terminal.setTitle(title);
+        Terminal.setTitle(PROGRAM_TITLE + " - " + PROGRAM_VERSION);
         
         Map<String, Class<? extends ExecutableFile>> executables;
         executables = registerExecutables();
@@ -91,18 +92,21 @@ public class Main
         Server lastServer;
         UserAccount lastUser;
         
-        /* Must load data in the following order:
-           servers, filesystem, users, mail
+        /* Load terminal configuration. Config must be loaded in the following
+           order: servers, filesystem, users, mail
         */
         ResourceLoader.loadMOTD();
-        lastServer = ResourceLoader.loadServers();
-        ResourceLoader.loadFileSystem(executables);
-        lastUser = ResourceLoader.loadUsers();
-        ResourceLoader.loadMail();
+        lastServer = ResourceLoader.loadServerConfiguration();
+        ResourceLoader.loadFileSystemConfiguration(executables);
+        lastUser = ResourceLoader.loadUserConfiguration();
+        ResourceLoader.loadMailConfiguration();
         
         launchTerminal(new LoginShell(lastServer, lastUser));
     }
     
+    /*
+     * Invokes the default login shell and shows the terminal window.
+     */
     private static void launchTerminal(LoginShell defaultLoginShell)
     {
         Logger.info("Launching terminal...");
@@ -110,6 +114,7 @@ public class Main
         Terminal.show();
         Terminal.printMOTD();
         
+        // Reinvoke the login shell if the user exits. 
         while (true) {
             Terminal.pushLoginShell(defaultLoginShell);
             defaultLoginShell.exec();
@@ -118,6 +123,10 @@ public class Main
         }
     }
     
+    /*
+     * Initializes terminal commands by associating command names with their
+     * respective classes.
+     */
     private static
     Map<String, Class<? extends ExecutableFile>> registerExecutables()
     {
@@ -143,11 +152,19 @@ public class Main
         return exes;
     }
     
+    /*
+     * Adds a handler for unchecked exceptions. When an unchecked exception is
+     * thrown, the user will be shown an error message.
+     */
     private static void initUncaughtExceptionHandler()
     {
         Thread.setDefaultUncaughtExceptionHandler(
                 new UncaughtExceptionHandler());
     }
+    
+    /*
+     * Sets the application look and feel to match the system's look and feel.
+     */
     private static void initLookAndFeel()
     {
         try {

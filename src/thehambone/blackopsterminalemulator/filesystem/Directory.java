@@ -30,8 +30,8 @@ import java.util.List;
 
 /**
  * A {@code Directory} is a record in the filesystem that contains references
- * to other filesystem objects like files or other directories. A directory has
- * one parent and can contain any number of child objects.
+ * to other filesystem objects (like files or other directories). A directory
+ * has one parent and can contain any number of child objects.
  * <p>
  * Created on Nov 28, 2015.
  *

@@ -28,12 +28,21 @@ import thehambone.blackopsterminalemulator.Terminal;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
 /**
+ * The "foobar" command.
+ * <p>
+ * Useless command; prints the string "Fee Fie Foe Foo!".
+ * <p>
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
 public class FoobarCommand extends ExecutableFile
 {
+    /**
+     * Creates a new instance of the {@code FoobarCommand} class.
+     * 
+     * @param id the code id
+     */
     public FoobarCommand(int id)
     {
         super(id, "foobar");

@@ -45,7 +45,7 @@ import java.util.ListIterator;
 public final class ScreenBuffer
 {
     /**
-     * The number of spaces the tab character occupies.
+     * The number of spaces the tab character should occupy.
      */
     public static final int TAB_LENGTH = 4;
     

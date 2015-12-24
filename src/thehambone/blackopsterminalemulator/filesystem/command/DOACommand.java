@@ -24,16 +24,24 @@
 
 package thehambone.blackopsterminalemulator.filesystem.command;
 
-import thehambone.blackopsterminalemulator.Terminal;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
 /**
+ * The "doa" command.
+ * <p>
+ * This command launches Dead Ops Arcade.
+ * <p>
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
 public class DOACommand extends ExecutableFile
 {
+    /**
+     * Creates a new instance of the {@code DOACommand} class.
+     * 
+     * @param id the filesystem object id
+     */
     public DOACommand(int id)
     {
         super(id, "doa");
@@ -42,6 +50,7 @@ public class DOACommand extends ExecutableFile
     @Override
     public void exec(String[] args)
     {
-        Terminal.println("*** Launches Dead Ops Arcade ***");
+        // TODO: become a coding guru and implement Dead Ops Arcade
+        // Until then, do nothing... just pretend you're playing it
     }
 }

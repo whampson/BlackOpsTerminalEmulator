@@ -25,9 +25,6 @@
 package thehambone.blackopsterminalemulator.filesystem;
 
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
-import java.io.IOException;
-import javax.imageio.ImageIO;
 import thehambone.blackopsterminalemulator.Terminal;
 import thehambone.blackopsterminalemulator.io.ResourceLoader;
 

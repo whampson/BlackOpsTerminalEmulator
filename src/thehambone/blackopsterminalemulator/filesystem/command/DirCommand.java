@@ -24,8 +24,6 @@
 
 package thehambone.blackopsterminalemulator.filesystem.command;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import thehambone.blackopsterminalemulator.LoginShell;
 import thehambone.blackopsterminalemulator.ScreenBuffer;
@@ -36,17 +34,29 @@ import thehambone.blackopsterminalemulator.filesystem.File;
 import thehambone.blackopsterminalemulator.filesystem.FileSystemObject;
 
 /**
+ * The "dir" command.
+ * <p>
+ * Prints the contents of the current directory.
+ * <p>
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
 public class DirCommand extends ExecutableFile
 {
+    /**
+     * Creates a new instance of the {@code DirCommand} class.
+     * 
+     * @param id the filesystem object id
+     */
     public DirCommand(int id)
     {
         super(id, "dir");
     }
     
+    /*
+     * Rounds a decimal number to the nearest whole number; 0.5 is rounded down.
+     */
     private double roundHalfDown(double d)
     {
         if (d % 0.5 == 0) {
@@ -67,29 +77,40 @@ public class DirCommand extends ExecutableFile
         FileSystemObject o;
         String objName;
         int itemsPrinted = 0;
+        
+        // Iterate through all children of the current directory
         for (int i = 0; i < objs.size(); i++) {
             o = objs.get(i);
             objName = o.getName();
             
+            /* Append a slash (/) to the end of the object name to indicate it
+               is a directory
+            */
             if (o instanceof Directory) {
                 objName += Directory.FILE_SEPARATOR_CHAR;
             }
             
+            // Skip hidden objects
             if (o instanceof File && ((File)o).isHidden()) {
                 continue;
             }
             
+            // Print object name
             Terminal.print(' ');
             Terminal.print(objName);
             itemsPrinted++;
             
+            // Print a newline after every 4 items printed
             if (itemsPrinted % 4 == 0) {
                 Terminal.println();
-            } else {
-                int tabCount = 5 - (int)roundHalfDown((double)objName.length() / ScreenBuffer.TAB_LENGTH);
-                for (int j = 0; j < tabCount; j++) {
-                    Terminal.print('\t');
-                }
+                continue;
+            }
+            
+            // Align items on the line by padding space with tab characters
+            int tabCount = 5 - (int)roundHalfDown(
+                            (double)objName.length() / ScreenBuffer.TAB_LENGTH);
+            for (int j = 0; j < tabCount; j++) {
+                Terminal.print('\t');
             }
         }
         

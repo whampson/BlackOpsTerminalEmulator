@@ -101,7 +101,9 @@ public final class LoginShell extends Shell
         currentDirectory = dir;
     }
     
-    // Internal command "3arc"
+    /*
+     * Internal command "3arc"
+     */
     private void cmd3arc(String[] args)
     {
         if (args.length == 0) {
@@ -113,7 +115,9 @@ public final class LoginShell extends Shell
         }
     }
     
-    // Internal command "exit"
+    /*
+     * Internal command "exit"
+     */
     private void cmdExit(String[] args)
     {
         Terminal.popLoginShell();
@@ -190,7 +194,8 @@ public final class LoginShell extends Shell
             } else if (fso instanceof File) {
                 // Check if object is a symlink to an executable
                 File f = (File)fso;
-                if (f.isAlias() && f.getAliasTarget() instanceof ExecutableFile) {
+                if (f.isAlias()
+                        && f.getAliasTarget() instanceof ExecutableFile) {
                     exe = (ExecutableFile)f.getAliasTarget();
                 }
             }

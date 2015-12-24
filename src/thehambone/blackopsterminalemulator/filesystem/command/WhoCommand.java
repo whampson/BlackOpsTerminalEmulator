@@ -31,12 +31,22 @@ import thehambone.blackopsterminalemulator.UserAccount;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
 /**
+ * The "who" command.
+ * <p>
+ * This command lists almost all user accounts on the system. Users marked as
+ * "unlisted" are not shown.
+ * <p>
  * Created on Nov 29, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
 public class WhoCommand extends ExecutableFile
 {
+    /**
+     * Creates a new instance of the {@code WhoCommand} class.
+     * 
+     * @param id the filesystem object id
+     */
     public WhoCommand(int id)
     {
         super(id, "who");
@@ -49,6 +59,7 @@ public class WhoCommand extends ExecutableFile
         
         List<UserAccount> users = system.getUsers();
         
+        // List all users, skip unlisted users
         for (UserAccount u : users) {
             if (!u.getHomeDirectory().isUnlisted()) {
                 Terminal.println(u.getUsername());

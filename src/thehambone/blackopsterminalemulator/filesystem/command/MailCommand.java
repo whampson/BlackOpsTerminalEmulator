@@ -33,6 +33,10 @@ import thehambone.blackopsterminalemulator.Terminal;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
 /**
+ * The "mail" command.
+ * <p>
+ * This command opens the current user's mailbox and allows them to read mail.
+ * <p>
  * Created on Dec 6, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
@@ -41,6 +45,11 @@ public class MailCommand extends ExecutableFile
 {
     private Mailbox mailbox;
     
+    /**
+     * Creates a new instance of the {@code MailCommand} class.
+     * 
+     * @param id the filesystem object id
+     */
     public MailCommand(int id)
     {
         super(id, "mail");
@@ -60,11 +69,17 @@ public class MailCommand extends ExecutableFile
         private final static String DEFAULT_MESSAGE
                 = "Mail Version 0.72.  Type ? for help.";
         
-        public MailShell()
+        /*
+         * Creates a new {@code MailShell} object.
+         */
+        private MailShell()
         {
             super("&");
         }
         
+        /*
+         * Prints n tabs to the console.
+         */
         private void printTabs(int n)
         {
             for (int i = 0; i < n; i++) {
@@ -72,31 +87,48 @@ public class MailCommand extends ExecutableFile
             }
         }
         
+        /*
+         * Shows the contents of the inbox.
+         */
         private void showInbox()
         {
-            Terminal.println("id\t\t\t from\t\t\t\t\t  date\t\t\t\t\t   subject");
+            Terminal.println("id\t\t\t from\t\t\t\t\t  "
+                    + "date\t\t\t\t\t   subject");
+            
             List<Mail> mail = mailbox.getAllMail();
             Mail m;
+            int tabCount;
+            
             for (int i = 0; i < mail.size(); i++) {
                 m = mail.get(i);
+                
+                // Print number
                 if (i < 10) {
                     Terminal.print(' ');
                 }
                 Terminal.print(i + " ");
                 
-                int tabCount = 7 - (int)Math.round((double)m.getSender().length() / ScreenBuffer.TAB_LENGTH);
+                // Print sender
                 Terminal.print(m.getSender());
+                tabCount = 7 - (int)Math.round((double)
+                        m.getSender().length() / ScreenBuffer.TAB_LENGTH);
                 printTabs(tabCount);
                 
-                tabCount = 6 - (int)Math.floor((double)m.getDate().length() / ScreenBuffer.TAB_LENGTH);
+                // Print date
                 Terminal.print(m.getDate());
+                tabCount = 6 - (int)Math.floor((double)
+                        m.getDate().length() / ScreenBuffer.TAB_LENGTH);
                 printTabs(tabCount);
                 
+                // Print subject
                 Terminal.print(m.getSubject());
                 Terminal.println();
             }
         }
         
+        /*
+         * Prints the mail help informaton.
+         */
         private void showHelp()
         {
             Terminal.println("Mail Help:");
@@ -106,6 +138,9 @@ public class MailCommand extends ExecutableFile
             Terminal.println("\t q\t\t\tQuit Mail");
         }
         
+        /*
+         * Opens a mail.
+         */
         private void openMail(int id)
         {
             Mail m = mailbox.getMail(id);
@@ -129,8 +164,13 @@ public class MailCommand extends ExecutableFile
             String input;
             
             while (isRunning()) {
+                // Print prompt
                 Terminal.print(getPrompt());
+                
+                // Read input from the user
                 input = Terminal.readLine();
+                
+                // Check if the user typed one of the mail commands
                 switch (input) {
                     case "i":
                         showInbox();
@@ -145,19 +185,25 @@ public class MailCommand extends ExecutableFile
                 
                 String mailIDStr = "";
                 char c;
+                
+                // Extracts a number from the user-typed string
                 for (int i = 0; i < Math.min(4, input.length()); i++) {
                     c = input.charAt(i);
                     if (c > 0x29 && c < 0x3A) {
+                        // Append the character if it is a numeric char
                         mailIDStr += c;
                     } else {
+                        // Break at the first occurance of a non-numeric char
                         break;
                     }
                 }
+                
                 if (mailIDStr.isEmpty()) {
                     Terminal.println(DEFAULT_MESSAGE);
                     continue;
                 }
                 
+                // Open the specified mail
                 int mailID = Integer.parseInt(mailIDStr);
                 openMail(mailID);
             }

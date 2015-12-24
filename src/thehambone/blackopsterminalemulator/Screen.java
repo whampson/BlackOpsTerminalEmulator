@@ -350,7 +350,6 @@ public final class Screen
                 }
                 
                 if (isCursorVisible) {
-                    
                     // Get cursor coordinates
                     x = screenBuffer.getCursorX() - colorCharOffset;
                     y = screenBuffer.getCursorY();

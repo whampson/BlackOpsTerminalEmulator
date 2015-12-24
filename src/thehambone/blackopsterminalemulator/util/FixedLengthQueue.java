@@ -29,7 +29,7 @@ import java.util.Iterator;
 /**
  * A {@code FixedLengthQueue} represents a first-in-first-out (FIFO) collection
  * of objects whose maximum capacity does not change. The class implements the
- * Iterable interface so items in the queue can be iterated over.
+ * Iterable interface so items in the queue can be iterated.
  * <p>
  * Created on Nov 29, 2015.
  *

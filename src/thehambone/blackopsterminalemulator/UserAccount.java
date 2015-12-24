@@ -54,6 +54,7 @@ public final class UserAccount
         this.username = username;
         this.password = password;
         this.homeDirectory = homeDirectory;
+        
         mailbox = new Mailbox();
     }
     
@@ -87,6 +88,11 @@ public final class UserAccount
         return homeDirectory;
     }
     
+    /**
+     * Returns the mailbox associated with this user account.
+     * 
+     * @return this user's mailbox
+     */
     public Mailbox getMailbox()
     {
         return mailbox;

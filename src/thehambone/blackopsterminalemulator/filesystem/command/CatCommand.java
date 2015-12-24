@@ -33,19 +33,34 @@ import thehambone.blackopsterminalemulator.filesystem.HomeDirectory;
 import thehambone.blackopsterminalemulator.filesystem.PrintableFile;
 
 /**
+ * The "cat" command.
+ * <p>
+ * This prints the contents of text files, displays images, and plays sound
+ * files.
+ * <p>
  * Created on Nov 30, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
 public class CatCommand extends ExecutableFile
 {
+    /**
+     * Creates a new instance of the {@code CatCommand} class.
+     * 
+     * @param id the filesystem object id
+     */
     public CatCommand(int id)
     {
         super(id, "cat");
     }
     
+    /*
+     * Splits a string by the character stored in FILE_SEPARATOR_CHAR. This
+     * differs from String.split() in that it preserves empty tokens.
+     */
     private String[] tokenizePath(String path)
     {
+        // Count tokens
         int tokenCount = 1;
         for (int i = 0; i < path.length(); i++) {
             if (path.charAt(i) == FILE_SEPARATOR_CHAR) {
@@ -55,6 +70,7 @@ public class CatCommand extends ExecutableFile
         
         String[] tokens = new String[tokenCount];
         
+        // Split the string
         int tokenIndex = 0;
         String tokenBuffer = "";
         char c;
@@ -67,7 +83,6 @@ public class CatCommand extends ExecutableFile
                 tokenBuffer += c;
             }
         }
-        
         tokens[tokenIndex] = tokenBuffer;
         
         return tokens;
@@ -80,69 +95,100 @@ public class CatCommand extends ExecutableFile
         FileSystem fileSystem = shell.getSystem().getFileSystem();
         HomeDirectory currentUserHomeDir = shell.getUser().getHomeDirectory();
         
+        // Exit if no arguments provided
         if (args.length == 0) {
             Terminal.println("Error:  Invalid Input");
             return;
         }
         
+        /*
+         * The path resolution code below is shared with the "cd" command.
+         */
+        
+        // Split path
         String path = args[0];
-        String[] pathNodes = tokenizePath(path);
-        
-        FileSystemObject currentObj = shell.getCurrentDirectory();
-        
-        if (pathNodes.length > 2
-                && (pathNodes[0].isEmpty() && pathNodes[1].isEmpty())) {
+        String[] pathTokens = tokenizePath(path);
+
+        /*
+         * This mocks weird behavhor exhibited by the actual terminal. If there
+         * are more than two tokens and first two tokens are empty, the command
+         * will behave as if no arguments were supplied.
+         */
+        if (pathTokens.length > 2
+                && (pathTokens[0].isEmpty() && pathTokens[1].isEmpty())) {
             Terminal.println("Error:  Invalid Input");
             return;
         }
         
+        String token;
         FileSystemObject fso;
-        String node;
-        boolean wasLastNodePopOperator = false;
-       
-        for (int i = 0; i < pathNodes.length; i++) {
-            node = pathNodes[i];
+        FileSystemObject currentObj = shell.getCurrentDirectory();
+        boolean wasLastNodeUpOperator = false;
+        
+        /* Loop through the tokenized path; handle each token with respect to
+           the previous token
+        */
+        for (int i = 0; i < pathTokens.length; i++) {
+            token = pathTokens[i];
             
-            if (node.isEmpty()) {
+            /* Change to root if the fitst token is empty, throw an error if any
+               other token is empty
+            */
+            if (token.isEmpty()) {
                 if (i == 0) {
                     currentObj = fileSystem.getRoot();
                     continue;
-                } else if (i == pathNodes.length - 1) {
+                } else if (i == pathTokens.length - 1) {
                     continue;
                 }
                 Terminal.println("Error:  Invalid Path");
                 return;
             }
-            if (node.equals(".")) {
+            
+            // Ignore if token is current directory operator
+            if (token.equals(".")) {
                 continue;
-            } else if (node.equals("..")) {
-                if (wasLastNodePopOperator) {
+            }
+            
+            /* Move up a node if the token is the "up" operator. For some
+               reason, the actual terminal only acknowldges the first "up"
+               operator if there are multiple in a row.
+            */
+            if (token.equals("..")) {
+                if (wasLastNodeUpOperator) {
                     continue;
                 }
                 if (currentObj.hasParent()) {
                     currentObj = currentObj.getParent();
                 }
-                wasLastNodePopOperator = true;
+                wasLastNodeUpOperator = true;
                 continue;
             }
-            fso = fileSystem.getFileSystemObject(node);
+            
+            fso = fileSystem.getFileSystemObject(token);
+            
             if (fso == null) {
                 Terminal.println("Error:  Invalid Path");
                 return;
-            } else if (fso instanceof HomeDirectory
-                    && fso != currentUserHomeDir) {
+            }
+            
+            // Disallow the traversal of other users' homedirs
+            if (fso instanceof HomeDirectory && fso != currentUserHomeDir) {
                 Terminal.println("Error:  Insufficient Permissions");
                 return;
             }
+            
             currentObj = fso;
-            wasLastNodePopOperator = false;
+            wasLastNodeUpOperator = false;
         }
         
+        // This is printed if the user tries to print the root dir
         if (!currentObj.hasParent()) {
             Terminal.println("Error:  File Not Found");
             return;
         }
         
+        // Print the file if the path resolves to a PrintableFile
         if (currentObj instanceof PrintableFile) {
             PrintableFile pf = (PrintableFile)currentObj;
             pf.print();

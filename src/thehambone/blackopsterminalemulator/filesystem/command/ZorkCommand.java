@@ -24,16 +24,32 @@
 
 package thehambone.blackopsterminalemulator.filesystem.command;
 
-import thehambone.blackopsterminalemulator.Terminal;
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
+import thehambone.blackopsterminalemulator.io.Logger;
 
 /**
+ * The "zork" command.
+ * <p>
+ * This command launches Zork I: The Great Underground Empire.
+ * <p>
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
 public class ZorkCommand extends ExecutableFile
 {
+    private static final String ZORK_WEB_URL
+            = "http://iplayif.com/?story=http%3A%2F%2Fwww.ifarchive.org"
+            + "%2Fif-archive%2Fgames%2Fzcode%2Fzdungeon.z5";
+    /**
+     * Creates a new instance of the {@code ZorkCommand} class.
+     * 
+     * @param id the filesystem object id
+     */
     public ZorkCommand(int id)
     {
         super(id, "zork");
@@ -42,6 +58,13 @@ public class ZorkCommand extends ExecutableFile
     @Override
     public void exec(String[] args)
     {
-        Terminal.println("*** Launches Zork I: The Great Underground Empire ***");
+        // TODO: become a code guru and reverse-engineer Zork.
+        // (or just use a pre-made library)
+        // For now, launch a web version of Zork I.
+        try {
+            Desktop.getDesktop().browse(new URI(ZORK_WEB_URL));
+        } catch (IOException | URISyntaxException ex) {
+            Logger.stackTrace(ex);
+        }
     }
 }

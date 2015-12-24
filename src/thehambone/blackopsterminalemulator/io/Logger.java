@@ -30,86 +30,101 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import thehambone.blackopsterminalemulator.Main;
-import thehambone.blackopsterminalemulator.filesystem.File;
+import thehambone.blackopsterminalemulator.Terminal;
 
 /**
+ * This class is responsible for outputting information about the program as it
+ * is running.
+ * <p>
  * Created on Dec 14, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
 public class Logger
 {
-    private static final StringBuilder LOG = new StringBuilder();
+    private static final StringBuilder LOG_BUFFER = new StringBuilder();
     
     private static final String TIMESTAMP_FORMAT = "HH:mm:ss";
     private static final String CRASH_DUMP_TIMESTAMP_FORMAT = "yyyyMMddHHmmss";
     
-    private static final String DEBUG_PREFIX_FORMAT = "<%s> [DEBUG]: %s";
     private static final String INFO_PREFIX_FORMAT = "<%s> [INFO]: %s";
     private static final String ERROR_PREFIX_FORMAT = "<%s> [ERROR]: %s";
     
+    /**
+     * Creates a text file containing information about the current state of the
+     * program, including everything that has been logged thus far. This file is
+     * useful for debugging a fatal crash.
+     * 
+     * @return the name of the newly-created file.
+     * @throws IOException if the file failed to be created or written to
+     */
     public static String generateCrashDump() throws IOException
     {
-        String timestamp = new SimpleDateFormat(CRASH_DUMP_TIMESTAMP_FORMAT)
-                .format(new Date());
-        
-        String fileName = "crash-dump_" + timestamp + ".log";
+        String fileName = "crash-dump_" + timestamp(CRASH_DUMP_TIMESTAMP_FORMAT)
+                + ".log";
         
         PrintWriter pw = new PrintWriter(new FileOutputStream(fileName), true);
         
-//        Terminal.crashDump(pw);
+        // Dump the current state of the Terminal to the file
+        Terminal.crashDump(pw);
         
-        pw.println(LOG.toString().replaceAll("\\\n",
-                System.getProperty("line.separator")));
+        // Write the log buffer to the file with the correct newline characters
+        pw.println(LOG_BUFFER.toString()
+                .replaceAll("\\\n", System.getProperty("line.separator")));
         pw.flush();
         
         return fileName;
     }
     
-//    public static void debug(String s)
-//    {
-//        debug("%s\n", s);
-//    }
-//    
-//    public static void debug(String format, Object... args)
-//    {
-//        if (!Main.DEBUG) {
-//            return;
-//        }
-//        
-//        formatAndOutput(DEBUG_PREFIX_FORMAT, format, args);
-//    }
-    
+    /**
+     * Prints an informational message.
+     * 
+     * @param s the message to print
+     */
     public static void info(String s)
     {
         info("%s\n", s);
     }
     
+    /**
+     * Prints a formatted informational message.
+     * 
+     * @param format the message format
+     * @param args the format arguments
+     * @see String#format(java.lang.String, java.lang.Object...)
+     */
     public static void info(String format, Object... args)
     {
         formatAndOutput(INFO_PREFIX_FORMAT, format, args);
     }
     
+    /**
+     * Prints an error message.
+     * 
+     * @param s the message to be printed
+     */
     public static void error(String s)
     {
         error("%s\n", s);
     }
     
+    /**
+     * Prints a formatted error message.
+     * 
+     * @param format the message format
+     * @param args the format arguments
+     * @see String#format(java.lang.String, java.lang.Object...)
+     */
     public static void error(String format, Object... args)
     {
         formatAndOutput(ERROR_PREFIX_FORMAT, format, args);
     }
     
-//    public static void error(Throwable cause)
-//    {
-//        if (Main.DEBUG) {
-//            stackTrace(cause);
-//        } else {
-//            error("%s: %s\n", cause.getClass().getName(), cause.getMessage());
-//        }
-//    }
-    
+    /**
+     * Appends the stack trace of an error to the log.
+     * 
+     * @param cause the cause of the error
+     */
     public static void stackTrace(Throwable cause)
     {
         StringWriter writer = new StringWriter();
@@ -118,9 +133,12 @@ public class Logger
         
         formatAndOutput(ERROR_PREFIX_FORMAT, "%s\n",
                 writer.getBuffer().toString());
-        
     }
     
+    /*
+     * Prepends the message with a message type prefix, then formats the string
+     * by printf() rules.
+     */
     private static void formatAndOutput(String messagePrefixFormat,
             String format, Object... args)
     {
@@ -128,12 +146,24 @@ public class Logger
         String toOutput = String.format(messagePrefixFormat,
                 timestamp(), message);
         
-        LOG.append(toOutput);
+        LOG_BUFFER.append(toOutput);
         System.out.print(toOutput);
     }
     
+    /*
+     * Returns a string containing the current time.
+     */
     private static String timestamp()
     {
-        return new SimpleDateFormat(TIMESTAMP_FORMAT).format(new Date());
+        return timestamp(TIMESTAMP_FORMAT);
+    }
+    
+    /*
+     * Returns a string containing the current date and time as specified in the
+     * timestamp format parameter.
+     */
+    private static String timestamp(String format)
+    {
+        return new SimpleDateFormat(format).format(new Date());
     }
 }

@@ -31,6 +31,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -41,9 +42,6 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -60,7 +58,6 @@ public final class Terminal
     
     private static final int INPUT_BUFFER_LENGTH = 81;
     
-    // These characters won't be used anywhere else, so why not?
     private static final char INPUT_HISTORY_CYCLE_UP = '\uFFFE';
     private static final char INPUT_HISTORY_CYCLE_DOWN = '\uFFFF';
     
@@ -231,6 +228,11 @@ public final class Terminal
         return TERMINAL_INSTANCE.activeShells.pop();
     }
     
+    public static void crashDump(PrintWriter pw)
+    {
+        // TODO: implement crash dump code
+    }
+    
     /**
      * Sets the window title.
      * 
@@ -275,7 +277,7 @@ public final class Terminal
      * If more than 22 lines are printed on the screen by the same string, the
      * output will be stopped until a key is pressed and "--MORE--" will be
      * printed on screen. This creates a screen paging effect and its purpose is
-     * to allow the user to read the output one "screen-full" at a time.
+     * to allow the user to read the output one screenful at a time.
      * 
      * @param s the string to be printed
      */
@@ -786,6 +788,9 @@ public final class Terminal
         actionMap.put(ch, keyAction);
     }
     
+    /*
+     * Maps the escape key and defines its action.
+     */
     private void registerESCKey()
     {
         AbstractAction keyAction = new AbstractAction()
@@ -793,6 +798,7 @@ public final class Terminal
             @Override
             public void actionPerformed(ActionEvent e)
             {
+                // Attempt to close window
                 frame.dispatchEvent(
                         new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
             }

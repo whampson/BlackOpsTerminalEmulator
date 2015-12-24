@@ -29,6 +29,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * A {@code MailBox} is effectively a database containing a particular user's
+ * mail. Every user has their own mailbox which is accessible via the "mail"
+ * command.
+ * <p>
  * Created on Dec 6, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
@@ -37,16 +41,33 @@ public class Mailbox
 {
     private final List<Mail> mailList;
     
+    /**
+     * Creates a new {@code MailBox} object.
+     */
     public Mailbox()
     {
         mailList = new ArrayList<>();
     }
     
+    /**
+     * Adds a mail to this mailbox.
+     * 
+     * @param m the mail to add
+     */
     public void addMail(Mail m)
     {
         mailList.add(m);
     }
     
+    /**
+     * Retrieves mail from this mailbox through the mail's ID number. The ID
+     * numbers are ordinal; the first item in the mailbox as 0, the next is
+     * 1, and so forth.
+     * 
+     * @param id the ID number of the mail to be retrieved
+     * @return the mail item with the corresponding ID, {@code null} if the ID
+     *         is invalid
+     */
     public Mail getMail(int id)
     {
         if (mailList.isEmpty() || id < 0 || id > mailList.size() - 1) {
@@ -56,6 +77,11 @@ public class Mailbox
         return mailList.get(id);
     }
     
+    /**
+     * Gets all of the mail in this mailbox as a List.
+     * 
+     * @return the entire mailbox as a List.
+     */
     public List<Mail> getAllMail()
     {
         return Collections.unmodifiableList(mailList);

@@ -28,12 +28,21 @@ import thehambone.blackopsterminalemulator.Terminal;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
 /**
+ * The "clear" command.
+ * <p>
+ * This command clears the terminal screen.
+ * <p>
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
 public class ClearCommand extends ExecutableFile
 {
+    /**
+     * Creates a new instance of the {@code ClearCommand} class.
+     * 
+     * @param id the filesystem object id
+     */
     public ClearCommand(int id)
     {
         super(id, "clear");
@@ -42,6 +51,7 @@ public class ClearCommand extends ExecutableFile
     @Override
     public void exec(String[] args)
     {
+        // Clear the screen by filling the screen with newlines
         for (int i = 0; i < Terminal.LINES; i++) {
             Terminal.println();
         }

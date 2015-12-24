@@ -28,12 +28,22 @@ import thehambone.blackopsterminalemulator.Terminal;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 
 /**
+ * The "hello" command.
+ * <p>
+ * This command basically does nothing apart from launching Zork if the correct
+ * argument is provided.
+ * <p>
  * Created on Nov 28, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
 public class HelloCommand extends ExecutableFile
 {
+    /**
+     * Creates a new instance of the {@code HelloCommand} class.
+     * 
+     * @param id the filesystem object id
+     */
     public HelloCommand(int id)
     {
         super(id, "hello");
@@ -42,10 +52,15 @@ public class HelloCommand extends ExecutableFile
     @Override
     public void exec(String[] args)
     {
+        // Show a help messsage if no arguments are provided
         if (args.length == 0) {
             Terminal.println("Error:  Invalid Input - common usages include:");
             Terminal.println("hello brother, hello nurse, and hello sailor");
-        } else if (args[0].equals("sailor")) {
+            return;
+        }
+        
+        // Launch Zork
+        if (args[0].equals("sailor")) {
             ExecutableFile zork = (ExecutableFile)Terminal.getActiveLoginShell()
                     .getSystem().getFileSystem().getFileSystemObject("zork");
             zork.exec(new String[0]);
