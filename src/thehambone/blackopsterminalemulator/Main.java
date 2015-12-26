@@ -34,6 +34,7 @@ import thehambone.blackopsterminalemulator.filesystem.command.CatCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.CdCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.ClearCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.DOACommand;
+import thehambone.blackopsterminalemulator.filesystem.command.DebugCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.DecodeCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.DirCommand;
 import thehambone.blackopsterminalemulator.filesystem.command.EncodeCommand;
@@ -73,8 +74,7 @@ public class Main
      */
     public static void main(String[] args)
     {
-        // TODO: Terminal crashdump
-        // documentation, logging, add resources,
+        //TODO: documentation, add resources,
         // arrow keys, menu bar
         
         Logger.info(PROGRAM_TITLE);
@@ -136,6 +136,7 @@ public class Main
         exes.put("cd", CdCommand.class);
         exes.put("clear", ClearCommand.class);
         exes.put("doa", DOACommand.class);
+        exes.put("debug", DebugCommand.class);
         exes.put("decode", DecodeCommand.class);
         exes.put("dir", DirCommand.class);
         exes.put("encode", EncodeCommand.class);

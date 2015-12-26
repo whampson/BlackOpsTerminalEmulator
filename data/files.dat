@@ -23,6 +23,7 @@
 119,    type,                   false,          ,                               102
 120,    who,                    false,          ,
 121,    zork,                   false,          ,
+122,    debug,                  false,          ,
 
 # system files
 # id    name                    is_hidden       resource_name                   alias_target_id

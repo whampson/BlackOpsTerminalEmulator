@@ -30,6 +30,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import thehambone.blackopsterminalemulator.Main;
 import thehambone.blackopsterminalemulator.Terminal;
 
 /**
@@ -65,12 +66,38 @@ public class Logger
         
         PrintWriter pw = new PrintWriter(new FileOutputStream(fileName), true);
         
+        String titleString = Main.PROGRAM_TITLE + " crash dump";
+        pw.println(titleString);
+        for (int i = 0; i < titleString.length(); i++) {
+            pw.print('=');
+        }
+        pw.println();
+        pw.println("Dump created: " + new Date());
+        pw.println();
+        
+        pw.println("Program Version");
+        pw.println("---------------");
+        pw.println(Main.PROGRAM_VERSION);
+        pw.println();
+        
+        // Print some JVM system properties
+        pw.println("System Info");
+        pw.println("-----------");
+        pw.println("OS Name: " + System.getProperty("os.name"));
+        pw.println("OS Version: " + System.getProperty("os.version"));
+        pw.println("OS Architecture: " + System.getProperty("os.arch"));
+        pw.println("JVM Version: " + System.getProperty("java.version"));
+        pw.println("JVM Architecture: "
+                + System.getProperty("sun.arch.data.model"));
+        pw.println();
+        
         // Dump the current state of the Terminal to the file
-        Terminal.crashDump(pw);
+        Terminal.printCurrentState(pw);
         
         // Write the log buffer to the file with the correct newline characters
-        pw.println(LOG_BUFFER.toString()
-                .replaceAll("\\\n", System.getProperty("line.separator")));
+        pw.println("Log");
+        pw.println("---");
+        pw.println(LOG_BUFFER.toString());
         pw.flush();
         
         return fileName;

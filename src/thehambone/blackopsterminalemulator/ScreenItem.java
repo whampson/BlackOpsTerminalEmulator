@@ -120,4 +120,22 @@ public final class ScreenItem
         this.image = image;
         ch = 0;
     }
+    
+    @Override
+    public String toString()
+    {
+        String data = "";
+        
+        if (hasImage()) {
+            data = String.format("image: { width = %d, height = %d }",
+                    image.getWidth(), image.getHeight());
+        } else {
+            if (ch == '\n') {
+                data += "(\\n)";
+            }
+            data += Character.toString(ch);
+        }
+        
+        return data;
+    }
 }

@@ -22,46 +22,24 @@
  * THE SOFTWARE.
  */
 
-package thehambone.blackopsterminalemulator.filesystem;
+package thehambone.blackopsterminalemulator.util;
+
+import java.io.PrintWriter;
 
 /**
- * A {@code PrintableFile} is a type of file whose data is meant to be output to
- * the user.
+ * The {@code Debuggable} interface should be implemented if a class contains
+ * useful information for debugging.
  * <p>
- * Created on Nov 30, 2015.
+ * Created on Dec 25, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public abstract class PrintableFile extends File
+public interface Debuggable
 {
-    private final String resourceName;
-    
     /**
-     * Creates a new {@code PrintableFile}.
+     * Writes debug info to a data stream.
      * 
-     * @param id the filesystem object id
-     * @param name the name of this file
-     * @param resourceName the name of the resource containing the file data
+     * @param pw data stream
      */
-    public PrintableFile(int id, String name, String resourceName)
-    {
-        super(id, name);
-        
-        this.resourceName = resourceName;
-    }
-    
-    /**
-     * Gets the name of the resource containing the file data.
-     * 
-     * @return the resource path
-     */
-    public String getResourceName()
-    {
-        return resourceName;
-    }
-    
-    /**
-     * Outputs the contents of this file.
-     */
-    public abstract void print();
+    public void printDebugInfo(PrintWriter pw);
 }

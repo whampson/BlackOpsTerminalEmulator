@@ -29,9 +29,11 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import thehambone.blackopsterminalemulator.util.Debuggable;
 
 /**
  * A {@code ScreenBuffer} contains all of the items currently visible on the
@@ -42,7 +44,7 @@ import java.util.ListIterator;
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public final class ScreenBuffer
+public final class ScreenBuffer implements Debuggable
 {
     /**
      * The number of spaces the tab character should occupy.
@@ -426,5 +428,31 @@ public final class ScreenBuffer
                 break;
             }
         }
+    }
+
+    @Override
+    public void printDebugInfo(PrintWriter pw)
+    {
+        int x = 0;
+        
+        pw.println("Screen Buffer");
+        pw.println("-------------");
+        pw.println("index       data");
+        pw.printf("%08d    ", 0);
+        
+        for (int i = 0; i < buf.size(); i++) {
+            pw.print(buf.get(i).toString());
+            
+            // Handle newlines and line wrapping
+            if (buf.get(i).getCharacter() == '\n' || x > columns - 1) {
+                x = 0;
+                pw.printf("%08d    ", i);
+            } else {
+                x++;
+            }
+        }
+        
+        pw.println();
+        pw.println();
     }
 }

@@ -110,4 +110,12 @@ public final class Mail
            pager prompt to show */
         Terminal.print(fileData);
     }
+    
+    @Override
+    public String toString()
+    {
+        return String.format(
+                "Mail: { sender = %s, date = %s, subject = %s, resource = %s }",
+                sender, date, subject, resourceName);
+    }
 }

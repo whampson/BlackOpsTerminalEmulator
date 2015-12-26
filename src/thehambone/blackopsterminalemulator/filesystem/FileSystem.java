@@ -24,6 +24,9 @@
 
 package thehambone.blackopsterminalemulator.filesystem;
 
+import java.util.Iterator;
+import thehambone.blackopsterminalemulator.util.PreorderIterator;
+
 /**
  * A {@code FileSystem} is a collection of records which contain information
  * regarding files present on the system. A filesystem can also contain
@@ -34,7 +37,7 @@ package thehambone.blackopsterminalemulator.filesystem;
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public class FileSystem
+public class FileSystem implements Iterable<FileSystemObject>
 {
     private final FileSystemObject root;
     
@@ -89,5 +92,11 @@ public class FileSystem
         
         // Traverse the tree until the child with the matching name is found
         return root.getChild(name);
+    }
+    
+    @Override
+    public Iterator<FileSystemObject> iterator()
+    {
+        return new PreorderIterator(root);
     }
 }

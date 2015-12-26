@@ -24,7 +24,6 @@
 
 package thehambone.blackopsterminalemulator.util;
 
-import java.io.IOException;
 import javax.swing.JOptionPane;
 import thehambone.blackopsterminalemulator.io.Logger;
 
@@ -57,8 +56,11 @@ public final class UncaughtExceptionHandler
         String crashReportFileName = null;
         try {
             crashReportFileName = Logger.generateCrashDump();
-        } catch (IOException ex) {
-            Logger.stackTrace(ex);
+        } catch (Throwable tr) {
+            // Catch anything that can be thrown
+            // We don't want another RuntimeException!
+            Logger.error("Failed to generate crash dump");
+            Logger.stackTrace(tr);
         }
         
         // Error message

@@ -45,18 +45,23 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import thehambone.blackopsterminalemulator.filesystem.FileSystem;
+import thehambone.blackopsterminalemulator.filesystem.FileSystemObject;
+import thehambone.blackopsterminalemulator.filesystem.PrintableFile;
+import thehambone.blackopsterminalemulator.util.Debuggable;
 import thehambone.blackopsterminalemulator.util.FixedLengthQueue;
 /**
  * Created on Nov 18, 2015.
  *
  * @author thehambone <thehambone93@gmail.com>
  */
-public final class Terminal
+public final class Terminal implements Debuggable
 {
     public static final int COLUMNS = 80;
     public static final int LINES = 27;
     
     private static final int INPUT_BUFFER_LENGTH = 81;
+    private static char[] INPUT_BUFFER = new char[INPUT_BUFFER_LENGTH];
     
     private static final char INPUT_HISTORY_CYCLE_UP = '\uFFFE';
     private static final char INPUT_HISTORY_CYCLE_DOWN = '\uFFFF';
@@ -184,6 +189,16 @@ public final class Terminal
     }
     
     /**
+     * Gets the screen associated with the current Terminal instance.
+     * 
+     * @return the terminal screen
+     */
+    public static Screen getScreen()
+    {
+        return TERMINAL_INSTANCE.screen;
+    }
+    
+    /**
      * Checks whether the maximum number of active login shells has been
      * reached.
      * 
@@ -226,11 +241,6 @@ public final class Terminal
     public static LoginShell popLoginShell()
     {
         return TERMINAL_INSTANCE.activeShells.pop();
-    }
-    
-    public static void crashDump(PrintWriter pw)
-    {
-        // TODO: implement crash dump code
     }
     
     /**
@@ -429,7 +439,6 @@ public final class Terminal
     public static String readLine(char charToPrint)
     {
         char c;
-        char[] buf;
         int bufPointer;
         boolean printDifferentChar;
         boolean isReadingInput;
@@ -437,7 +446,7 @@ public final class Terminal
         String input;
         FixedLengthQueue<String> inputHistory;
         
-        buf = new char[INPUT_BUFFER_LENGTH];
+        INPUT_BUFFER = new char[INPUT_BUFFER_LENGTH];
         bufPointer = 0;
         printDifferentChar = charToPrint != 0;
         isReadingInput = true;
@@ -462,7 +471,7 @@ public final class Terminal
                     break;
                 case '\b':  // Backspace
                     if (bufPointer > 0) {
-                        buf[--bufPointer] = 0;
+                        INPUT_BUFFER[--bufPointer] = 0;
                         print('\b');
                     }
                     break;
@@ -481,8 +490,8 @@ public final class Terminal
                     }
                     
                     // Erase the current input
-                    for (int i = 0; i < buf.length; i++) {
-                        if (buf[i] == 0) {
+                    for (int i = 0; i < INPUT_BUFFER_LENGTH; i++) {
+                        if (INPUT_BUFFER[i] == 0) {
                             break;
                         }
                         print('\b');
@@ -490,11 +499,11 @@ public final class Terminal
                     
                     // Reset the input buffer
                     bufPointer = 0;
-                    buf = new char[INPUT_BUFFER_LENGTH];
+                    INPUT_BUFFER = new char[INPUT_BUFFER_LENGTH];
                     
                     // Add the retrieved string to input buffer and print
                     for (int i = 0; i < input.length(); i++) {
-                        buf[i] = input.charAt(i);
+                        INPUT_BUFFER[i] = input.charAt(i);
                         bufPointer++;
                     }
                     print(input);
@@ -529,8 +538,8 @@ public final class Terminal
                     }
                     
                     // Erase the current input
-                    for (int i = 0; i < buf.length; i++) {
-                        if (buf[i] == 0) {
+                    for (int i = 0; i < INPUT_BUFFER_LENGTH; i++) {
+                        if (INPUT_BUFFER[i] == 0) {
                             break;
                         }
                         print('\b');
@@ -538,11 +547,11 @@ public final class Terminal
                     
                     // Reset the input buffer
                     bufPointer = 0;
-                    buf = new char[INPUT_BUFFER_LENGTH];
+                    INPUT_BUFFER = new char[INPUT_BUFFER_LENGTH];
                     
                     // Add the retrieved string to input buffer and print
                     for (int i = 0; i < input.length(); i++) {
-                        buf[i] = input.charAt(i);
+                        INPUT_BUFFER[i] = input.charAt(i);
                         bufPointer++;
                     }
                     print(input);
@@ -554,8 +563,8 @@ public final class Terminal
                     break;
                 default:
                     // Add character to buffer and print character
-                    if (bufPointer < buf.length) {
-                        buf[bufPointer++] = c;
+                    if (bufPointer < INPUT_BUFFER_LENGTH) {
+                        INPUT_BUFFER[bufPointer++] = c;
                         print(charToPrint);
                     }
             }
@@ -564,7 +573,7 @@ public final class Terminal
         
         // Create string from input buffer
         // Trim to remove extra null characters
-        input = new String(buf).trim();
+        input = new String(INPUT_BUFFER).trim();
         
         // Add input string to the input history queue
         if (inputHistory.isFull()) {
@@ -573,6 +582,16 @@ public final class Terminal
         inputHistory.insert(input);
         
         return input;
+    }
+    
+    /**
+     * Writes debug info to a data stream.
+     * 
+     * @param pw data stream
+     */
+    public static void printCurrentState(PrintWriter pw)
+    {
+        TERMINAL_INSTANCE.printDebugInfo(pw);
     }
     
     /*
@@ -815,5 +834,83 @@ public final class Terminal
     {
         Toolkit tk = Toolkit.getDefaultToolkit();
         return tk.getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
+    }
+    
+    @Override
+    public void printDebugInfo(PrintWriter pw)
+    {
+        screen.getScreenBuffer().printDebugInfo(pw);
+        
+        pw.println("Input Buffer");
+        pw.println("------------");
+        for (int i = 0; i < INPUT_BUFFER_LENGTH; i++) {
+            if (INPUT_BUFFER[i] == 0) {
+                break;
+            }
+            pw.print(INPUT_BUFFER[i]);
+        }
+        pw.println();
+        pw.println();
+
+        pw.println("Input History");
+        pw.println("-------------");
+        for (String s : inputHistory) {
+            pw.println(s);
+        }
+        pw.println();
+        
+        pw.println("MOTD");
+        pw.println("----");
+        if (!motd.isEmpty()) {
+            pw.println(motd);
+        }
+        pw.println();
+        
+        pw.println("Server Info");
+        pw.println("-----------");
+        for (Server s : servers) {
+            pw.println("Server: " + s.getName());
+            for (UserAccount u : s.getUsers()) {
+                pw.println("    User: " + u.getUsername());
+                for (Mail m : u.getMailbox().getAllMail()) {
+                    pw.println("        " + m);
+                }
+            }
+        }
+        pw.println();
+        
+        pw.println("Server Filesystems");
+        pw.println("------------------");
+        for (Server s : servers) {
+            pw.println("Server: " + s.getName());
+            
+            FileSystem fs = s.getFileSystem();
+            if (fs == null) {
+                continue;
+            }
+            
+            Iterator<FileSystemObject> it = fs.iterator();
+            
+            FileSystemObject obj;
+            boolean printResource;
+            while (it.hasNext()) {
+                obj = it.next();
+                if (obj == null) {
+                    continue;
+                }
+                
+                printResource = obj instanceof PrintableFile;
+                
+                pw.printf("    %s { id = %d%s }",
+                        obj.getPath(),
+                        obj.getID(),
+                        printResource
+                                ? ", resource = "
+                                        + ((PrintableFile)obj).getResourceName()
+                                : "");
+                pw.println();
+            }
+        }
+        pw.println();
     }
 }
