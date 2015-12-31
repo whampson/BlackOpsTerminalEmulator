@@ -75,7 +75,7 @@ public class Main
     public static void main(String[] args)
     {
         //TODO: documentation, add resources,
-        // arrow keys, menu bar
+        // arrow keys, menu bar, TEST
         
         Logger.info(PROGRAM_TITLE);
         Logger.info("Version %s\n", PROGRAM_VERSION);
@@ -135,10 +135,10 @@ public class Main
         exes.put("cat", CatCommand.class);
         exes.put("cd", CdCommand.class);
         exes.put("clear", ClearCommand.class);
-        exes.put("doa", DOACommand.class);
         exes.put("debug", DebugCommand.class);
         exes.put("decode", DecodeCommand.class);
         exes.put("dir", DirCommand.class);
+        exes.put("doa", DOACommand.class);
         exes.put("encode", EncodeCommand.class);
         exes.put("foobar", FoobarCommand.class);
         exes.put("hello", HelloCommand.class);

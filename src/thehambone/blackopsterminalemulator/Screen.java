@@ -34,6 +34,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
+import javax.swing.JMenuItem;
 import javax.swing.Timer;
 import thehambone.blackopsterminalemulator.io.Logger;
 
@@ -374,6 +375,7 @@ public final class Screen
     private Dimension calculateComponentSize()
     {
         Dimension dim = new Dimension();
+        
         FontMetrics fm = component.getFontMetrics(font);
         String testString = "";
         
@@ -394,7 +396,11 @@ public final class Screen
                 + (charWidth * 2) - 2 + (TEXT_HORIZONTAL_OFFSET * 2)
                 + PADDING_X;
         dim.height = charHeight * (lines + 3)
-                - charHeight - TEXT_VERTICAL_OFFSET + PADDING_Y;
+                - charHeight - TEXT_VERTICAL_OFFSET + PADDING_Y
+                + (int)new JMenuItem().getPreferredSize().getHeight();
+        
+//        dim.height = 461;
+//        dim.width = 660;
         
         return dim;
     }
