@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 thehambone <thehambone93@gmail.com>.
+ * Copyright 2015-2016 thehambone <thehambone93@gmail.com>.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,8 +40,10 @@ import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -52,6 +54,7 @@ import javax.swing.SwingUtilities;
 import thehambone.blackopsterminalemulator.filesystem.FileSystem;
 import thehambone.blackopsterminalemulator.filesystem.FileSystemObject;
 import thehambone.blackopsterminalemulator.filesystem.PrintableFile;
+import thehambone.blackopsterminalemulator.io.ResourceLoader;
 import thehambone.blackopsterminalemulator.util.Debuggable;
 import thehambone.blackopsterminalemulator.util.FixedLengthQueue;
 /**
@@ -119,10 +122,9 @@ public final class Terminal implements Debuggable
         
         motd = "";
         
+        initFrameIcon();
         initMenuBar();
-        
         registerInputKeys();
-        
         initWindowClosePrompt();
     }
     
@@ -613,6 +615,18 @@ public final class Terminal implements Debuggable
         return previousInput;
     }
     
+    /*
+     * Loads and sets the program icon.
+     */
+    private void initFrameIcon()
+    {
+        frame.setIconImage(
+                ResourceLoader.loadEmbeddedImage("res/logosmall.png"));
+    }
+    
+    /*
+     * Initializes the menu bar.
+     */
     private void initMenuBar()
     {
         JMenuBar menuBar = new JMenuBar();
@@ -652,11 +666,17 @@ public final class Terminal implements Debuggable
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                // TODO: Show About dialog
+                // Show About dialog
+                AboutDialog ad = new AboutDialog(frame, true);
+                ad.setLocationRelativeTo(frame);
+                ad.setVisible(true);
             }
         });
     }
     
+    /*
+     * Sets up the close program confirmation dialog.
+     */
     private void initWindowClosePrompt()
     {
         frame.addWindowListener(new WindowAdapter()

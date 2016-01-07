@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 thehambone <thehambone93@gmail.com>.
+ * Copyright 2015-2016 thehambone <thehambone93@gmail.com>.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -61,11 +61,19 @@ import thehambone.blackopsterminalemulator.util.UncaughtExceptionHandler;
 public class Main
 {
     public static final String PROGRAM_TITLE
-            = "Call of Duty: Black Ops Terminal Emulator";
+            = "BO Terminal";
+    public static final String PROGRAM_SLOGAN
+            = "The Call of Duty: Black Ops terminal emulator.";
+    public static final String PROGRAM_SLOGAN_HTML
+            = "<html>"
+            + "The <i>Call of Duty: Black Ops</i> terminal emulator."
+            + "</html>";
     public static final String PROGRAM_VERSION
             = "1.0-alpha";
     public static final String PROGRAM_AUTHOR = "thehambone";
     public static final String PROGRAM_AUTHOR_EMAIL = "thehambone93@gmail.com";
+    public static final String PROGRAM_COPYRIGHT
+            = "Copyright (C) 2015-2016 " + PROGRAM_AUTHOR + ".";
     
     /**
      * Program entry point.
@@ -74,8 +82,7 @@ public class Main
      */
     public static void main(String[] args)
     {
-        //TODO: documentation, add resources,
-        // arrow keys, menu bar, TEST
+        //TODO: add resources, about dialog text, TEST, rethink title
         
         Logger.info(PROGRAM_TITLE);
         Logger.info("Version %s\n", PROGRAM_VERSION);

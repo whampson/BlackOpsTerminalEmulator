@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 thehambone <thehambone93@gmail.com>.
+ * Copyright 2015-2016 thehambone <thehambone93@gmail.com>.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,18 @@
 
 package thehambone.blackopsterminalemulator.io;
 
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -112,6 +116,23 @@ public class ResourceLoader
         try {
             String resourcePath = IMAGE_FILE_PATH + resourceName;
             image = ImageIO.read(new FileInputStream(resourcePath));
+        } catch (IOException ex) {
+            Logger.stackTrace(ex);
+        }
+        
+        return image;
+    }
+    
+    public static Image loadEmbeddedImage(String resourcePath)
+    {
+        Image image = null;
+        
+        try {
+//            InputStream stream = ClassLoader.getSystemClassLoader()
+//                    .getResourceAsStream(resourcePath);
+
+            InputStream stream = new FileInputStream(resourcePath);
+            image = ImageIO.read(stream);
         } catch (IOException ex) {
             Logger.stackTrace(ex);
         }

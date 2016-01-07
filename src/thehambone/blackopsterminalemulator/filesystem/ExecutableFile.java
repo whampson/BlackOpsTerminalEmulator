@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 thehambone <thehambone93@gmail.com>.
+ * Copyright 2015-2016 thehambone <thehambone93@gmail.com>.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
