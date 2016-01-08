@@ -65,8 +65,11 @@ public class AboutDialog extends JDialog
     private static final String LOGO_PATH = "res/logo.png";
     private static final String BACGROUND_PATH = "res/gradient.png";
     private static final String PROGRAM_DESCRIPTION
-            = "This program attempts to emulate the Terminal found in the "
-            + "videogame Call of Duty: Black Ops";
+            = "This program emulates the fake computer terminal found in the "
+            + "videogame Call of Duty: Black Ops. The goal of this program is "
+            + "to match the terminal exactly, which involves including all "
+            + "text files, images, sound files, and mail found on the original "
+            + "terminal, as well as incorporating its bugs and shortcomings.";
     
     private static final int WINDOW_WIDTH = 320;
     private static final int WINDOW_HEIGHT = 260;
@@ -110,38 +113,37 @@ public class AboutDialog extends JDialog
         // Title label
         programTitleLabel = new JLabel(Main.PROGRAM_TITLE);
         programTitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        programTitleLabel.setFont(
-                new Font(defaultLabelFont.getName(), Font.BOLD, 14));
+        programTitleLabel.setFont(new Font("Courier New", Font.BOLD, 24));
         getContentPane().add(programTitleLabel);
-        programTitleLabel.setBounds(78, 10, 230, 17);
+        programTitleLabel.setBounds(78, 6, 230, 17);
         
         // Slogan label
         programSloganLabel = new JLabel(Main.PROGRAM_SLOGAN_HTML);
         programSloganLabel.setHorizontalAlignment(SwingConstants.CENTER);
         getContentPane().add(programSloganLabel);
-        programSloganLabel.setBounds(78, 30, 230, 14);
+        programSloganLabel.setBounds(78, 26, 230, 14);
         
         // Version label 1
         programVersionTitleLabel = new JLabel("Version:");
         programVersionTitleLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         getContentPane().add(programVersionTitleLabel);
-        programVersionTitleLabel.setBounds(78, 50, 114, 14);
+        programVersionTitleLabel.setBounds(78, 46, 114, 14);
         
         // Version label 2
         programVersionLabel = new JLabel(Main.PROGRAM_VERSION);
         getContentPane().add(programVersionLabel);
-        programVersionLabel.setBounds(194, 50, 114, 14);
+        programVersionLabel.setBounds(194, 46, 114, 14);
         
         // Author label 1
         programAuthorTitleLabel = new JLabel("Created by:");
         programAuthorTitleLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         getContentPane().add(programAuthorTitleLabel);
-        programAuthorTitleLabel.setBounds(78, 64, 114, 14);
+        programAuthorTitleLabel.setBounds(78, 60, 114, 14);
         
         // Author label 2
         programAuthorLabel = new JLabel(Main.PROGRAM_AUTHOR);
         getContentPane().add(programAuthorLabel);
-        programAuthorLabel.setBounds(194, 64, 114, 14);
+        programAuthorLabel.setBounds(194, 60, 114, 14);
         
         // Description text pane
         descriptionTextPane = new JTextPane();
@@ -154,7 +156,7 @@ public class AboutDialog extends JDialog
         descriptionScrollPane = new JScrollPane();
         descriptionScrollPane.setViewportView(descriptionTextPane);
         getContentPane().add(descriptionScrollPane);
-        descriptionScrollPane.setBounds(6, 84, 302, 104);
+        descriptionScrollPane.setBounds(6, 80, 302, 108);
         
         // Copyright label
         programCopyrightLabel = new JLabel(Main.PROGRAM_COPYRIGHT);

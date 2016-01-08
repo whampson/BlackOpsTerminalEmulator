@@ -25,10 +25,12 @@
 package thehambone.blackopsterminalemulator.filesystem.command;
 
 import java.io.IOException;
+import thehambone.blackopsterminalemulator.Main;
 import thehambone.blackopsterminalemulator.Screen;
 import thehambone.blackopsterminalemulator.Terminal;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
 import thehambone.blackopsterminalemulator.io.Logger;
+import thehambone.blackopsterminalemulator.io.ResourceLoader;
 
 /**
  * The "debug" command.
@@ -61,14 +63,16 @@ public class DebugCommand extends ExecutableFile
         Terminal.println("Options:");
         Terminal.println("\tbg <colorID>\t\t\t\t"
                 + "sets the background color");
-        Terminal.println("\tcrashdump\t\t\t\t\t"
-                + "creates a crash dump file");
         Terminal.println("\tfg <colorID>\t\t\t\t"
                 + "sets the foreground color");
-        Terminal.println("\tlistcolors\t\t\t\t\t"
-                + "lists all available colors");
+        Terminal.println();
+        Terminal.println("\tcrashdump\t\t\t\t\t"
+                + "creates a crash dump file");
         Terminal.println("\trtexception [message]\t\t"
                 + "creates a fake RuntimeException");
+        Terminal.println();
+        Terminal.println("\treloadfs \t\t\t\t\t"
+                + "reloads file system config");
     }
     
     /*
@@ -110,6 +114,15 @@ public class DebugCommand extends ExecutableFile
     }
     
     /*
+     * Reloads the terminal file system configuration.
+     */
+    private void reloadFileSystem()
+    {
+        ResourceLoader.loadFileSystemConfiguration(Main.registerExecutables());
+        Terminal.println("File system reloaded");
+    }
+    
+    /*
      * Sets the background color of the terminal screen.
      */
     private void setBG(int colorID)
@@ -143,6 +156,8 @@ public class DebugCommand extends ExecutableFile
             case "bg":
                 if (args.length - 1 < 1) {
                     Terminal.println("Usage: bg <colorID>");
+                    Terminal.println("Color IDs:");
+                    listColors();
                     return;
                 }
                 int bgColorID = Integer.parseInt(args[1]);
@@ -156,14 +171,16 @@ public class DebugCommand extends ExecutableFile
             case "fg":
                 if (args.length - 1 < 1) {
                     Terminal.println("Usage: fg <colorID>");
+                    Terminal.println("Color IDs:");
+                    listColors();
                     return;
                 }
                 int fgColorID = Integer.parseInt(args[1]);
                 setFG(fgColorID);
                 break;
                 
-            case "listcolors":
-                listColors();
+            case "reloadfs":
+                reloadFileSystem();
                 break;
                 
             case "rtexception":

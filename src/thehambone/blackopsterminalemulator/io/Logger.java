@@ -100,6 +100,8 @@ public class Logger
         pw.println(LOG_BUFFER.toString());
         pw.flush();
         
+        Logger.info("Crash dump saved to " + fileName);
+        
         return fileName;
     }
     

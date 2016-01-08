@@ -142,6 +142,13 @@ public final class LoginShell extends Shell
         
         // Loop until shell is terminated
         while (isRunning()) {
+            // Update window title
+            Terminal.setTitle(Main.PROGRAM_TITLE + " " + Main.PROGRAM_VERSION
+                    + (Main.isDebugModeEnabled() ? " (debug)" : "")
+                    + " | " + getSystem().getName()
+                    + " | " + getUser().getUsername()
+                    + " | " + getCurrentDirectory().getPath());
+            
             // Reset previous command
             exe = null;
             
@@ -205,6 +212,14 @@ public final class LoginShell extends Shell
                 Terminal.println("Error:  Unknown Command - try \"help\"");
                 continue;
             }
+            
+            // Update window title with exe name
+            Terminal.setTitle(Main.PROGRAM_TITLE + " " + Main.PROGRAM_VERSION
+                    + (Main.isDebugModeEnabled() ? " (debug)" : "")
+                    + " | " + getSystem().getName()
+                    + " | " + getUser().getUsername()
+                    + " | " + getCurrentDirectory().getPath()
+                    + " | " + input);
             
             // Run the command
             exe.exec(args);

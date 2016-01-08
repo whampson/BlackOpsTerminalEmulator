@@ -446,7 +446,7 @@ public final class ScreenBuffer implements Debuggable
             // Handle newlines and line wrapping
             if (buf.get(i).getCharacter() == '\n' || x > columns - 1) {
                 x = 0;
-                pw.printf("%08d    ", i);
+                pw.printf("%08d    ", i + 1);
             } else {
                 x++;
             }

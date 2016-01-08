@@ -26,6 +26,7 @@ package thehambone.blackopsterminalemulator;
 
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
@@ -61,7 +62,7 @@ import thehambone.blackopsterminalemulator.util.UncaughtExceptionHandler;
 public class Main
 {
     public static final String PROGRAM_TITLE
-            = "BO Terminal";
+            = "BLOTE";
     public static final String PROGRAM_SLOGAN
             = "The Call of Duty: Black Ops terminal emulator.";
     public static final String PROGRAM_SLOGAN_HTML
@@ -74,6 +75,8 @@ public class Main
     public static final String PROGRAM_AUTHOR_EMAIL = "thehambone93@gmail.com";
     public static final String PROGRAM_COPYRIGHT
             = "Copyright (C) 2015-2016 " + PROGRAM_AUTHOR + ".";
+    
+    private static boolean debug = false;
     
     /**
      * Program entry point.
@@ -90,8 +93,7 @@ public class Main
         
         initUncaughtExceptionHandler();
         initLookAndFeel();
-        
-        Terminal.setTitle(PROGRAM_TITLE + " - " + PROGRAM_VERSION);
+        parseCommandLineArgs(args);
         
         Map<String, Class<? extends ExecutableFile>> executables;
         executables = registerExecutables();
@@ -111,12 +113,28 @@ public class Main
         launchTerminal(new LoginShell(lastServer, lastUser));
     }
     
+    public static boolean isDebugModeEnabled()
+    {
+        return debug;
+    }
+    
+    private static void parseCommandLineArgs(String[] args)
+    {
+        if (args.length != 0 && args[0].equals("--debug")) {
+            debug = true;
+            Logger.info("Debug mode enabled.");
+        }
+    }
+    
     /*
      * Invokes the default login shell and shows the terminal window.
      */
     private static void launchTerminal(LoginShell defaultLoginShell)
     {
         Logger.info("Launching terminal...");
+        
+        Terminal.setTitle(PROGRAM_TITLE + " " + PROGRAM_VERSION
+                + (debug ? " (debug)" : ""));
         
         Terminal.show();
         Terminal.printMOTD();
@@ -134,7 +152,7 @@ public class Main
      * Initializes terminal commands by associating command names with their
      * respective classes.
      */
-    private static
+    public static
     Map<String, Class<? extends ExecutableFile>> registerExecutables()
     {
         Map<String, Class<? extends ExecutableFile>> exes = new HashMap<>();
@@ -142,7 +160,9 @@ public class Main
         exes.put("cat", CatCommand.class);
         exes.put("cd", CdCommand.class);
         exes.put("clear", ClearCommand.class);
-        exes.put("debug", DebugCommand.class);
+        if (debug) {
+            exes.put("debug", DebugCommand.class);
+        }
         exes.put("decode", DecodeCommand.class);
         exes.put("dir", DirCommand.class);
         exes.put("doa", DOACommand.class);
