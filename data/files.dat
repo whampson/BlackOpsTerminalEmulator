@@ -1,12 +1,13 @@
 # files
-# This file defines all of the file objects found on each server.
+# This file defines all of the file objects found on the terminal.
+
 # ==========
 # id              -- file system object ID
 # name            -- name of the file
 # is_hidden       -- indicates whether the file is hidden from directory
 #                    listings
 # resource_name   -- the name of the resource containing the file data
-#                    (the name is derived from actual the termial)
+#                    (the name is derived from actual the terminal)
 # alias_target_id -- if not empty, marks the file as an alias and points
 #                    to the "real" file
 # ==========
