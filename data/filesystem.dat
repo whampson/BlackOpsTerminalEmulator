@@ -1,4 +1,14 @@
 # filesystem
+# This file defines the directory structure of each server.
+
+# ==========
+# id            -- filesystem object ID
+# system        -- the system on which to create the directory tree
+# name          -- the name of the directory
+# parent_dir_id -- the filesystem object ID of the parent directory
+# file_ids      -- a whitespace-separated list of filesystem object IDs
+#                  defining which files belong to the directory
+# ==========
 
 #   600 level - root dir
 #   700 level - general dir
