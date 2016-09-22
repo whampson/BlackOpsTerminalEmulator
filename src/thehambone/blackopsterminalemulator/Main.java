@@ -84,7 +84,11 @@ public class Main
      */
     public static void main(String[] args)
     {
-        //TODO: add resources, about dialog text, TEST, rethink title
+        /* TODO:
+         * -finish adding resources
+         * -add --data-path=<path> argument
+         * -TEST TEST TEST
+         */
         
         Logger.info(PROGRAM_TITLE);
         Logger.info("Version %s\n", PROGRAM_VERSION);
@@ -95,16 +99,19 @@ public class Main
         parseCommandLineArgs(args);
         
         Map<String, Class<? extends ExecutableFile>> executables;
-        executables = registerExecutables();
-        
         Server lastServer;
         UserAccount lastUser;
         
-        /* Load terminal configuration. Config must be loaded in the following
-           order: servers, filesystem, users, mail
-        */
+        /* Load terminal configuration.
+           Config _must_ be loaded in the following order:
+               servers
+               executables
+               filesystem
+               users
+               mail */
         ResourceLoader.loadMOTD();
         lastServer = ResourceLoader.loadServerConfiguration();
+        executables = registerExecutables();
         ResourceLoader.loadFileSystemConfiguration(executables);
         lastUser = ResourceLoader.loadUserConfiguration();
         ResourceLoader.loadMailConfiguration();
@@ -112,11 +119,19 @@ public class Main
         launchTerminal(new LoginShell(lastServer, lastUser));
     }
     
+    /**
+     * Checks whether debug mode is on.
+     * 
+     * @return {@code true} if debug mode is enabled, {@code false} otherwise
+     */
     public static boolean isDebugModeEnabled()
     {
         return debug;
     }
     
+    /*
+     * Processes arguments passed via the command-line.
+     */
     private static void parseCommandLineArgs(String[] args)
     {
         if (args.length != 0 && args[0].equals("--debug")) {
