@@ -1,23 +1,32 @@
 # users
+# This file defines all of the users that have access to each server.
+# ==========
+# system      -- the system to create the user on
+# name        -- the user's login name
+# password    -- the user's login password
+# homedir_id  -- the filesystem object ID of the user's home directory
+# is_unlisted -- marks the user as hidden; the user cannot login via the login
+#                command and will not show up in user listings
+# ==========
 
 # system        name            password        homedir_id      is_unlisted
 Dreamland,      vbush,          majestic1,      801,            false
 Dreamland,      twalker,        thanksdad,      802,            false
 Dreamland,      roppen,         trinity,        803,            false
-# DoD,            rnixon,         ,               ,               true
-# DoD,            rmcnamara,      ,               ,               true
-# DoD,            jfkennedy,      ,               ,               true
-# DoD,            jbowman,        ,               ,               true
-# DoD,            fwoods,         ,               ,               true
-# DerRiese,       tmasaki,        ,               ,               true
-# DerRiese,       tdempsey,       ,               ,               true
-# DerRiese,       sophia,         ,               ,               true
-# DerRiese,       samantha,       ,               ,               true
-# DerRiese,       peter,          ,               ,               true
-# DerRiese,       nbelinksi,      ,               ,               true
-# DerRiese,       erichtofen,     ,               ,               true
-# DerRiese,       edward,         ,               ,               true
-# DerRiese,       drmaxis,        ,               ,               true
+#DoD,            rnixon,         ,               ,               true
+#DoD,            rmcnamara,      ,               ,               true
+#DoD,            jfkennedy,      ,               ,               true
+#DoD,            jbowman,        ,               ,               true
+#DoD,            fwoods,         ,               ,               true
+#DerRiese,       tmasaki,        ,               ,               true
+#DerRiese,       tdempsey,       ,               ,               true
+#DerRiese,       sophia,         ,               ,               true
+#DerRiese,       samantha,       ,               ,               true
+#DerRiese,       peter,          ,               ,               true
+#DerRiese,       nbelinksi,      ,               ,               true
+#DerRiese,       erichtofen,     ,               ,               true
+#DerRiese,       edward,         ,               ,               true
+#DerRiese,       drmaxis,        ,               ,               true
 CIA,            wraborn,        bromlow,        804,            false
 CIA,            vbush,          manhattan,      805,            false
 CIA,            twalker,        radi0,          806,            false
