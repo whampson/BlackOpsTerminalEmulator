@@ -40,7 +40,7 @@ import thehambone.blackopsterminalemulator.filesystem.PrintableFile;
  * <p>
  * Created on Nov 30, 2015.
  *
- * @author thehambone <thehambone93@gmail.com>
+ * @author Wes Hampson <thehambone93@gmail.com>
  */
 public class CatCommand extends ExecutableFile
 {

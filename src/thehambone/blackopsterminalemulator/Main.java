@@ -57,7 +57,7 @@ import thehambone.blackopsterminalemulator.util.UncaughtExceptionHandler;
  * <p>
  * Created on Nov 17, 2015.
  *
- * @author thehambone <thehambone93@gmail.com>
+ * @author Wes Hampson <thehambone93@gmail.com>
  */
 public class Main
 {
@@ -71,7 +71,7 @@ public class Main
             + "</html>";
     public static final String PROGRAM_VERSION
             = "1.0-alpha";
-    public static final String PROGRAM_AUTHOR = "thehambone";
+    public static final String PROGRAM_AUTHOR = "Wes Hampson";
     public static final String PROGRAM_AUTHOR_EMAIL = "thehambone93@gmail.com";
     public static final String PROGRAM_COPYRIGHT
             = "Copyright (C) 2015-2016 " + PROGRAM_AUTHOR + ".";

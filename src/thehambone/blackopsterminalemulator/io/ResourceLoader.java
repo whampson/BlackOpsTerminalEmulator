@@ -60,7 +60,7 @@ import thehambone.blackopsterminalemulator.filesystem.TextFile;
  * <p>
  * Created on Dec 18, 2015.
  *
- * @author thehambone <thehambone93@gmail.com>
+ * @author Wes Hampson <thehambone93@gmail.com>
  */
 public class ResourceLoader
 {

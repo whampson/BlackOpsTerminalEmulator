@@ -39,7 +39,7 @@ import thehambone.blackopsterminalemulator.Terminal;
  * <p>
  * Created on Dec 14, 2015.
  *
- * @author thehambone <thehambone93@gmail.com>
+ * @author Wes Hampson <thehambone93@gmail.com>
  */
 public class Logger
 {

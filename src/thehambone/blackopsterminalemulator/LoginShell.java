@@ -34,7 +34,7 @@ import thehambone.blackopsterminalemulator.filesystem.FileSystemObject;
  * <p>
  * Created on Nov 28, 2015.
  *
- * @author thehambone <thehambone93@gmail.com>
+ * @author Wes Hampson <thehambone93@gmail.com>
  */
 public final class LoginShell extends Shell
 {

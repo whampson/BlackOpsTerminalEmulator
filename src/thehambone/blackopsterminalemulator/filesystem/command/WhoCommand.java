@@ -38,7 +38,7 @@ import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
  * <p>
  * Created on Nov 29, 2015.
  *
- * @author thehambone <thehambone93@gmail.com>
+ * @author Wes Hampson <thehambone93@gmail.com>
  */
 public class WhoCommand extends ExecutableFile
 {
