@@ -11,6 +11,12 @@
 #                    to the "real" file
 # ==========
 
+#   100 level - executable files
+#   200 level - system files
+#   300 level - text files
+#   400 level - image files
+#   500 level - sound files
+
 # executables
 # id    name                    is_hidden       resource_name                   alias_target_id
 101,    alicia,                 false,          ,
