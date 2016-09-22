@@ -642,6 +642,9 @@ public final class Terminal implements Debuggable
         helpMenu.setMnemonic('H');
         helpAboutMenuItem.setMnemonic('A');
         
+        helpAboutMenuItem
+                .setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+        
         fileMenu.add(fileExitMenuItem);
         helpMenu.add(helpAboutMenuItem);
         
