@@ -25,6 +25,7 @@
 package thehambone.blackopsterminalemulator.util;
 
 import javax.swing.JOptionPane;
+import thehambone.blackopsterminalemulator.Main;
 import thehambone.blackopsterminalemulator.io.Logger;
 
 /**
@@ -68,13 +69,14 @@ public final class UncaughtExceptionHandler
                 + "A fatal exception has occured in thread \"%s\"."
                 + "<br><br>%s: %s<br><br>"
                 + "%s<br>"
-                + "Please contact the emulator developer for assistance."
+                + "Please contact the emulator developer at %s for assistance."
                 + "</p></html>",
                 t.getName(), e.getClass().getSimpleName(), e.getMessage(),
                 crashReportFileName != null
                         ? "A crash report has been generated "
                                 + "(" + crashReportFileName + ")."
-                        : "A crash report failed to generate.");
+                        : "A crash report failed to generate.",
+                Main.PROGRAM_AUTHOR_EMAIL);
         
         // Show error message
         JOptionPane.showMessageDialog(null,
