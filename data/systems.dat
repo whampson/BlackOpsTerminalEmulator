@@ -1,5 +1,13 @@
 # systems
+# This file defines which systems the terminal can connect to.
 
+# ==========
+# name          -- the name of the system; used when invoking rlogin
+# login_message -- the message to be displayed when the login command is
+#                  invoked; newline characters can be entered using '\n'
+# ==========
+
+# !!! CIA MUST BE LAST IN LIST OR TERMINAL WILL LAUNCH INCORRECTLY !!!
 # name          login_message
 DoD,            ""
 DerRiese,       ""
