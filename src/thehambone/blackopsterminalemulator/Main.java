@@ -26,7 +26,6 @@ package thehambone.blackopsterminalemulator;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
