@@ -66,10 +66,21 @@ public class AboutDialog extends JDialog
     private static final String BACGROUND_PATH = "res/gradient.png";
     private static final String PROGRAM_DESCRIPTION
             = "This program emulates the fake computer terminal found in the "
-            + "videogame Call of Duty: Black Ops. The goal of this program is "
-            + "to match the terminal exactly, which involves including all "
-            + "text files, images, sound files, and mail found on the original "
-            + "terminal, as well as incorporating its bugs and shortcomings.";
+            + "videogame \"Call of Duty: Black Ops\". The aim is to match the "
+            + "behavior of the fake terminal exactly; it should feel as if one "
+            + "were using the original terminal found in the game. This "
+            + "involves including all text files, images, sound files, and mail "
+            + "found on the original terminal, as well as incorporating its "
+            + "various bugs and shortcomings."
+            + "\n----------\n"
+            + "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY "
+            + "KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE "
+            + "WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE "
+            + "AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT "
+            + "HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, "
+            + "WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING "
+            + "FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR "
+            + "OTHER DEALINGS IN THE SOFTWARE.";
     
     private static final int WINDOW_WIDTH = 320;
     private static final int WINDOW_HEIGHT = 260;
