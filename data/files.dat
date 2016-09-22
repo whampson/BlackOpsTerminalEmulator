@@ -1,4 +1,15 @@
 # files
+# This file defines all of the file objects found on each server.
+# ==========
+# id              -- file system object ID
+# name            -- name of the file
+# is_hidden       -- indicates whether the file is hidden from directory
+#                    listings
+# resource_name   -- the name of the resource containing the file data
+#                    (the name is derived from actual the termial)
+# alias_target_id -- if not empty, marks the file as an alias and points
+#                    to the "real" file
+# ==========
 
 # executables
 # id    name                    is_hidden       resource_name                   alias_target_id
