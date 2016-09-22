@@ -1,4 +1,16 @@
 # mail
+# This file defines all of the mail objects for each user
+
+# ==========
+# system        -- the system on which the recipient exists
+# recipient     -- the login name of the recipient; dictates who gets which mail
+#                  objects
+# sender        -- the sender; a simple string; shows up in mailbox
+# date          -- the date received; a simple string; shows up in mailbox
+# subject       -- the mail subject; a simple string; shows up in mailbox
+# resource_name -- the name of the resource containing the mail body
+#                  (the name is derived from actual the terminal)
+# ==========
 
 # system    recipient       sender              date                    subject             resource_name
 CIA,        amason,         Jason Hudson,       Sat Nov 10 1963,        New Tech,           a56b90fc
