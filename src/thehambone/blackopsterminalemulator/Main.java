@@ -85,8 +85,7 @@ public class Main
     public static void main(String[] args)
     {
         /* TODO:
-         * -finish adding resources
-         * -add --data-path=<path> argument
+         * -finish adding resourcest
          * -TEST TEST TEST (test on Mac OS X and Linux)
          */
         
@@ -96,7 +95,7 @@ public class Main
         
         initUncaughtExceptionHandler();
         initLookAndFeel();
-        parseCommandLineOpts(args);
+        parseCommandLine(args);
         
         Map<String, Class<? extends ExecutableFile>> executables;
         Server lastServer;
@@ -132,7 +131,7 @@ public class Main
     /*
      * Processes options passed in via the command-line.
      */
-    private static void parseCommandLineOpts(String[] opts)
+    private static void parseCommandLine(String[] opts)
     {
         if (opts.length == 0) {
             return;
