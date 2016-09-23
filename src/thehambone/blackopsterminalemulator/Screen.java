@@ -54,8 +54,8 @@ public final class Screen
     private static final int IMAGE_HORIZONTAL_OFFSET = 3;
     private static final int IMAGE_VERTICAL_OFFSET = 4;
     
-    private static final int PADDING_X = 2;
-    private static final int PADDING_Y = 2;
+    private static final int PADDING_X = 8;
+    private static final int PADDING_Y = -2;
     
     private static final char COLOR_ESCAPE_CHAR = '^';
     
@@ -380,27 +380,24 @@ public final class Screen
         String testString = "";
         
         // Set character dimensions
-        charWidth = fm.getWidths()[1];
+        charWidth = fm.stringWidth("m");
         charHeight = fm.getHeight();
         
         /* Fill test string with as many spaces as the screen will show in one
            line. We want 1 extra space to accomodate for the cursor. */
         for (int i = 0; i < columns + 1; i++) {
-            testString += " ";
+            testString += "m";
         }
         
-        // TODO: develop a way to accurately measure height from text
-        // As of now, height is only accurate for Courier New 13pt font
-        // (or just hardcode it)
-        dim.width = (fm.stringWidth(testString) - charWidth)
-                + (charWidth * 2) - 2 + (TEXT_HORIZONTAL_OFFSET * 2)
+        // Calculate screen dimensions
+        int menuBarHeight = (int)new JMenuItem().getPreferredSize().getHeight();
+        dim.width = fm.stringWidth(testString)
+                + TEXT_HORIZONTAL_OFFSET * 2
                 + PADDING_X;
-        dim.height = charHeight * (lines + 3)
-                - charHeight - TEXT_VERTICAL_OFFSET + PADDING_Y
-                + (int)new JMenuItem().getPreferredSize().getHeight();
-        
-//        dim.height = 461;
-//        dim.width = 660;
+        dim.height = charHeight * (lines + 2)
+                - TEXT_VERTICAL_OFFSET * 2
+                - PADDING_Y
+                + menuBarHeight;
         
         return dim;
     }
