@@ -87,7 +87,7 @@ public class Main
         /* TODO:
          * -finish adding resources
          * -add --data-path=<path> argument
-         * -TEST TEST TEST
+         * -TEST TEST TEST (test on Mac OS X and Linux)
          */
         
         Logger.info(PROGRAM_TITLE);
@@ -96,7 +96,7 @@ public class Main
         
         initUncaughtExceptionHandler();
         initLookAndFeel();
-        parseCommandLineArgs(args);
+        parseCommandLineOpts(args);
         
         Map<String, Class<? extends ExecutableFile>> executables;
         Server lastServer;
@@ -130,13 +130,41 @@ public class Main
     }
     
     /*
-     * Processes arguments passed via the command-line.
+     * Processes options passed in via the command-line.
      */
-    private static void parseCommandLineArgs(String[] args)
+    private static void parseCommandLineOpts(String[] opts)
     {
-        if (args.length != 0 && args[0].equals("--debug")) {
-            debug = true;
-            Logger.info("Debug mode enabled.");
+        if (opts.length == 0) {
+            return;
+        }
+        
+        /* Format: '--option' or '--option=ARGUMENT' */
+        String arg = "";
+        String[] optArg;
+        for (String opt : opts) {
+            // Split option and argument by equals sign
+            optArg = opt.split("=");
+            opt = optArg[0];
+            
+            // Concatenate remaining argument tokens into one
+            if (optArg.length > 1) {
+                arg = "";
+                for (int i = 1; i < optArg.length; i++) {
+                    arg += optArg[i];
+                }
+            }
+            
+            // Parse options
+            switch (opt) {
+                case "--debug":
+                    debug = true;
+                    Logger.info("Debug mode enabled.");
+                    break;
+                case "--data-dir":
+                    ResourceLoader.setDataDirectory(arg);
+                    Logger.info("Data directory set to '%s'\n", arg);
+                    break;
+            }
         }
     }
     
