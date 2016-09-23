@@ -85,8 +85,9 @@ public class Main
     public static void main(String[] args)
     {
         /* TODO:
-         * -finish adding resourcest
-         * -TEST TEST TEST (test on Mac OS X and Linux)
+         * -finish adding resources
+         * -Fix about dialog dimensions (don't hardcode component locations!)
+         * -TEST TEST TEST (test screen rendering on Mac OS X and Linux)
          */
         
         Logger.info(PROGRAM_TITLE);
