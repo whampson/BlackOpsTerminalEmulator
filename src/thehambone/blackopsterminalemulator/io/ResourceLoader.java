@@ -63,17 +63,32 @@ import thehambone.blackopsterminalemulator.filesystem.TextFile;
 public class ResourceLoader
 {
     // Configuration file paths
-    private static final String FILES_PATH = "data/files.dat";
-    private static final String FILESYSTEM_PATH = "data/filesystem.dat";
-    private static final String MAIL_PATH = "data/mail.dat";
-    private static final String MOTD_PATH = "data/_motd";
-    private static final String SERVERS_PATH = "data/systems.dat";
-    private static final String USERS_PATH = "data/users.dat";
+    private static final String DEFAULT_DATA_DIR = "data";
+    private static final String CFG_FILES = "files.dat";
+    private static final String CFG_FILESYSTEM = "filesystem.dat";
+    private static final String CFG_MAIL = "mail.dat";
+    private static final String CFG_MOTD = "_motd";
+    private static final String CFG_SERVERS = "systems.dat";
+    private static final String CFG_USERS = "users.dat";
     
     // Resource directory paths
-    private static final String TEXT_FILE_PATH = "data/txt/";
-    private static final String IMAGE_FILE_PATH = "data/img/";
-    private static final String SOUND_FILE_PATH = "data/aud/";
+    private static final String TEXT_FILE_PATH = "txt/";
+    private static final String IMAGE_FILE_PATH = "img/";
+    private static final String SOUND_FILE_PATH = "aud/";
+    
+    private static String dataDir = DEFAULT_DATA_DIR;
+    
+    /**
+     * Sets the directory from which to load configuration files.
+     * <p>
+     * The default directory is "data/".
+     * 
+     * @param dir the new data directory
+     */
+    public static void setDataDirectory(String dir)
+    {
+        dataDir = dir;
+    }
     
     /**
      * Loads a text resource.
@@ -86,7 +101,8 @@ public class ResourceLoader
         String textData = "";
         
         try {
-            String resourcePath = TEXT_FILE_PATH + resourceName;
+            String txtPath = dataDir + "/" + TEXT_FILE_PATH;
+            String resourcePath = txtPath + resourceName;
             BufferedReader reader
                     = new BufferedReader(new FileReader(resourcePath));
             
@@ -112,7 +128,8 @@ public class ResourceLoader
         BufferedImage image = null;
         
         try {
-            String resourcePath = IMAGE_FILE_PATH + resourceName;
+            String imgPath = dataDir + "/" + IMAGE_FILE_PATH;
+            String resourcePath = imgPath + resourceName;
             image = ImageIO.read(new FileInputStream(resourcePath));
         } catch (IOException ex) {
             Logger.stackTrace(ex);
@@ -126,9 +143,6 @@ public class ResourceLoader
         Image image = null;
         
         try {
-//            InputStream stream = ClassLoader.getSystemClassLoader()
-//                    .getResourceAsStream(resourcePath);
-
             InputStream stream = new FileInputStream(resourcePath);
             image = ImageIO.read(stream);
         } catch (IOException ex) {
@@ -149,7 +163,8 @@ public class ResourceLoader
         AudioInputStream stream = null;
         
         try {
-            String resourcePath = SOUND_FILE_PATH + resourceName;
+            String audPath = dataDir + "/" + SOUND_FILE_PATH;
+            String resourcePath = audPath + resourceName;
             stream = AudioSystem
                     .getAudioInputStream(new java.io.File(resourcePath));
         } catch (UnsupportedAudioFileException | IOException ex) {
@@ -174,7 +189,8 @@ public class ResourceLoader
         FileSystem tempFileSystem = loadFiles(exes);
         
         try {
-            DATFileReader reader = new DATFileReader(FILESYSTEM_PATH);
+            String fsCfgPath = dataDir + "/" + CFG_FILESYSTEM;
+            DATFileReader reader = new DATFileReader(fsCfgPath);
             reader.setCommentChar('#');
             reader.ignoreWhitespaces(true);
             
@@ -242,7 +258,8 @@ public class ResourceLoader
             }
         } catch (IOException ex) {
             Logger.stackTrace(ex);
-            showConfigFileErrorMessage(ex);
+            String msg = "Failed to load filesystem configuration";
+            throw new RuntimeException(msg, ex);
         }
     }
     
@@ -254,7 +271,8 @@ public class ResourceLoader
     {
         FileSystem tempFileSystem = new FileSystem(new Directory(0, ""));
         try {
-            DATFileReader reader = new DATFileReader(FILES_PATH);
+            String fCfgPath = dataDir + "/" + CFG_FILES;
+            DATFileReader reader = new DATFileReader(fCfgPath);
             reader.setCommentChar('#');
             reader.ignoreWhitespaces(true);
             
@@ -316,7 +334,8 @@ public class ResourceLoader
             }
         } catch (IOException ex) {
             Logger.stackTrace(ex);
-            showConfigFileErrorMessage(ex);
+            String msg = "Failed to load filesystem configuration";
+            throw new RuntimeException(msg, ex);
         } catch (InstantiationException | IllegalAccessException ex) {
             throw new RuntimeException(ex);
         } catch (NoSuchMethodException | SecurityException ex) {
@@ -334,7 +353,8 @@ public class ResourceLoader
     public static void loadMailConfiguration()
     {
         try {
-            DATFileReader reader = new DATFileReader(MAIL_PATH);
+            String mCfgPath = dataDir + "/" + CFG_MAIL;
+            DATFileReader reader = new DATFileReader(mCfgPath);
             reader.setCommentChar('#');
             reader.ignoreWhitespaces(true);
             
@@ -361,7 +381,8 @@ public class ResourceLoader
             }
         } catch (IOException ex) {
             Logger.stackTrace(ex);
-            showConfigFileErrorMessage(ex);
+            String msg = "Failed to load mail configuration";
+            throw new RuntimeException(msg, ex);
         }
     }
     
@@ -375,7 +396,8 @@ public class ResourceLoader
         Server s = null;
         
         try {
-            DATFileReader reader = new DATFileReader(SERVERS_PATH);
+            String sCfgPath = dataDir + "/" + CFG_SERVERS;
+            DATFileReader reader = new DATFileReader(sCfgPath);
             reader.setCommentChar('#');
             reader.ignoreWhitespaces(true);
             
@@ -392,7 +414,8 @@ public class ResourceLoader
             
         } catch (IOException ex) {
             Logger.stackTrace(ex);
-            showConfigFileErrorMessage(ex);
+            String msg = "Failed to load server configuration";
+            throw new RuntimeException(msg, ex);
         }
         
         return s;
@@ -408,7 +431,8 @@ public class ResourceLoader
         UserAccount u = null;
         
         try {
-            DATFileReader reader = new DATFileReader(USERS_PATH);
+            String uCfgPath = dataDir + "/" + CFG_USERS;
+            DATFileReader reader = new DATFileReader(uCfgPath);
             reader.setCommentChar('#');
             reader.ignoreWhitespaces(true);
             
@@ -433,7 +457,8 @@ public class ResourceLoader
             }
         } catch (IOException ex) {
             Logger.stackTrace(ex);
-            showConfigFileErrorMessage(ex);
+            String msg = "Failed to load user configuration";
+            throw new RuntimeException(msg, ex);
         }
         
         return u;
@@ -449,8 +474,9 @@ public class ResourceLoader
         String line;
         
         try {
+            String motdCfgPath = dataDir + "/" + CFG_MOTD;
             BufferedReader fileReader
-                    = new BufferedReader(new FileReader(MOTD_PATH));
+                    = new BufferedReader(new FileReader(motdCfgPath));
             
             while ((line = fileReader.readLine()) != null) {
                 motd += line + "\n";
@@ -460,46 +486,8 @@ public class ResourceLoader
             Logger.info("Loaded MOTD");
         } catch (IOException ex) {
             Logger.stackTrace(ex);
-            showConfigFileErrorMessage(ex);
+            String msg = "Failed to load motd";
+            throw new RuntimeException(msg, ex);
         }
-    }
-    
-    // TODO: Remove in favor of unchecked exception?
-    /*
-     * Displays an error message indicating that a config file loading operation
-     * has failed.
-     */
-    private static void showConfigFileErrorMessage(Throwable cause)
-    {
-        // Attempts to create a crash dump
-        String crashReportFileName = null;
-        try {
-            crashReportFileName = Logger.generateCrashDump();
-        } catch (IOException ex) {
-            Logger.stackTrace(ex);
-        }
-        
-        // Create error message
-        String message = String.format("<html><p style='width: 300px;'>"
-                + "An error occured while loading a configuration file:"
-                + "<br><br>%s: %s<br><br>"
-                + "%s<br>"
-                + "If the problem persists, please contact the emulator "
-                + "developer."
-                + "</p></html>",
-                cause.getClass().getSimpleName(), cause.getMessage(),
-                crashReportFileName != null
-                        ? "A crash report has been generated "
-                                + "(" + crashReportFileName + ")."
-                        : "A crash report failed to generate.");
-        
-        // Show error message
-        JOptionPane.showMessageDialog(null,
-                message,
-                "I/O Error",
-                JOptionPane.ERROR_MESSAGE);
-        
-        // Exit JVM with a nonzero exit code to indicate an error as occured
-        System.exit(1);
     }
 }
