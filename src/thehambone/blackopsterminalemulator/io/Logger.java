@@ -87,6 +87,7 @@ public class Logger
         pw.println("OS Version: " + System.getProperty("os.version"));
         pw.println("OS Architecture: " + System.getProperty("os.arch"));
         pw.println("JVM Version: " + System.getProperty("java.version"));
+        pw.println("JVM Vendor: " + System.getProperty("java.vendor"));
         pw.println("JVM Architecture: "
                 + System.getProperty("sun.arch.data.model"));
         pw.println();
