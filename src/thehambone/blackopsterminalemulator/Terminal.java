@@ -71,6 +71,11 @@ public final class Terminal implements Debuggable
     private static final char INPUT_HISTORY_CYCLE_UP = '\uFFFE';
     private static final char INPUT_HISTORY_CYCLE_DOWN = '\uFFFF';
     
+    private static final Font DEFAULT_FONT_WIN
+            = new Font("Courier New", Font.PLAIN, 13);
+    private static final Font DEFAULT_FONT_OSX_NIX
+            = new Font("Courier", Font.PLAIN, 13);
+    
     private static final int MAX_LOGIN_SHELLS = 15;
     
     private static final Terminal TERMINAL_INSTANCE = new Terminal();
@@ -101,7 +106,7 @@ public final class Terminal implements Debuggable
         
         Screen.ScreenColor bg = Screen.ScreenColor.BLACK;
         Screen.ScreenColor fg = Screen.ScreenColor.WHITE;
-        Font font = new Font("Courier New", Font.PLAIN, 13);
+        Font font = Main.isWindows() ? DEFAULT_FONT_WIN : DEFAULT_FONT_OSX_NIX;
         int cursorBlinkRate = 300;
         screen = new Screen(COLUMNS, LINES, bg, fg, font, cursorBlinkRate);
         
