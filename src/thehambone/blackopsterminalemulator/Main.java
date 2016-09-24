@@ -86,6 +86,8 @@ public class Main
     {
         /* TODO:
          * -finish adding resources
+         * -add '--font=FONT' option for setting font
+         * -make email in class @author tags javadoc compliant
          * -Fix about dialog dimensions (don't hardcode component locations!)
          * -TEST TEST TEST (test screen rendering on Mac OS X and Linux)
          */
@@ -127,6 +129,17 @@ public class Main
     public static boolean isDebugModeEnabled()
     {
         return debug;
+    }
+    
+    /**
+     * Checks whether the JVM is running on the Windows operating system.
+     * 
+     * @return {@code true} if Windows is being used, {@code false} otherwise
+     */
+    public static boolean isWindows()
+    {
+        String osName = System.getProperty("os.name").toLowerCase();
+        return osName.contains("win");
     }
     
     /*
