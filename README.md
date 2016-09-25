@@ -2,9 +2,16 @@
 The _Call of Duty: **Bl**ack **O**ps_ **T**erminal **E**mulator.
 
 ## General Information
-This program emulates the fake computer terminal found in the videogame _Call of Duty: Black Ops_. The aim of BLOTE is to match the behavior of the fake terminal exactly; it should feel as if one were using the original terminal found in the game. This involves including all text files, images, sound files, and mail found on the original terminal, as well as incorporating its various bugs and shortcomings.
+This program emulates the fake computer terminal found in the videogame
+_Call of Duty: Black Ops_. The aim of BLOTE is to match the behavior of the
+fake terminal exactly; it should feel as if one were using the original
+terminal found in the game. This involves including all text files, images,
+sound files, and mail found on the original terminal, as well as incorporating
+its various bugs and shortcomings.
 
-BLOTE is still a work-in-progress, although it is nearly complete. It currently lacks many of the text files found on the original terminal, but all of the core functionality has been implemented. Give it a try!
+BLOTE is still a work-in-progress, although it is nearly complete. It currently
+lacks many of the text files found on the original terminal, but all of the
+core functionality has been implemented. Give it a try!
 
 ## How to Use
 ### Compiling
@@ -24,7 +31,9 @@ Launch a shell and navigate to the repo directory. Launch BLOTE by running
 
 If using NetBeans, simply click the "Run" button.
 
-You may run BLOTE from anywhere on your computer if you'd like, but **be sure the `data` and `res` folders are in the working directory** or else BLOTE will not run correctly.
+You may run BLOTE from anywhere on your computer if you'd like, but **be sure
+the `data` and `res` folders are in the working directory** or else BLOTE will
+not run correctly.
 
 ## To-Do
 * Finish adding text, image, and sound files.
