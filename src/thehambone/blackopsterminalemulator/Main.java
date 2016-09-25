@@ -86,9 +86,6 @@ public class Main
     {
         /* TODO:
          * -finish adding resources
-         * -add '--font=FONT' option for setting font
-         * -make email in class @author tags javadoc compliant
-         * -Fix about dialog dimensions (don't hardcode component locations!)
          * -TEST TEST TEST (test screen rendering on Mac OS X and Linux)
          */
         
