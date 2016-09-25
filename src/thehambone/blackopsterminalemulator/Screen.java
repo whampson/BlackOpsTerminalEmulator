@@ -69,7 +69,7 @@ public final class Screen
     private Color background;
     private Color foreground;
     
-    private final Font font;
+    private Font font;
     private int charWidth;
     private int charHeight;
     
@@ -178,6 +178,19 @@ public final class Screen
     public void setForeground(ScreenColor foreground)
     {
         this.foreground = foreground.getColor();
+    }
+    
+    public Font getFont()
+    {
+        return font;
+    }
+    
+    public void setFont(Font f)
+    {
+        font = f;
+        component.invalidate();
+        component.repaint();
+        //component.setPreferredSize(calculateComponentSize());
     }
     
     /**
