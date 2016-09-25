@@ -55,7 +55,8 @@ import thehambone.blackopsterminalemulator.filesystem.PrintableFile;
 import thehambone.blackopsterminalemulator.io.ResourceLoader;
 import thehambone.blackopsterminalemulator.util.Debuggable;
 import thehambone.blackopsterminalemulator.util.FixedLengthQueue;
-/**
+
+/** 
  * Created on Nov 18, 2015.
  *
  * @author Wes Hampson
@@ -79,57 +80,6 @@ public final class Terminal implements Debuggable
     private static final int MAX_LOGIN_SHELLS = 15;
     
     private static final Terminal TERMINAL_INSTANCE = new Terminal();
-    
-    private final Object inputLock;
-    
-    private final JFrame frame;
-    
-    private final Screen screen;
-    
-    private final InputMap inputMap;
-    private final ActionMap actionMap;
-    
-    private final Stack<LoginShell> activeShells;
-    private final FixedLengthQueue<String> inputHistory;
-    private final List<Server> servers;
-    
-    private volatile char charTyped;
-    
-    private String motd;
-    
-    // Don't allow this class to be instantiated externally
-    private Terminal()
-    {
-        inputLock = new Object();
-        
-        frame = new JFrame();
-        
-        Screen.ScreenColor bg = Screen.ScreenColor.BLACK;
-        Screen.ScreenColor fg = Screen.ScreenColor.WHITE;
-        Font font = Main.isWindows() ? DEFAULT_FONT_WIN : DEFAULT_FONT_OSX_NIX;
-        int cursorBlinkRate = 300;
-        screen = new Screen(COLUMNS, LINES, bg, fg, font, cursorBlinkRate);
-        
-        inputMap = new InputMap();
-        actionMap = new ActionMap();
-        screen.getComponent().setInputMap(JComponent.WHEN_FOCUSED, inputMap);
-        screen.getComponent().setActionMap(actionMap);
-        
-        activeShells = new Stack<>();
-        
-        inputHistory = new FixedLengthQueue<>(8);
-        
-        servers = new ArrayList<>();
-        
-        charTyped = 0;
-        
-        motd = "";
-        
-        initFrameIcon();
-        initMenuBar();
-        registerInputKeys();
-        initWindowClosePrompt();
-    }
     
     /**
      * Displays the terminal window.
@@ -617,6 +567,59 @@ public final class Terminal implements Debuggable
         
         return previousInput;
     }
+    
+    private final Object inputLock;
+    
+    private final JFrame frame;
+    
+    private final Screen screen;
+    
+    private final InputMap inputMap;
+    private final ActionMap actionMap;
+    
+    private final Stack<LoginShell> activeShells;
+    private final FixedLengthQueue<String> inputHistory;
+    private final List<Server> servers;
+    
+    private volatile char charTyped;
+    
+    private String motd;
+    
+    // Don't allow this class to be instantiated externally
+    private Terminal()
+    {
+        inputLock = new Object();
+        
+        frame = new JFrame();
+        
+        Screen.ScreenColor bg = Screen.ScreenColor.BLACK;
+        Screen.ScreenColor fg = Screen.ScreenColor.WHITE;
+        Font font = Main.isWindows() ? DEFAULT_FONT_WIN : DEFAULT_FONT_OSX_NIX;
+        int cursorBlinkRate = 300;
+        screen = new Screen(COLUMNS, LINES, bg, fg, font, cursorBlinkRate);
+        
+        inputMap = new InputMap();
+        actionMap = new ActionMap();
+        screen.getComponent().setInputMap(JComponent.WHEN_FOCUSED, inputMap);
+        screen.getComponent().setActionMap(actionMap);
+        
+        activeShells = new Stack<>();
+        
+        inputHistory = new FixedLengthQueue<>(8);
+        
+        servers = new ArrayList<>();
+        
+        charTyped = 0;
+        
+        motd = "";
+        
+        initFrameIcon();
+        initMenuBar();
+        registerInputKeys();
+        initWindowClosePrompt();
+    }
+    
+    
     
     /*
      * Loads and sets the program icon.
