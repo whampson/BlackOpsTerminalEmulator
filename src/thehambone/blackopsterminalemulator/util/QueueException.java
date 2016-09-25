@@ -30,7 +30,7 @@ package thehambone.blackopsterminalemulator.util;
  * <p>
  * Created on Nov 29, 2015.
  *
- * @author Wes Hampson <thehambone93@gmail.com>
+ * @author Wes Hampson
  */
 public class QueueException extends RuntimeException
 {

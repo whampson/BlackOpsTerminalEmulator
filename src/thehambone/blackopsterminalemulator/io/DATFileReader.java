@@ -37,7 +37,7 @@ import java.io.IOException;
  * <p>
  * Created on Dec 5, 2015.
  *
- * @author Wes Hampson <thehambone93@gmail.com>
+ * @author Wes Hampson
  */
 public class DATFileReader
 {

@@ -35,7 +35,7 @@ import java.util.List;
  * <p>
  * Created on Nov 28, 2015.
  *
- * @author Wes Hampson <thehambone93@gmail.com>
+ * @author Wes Hampson
  */
 public class Directory implements FileSystemObject
 {

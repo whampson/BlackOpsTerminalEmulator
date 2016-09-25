@@ -33,7 +33,7 @@ import java.awt.image.BufferedImage;
  * <p>
  * Created on Nov 21, 2015.
  *
- * @author Wes Hampson <thehambone93@gmail.com>
+ * @author Wes Hampson
  */
 public final class ScreenItem
 {

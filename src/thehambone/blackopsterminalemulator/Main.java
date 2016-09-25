@@ -56,7 +56,7 @@ import thehambone.blackopsterminalemulator.util.UncaughtExceptionHandler;
  * <p>
  * Created on Nov 17, 2015.
  *
- * @author Wes Hampson <thehambone93@gmail.com>
+ * @author Wes Hampson
  */
 public class Main
 {

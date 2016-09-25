@@ -30,7 +30,7 @@ package thehambone.blackopsterminalemulator.filesystem;
  * <p>
  * Created on Nov 30, 2015.
  *
- * @author Wes Hampson <thehambone93@gmail.com>
+ * @author Wes Hampson
  */
 public abstract class PrintableFile extends File
 {

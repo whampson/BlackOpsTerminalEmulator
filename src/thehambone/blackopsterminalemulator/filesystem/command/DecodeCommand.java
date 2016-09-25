@@ -36,7 +36,7 @@ import thehambone.blackopsterminalemulator.filesystem.ExecutableFile;
  * <p>
  * Created on Dec 6, 2015.
  *
- * @author Wes Hampson <thehambone93@gmail.com>
+ * @author Wes Hampson
  */
 public class DecodeCommand extends ExecutableFile
 {

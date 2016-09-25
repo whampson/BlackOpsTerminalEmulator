@@ -33,7 +33,7 @@ import java.util.Iterator;
  * <p>
  * Created on Nov 29, 2015.
  *
- * @author Wes Hampson <thehambone93@gmail.com>
+ * @author Wes Hampson
  * @param <E> the type of each element in the queue
  */
 public class FixedLengthQueue<E> implements Iterable<E>

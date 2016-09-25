@@ -58,7 +58,7 @@ import thehambone.blackopsterminalemulator.util.FixedLengthQueue;
 /**
  * Created on Nov 18, 2015.
  *
- * @author Wes Hampson <thehambone93@gmail.com>
+ * @author Wes Hampson
  */
 public final class Terminal implements Debuggable
 {

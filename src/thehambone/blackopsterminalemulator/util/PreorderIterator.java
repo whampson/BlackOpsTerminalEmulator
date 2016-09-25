@@ -36,7 +36,7 @@ import thehambone.blackopsterminalemulator.filesystem.FileSystemObject;
  * <p>
  * Created on Dec 25, 2015.
  *
- * @author Wes Hampson <thehambone93@gmail.com>
+ * @author Wes Hampson
  */
 public class PreorderIterator implements Iterator<FileSystemObject>
 {

@@ -30,7 +30,7 @@ package thehambone.blackopsterminalemulator;
  * <p>
  * Created on Nov 28, 2015.
  *
- * @author Wes Hampson <thehambone93@gmail.com>
+ * @author Wes Hampson
  */
 public abstract class Shell
 {

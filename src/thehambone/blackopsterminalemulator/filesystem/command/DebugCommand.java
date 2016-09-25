@@ -37,11 +37,11 @@ import thehambone.blackopsterminalemulator.io.ResourceLoader;
  * The "debug" command.
  * <p>
  * This is a special command used for carrying out operations useful for
- * debugging purposes. This command does not exist in the original Teminal.
+ * debugging purposes. This command does not exist in the original Terminal.
  * <p>
  * Created on Dec 25, 2015.
  *
- * @author Wes Hampson <thehambone93@gmail.com>
+ * @author Wes Hampson
  */
 public class DebugCommand extends ExecutableFile
 {

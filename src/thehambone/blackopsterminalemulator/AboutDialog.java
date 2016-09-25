@@ -58,7 +58,7 @@ import thehambone.blackopsterminalemulator.io.ResourceLoader;
 /**
  * Created on Jan 6, 2016.
  *
- * @author Wes Hampson <thehambone93@gmail.com>
+ * @author Wes Hampson
  */
 public class AboutDialog extends JDialog
 {

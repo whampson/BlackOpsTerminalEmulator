@@ -41,7 +41,7 @@ import thehambone.blackopsterminalemulator.io.Logger;
  * <p>
  * Created on Dec 20, 2015.
  *
- * @author Wes Hampson <thehambone93@gmail.com>
+ * @author Wes Hampson
  */
 public final class UncaughtExceptionHandler
         implements Thread.UncaughtExceptionHandler
