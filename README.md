@@ -1,9 +1,5 @@
 # BLOTE
-The _Call of Duty: **Bl**ack **O**ps_ **t**erminal **e**mulator.
-
-![](http://i.imgur.com/YOKDznn.png)
-![](http://i.imgur.com/jIVKU1W.png)
-![](http://i.imgur.com/R47uxjM.png)
+The _Call of Duty: **Bl**ack **O**ps_ **T**erminal **E**mulator.
 
 ## General Information
 This program emulates the fake computer terminal found in the videogame _Call of Duty: Black Ops_. The aim of BLOTE is to match the behavior of the fake terminal exactly; it should feel as if one were using the original terminal found in the game. This involves including all text files, images, sound files, and mail found on the original terminal, as well as incorporating its various bugs and shortcomings.
@@ -31,3 +27,9 @@ You may specifiy an alternative data directory by running BLOTE from the command
 ## To-Do
 * Finish adding text, image, and sound files.
 * Test all commands, compare behavior with actual terminal
+
+## Screenshots
+![](http://i.imgur.com/YOKDznn.png)
+![](http://i.imgur.com/jIVKU1W.png)
+![](http://i.imgur.com/R47uxjM.png)
+![](http://i.imgur.com/S5ku5bh.png)
