@@ -24,6 +24,7 @@
 
 package thehambone.blackopsterminalemulator.filesystem.command;
 
+import java.awt.Font;
 import java.io.IOException;
 import thehambone.blackopsterminalemulator.Main;
 import thehambone.blackopsterminalemulator.Screen;
@@ -71,8 +72,11 @@ public class DebugCommand extends ExecutableFile
         Terminal.println("\trtexception [message]\t\t"
                 + "creates a fake RuntimeException");
         Terminal.println();
-        Terminal.println("\treloadfs \t\t\t\t\t"
+        Terminal.println("\treloadfs\t\t\t\t\t"
                 + "reloads file system config");
+        Terminal.println();
+        Terminal.println("\tfont <name>\t\t\t\t\t"
+                + "sets the terminal font");
     }
     
     /*
@@ -177,6 +181,17 @@ public class DebugCommand extends ExecutableFile
                 }
                 int fgColorID = Integer.parseInt(args[1]);
                 setFG(fgColorID);
+                break;
+                
+            case "font":
+                String fontName = "";
+                for (int i = 0; i < args.length - 1; i++) {
+                    fontName += args[i + 1] + " ";
+                }
+                fontName = fontName.trim();
+                Terminal.println("Setting font to " + fontName + "...");
+                Font f = new Font(fontName, Font.PLAIN, 13);
+                Terminal.getScreen().setFont(f);
                 break;
                 
             case "reloadfs":
