@@ -189,10 +189,13 @@ public class CdCommand extends ExecutableFile
                 return;
             }
             
-            // Disallow the traversal of other users' homedirs
+            // Disallow the traversal of other users' homedirs...
             if (fso instanceof HomeDirectory && fso != currentUserHomeDir) {
-                Terminal.println("Error:  Insufficient Permissions");
-                return;
+                // ...unless it is an 'unlisted' homedir
+                if (!((HomeDirectory)fso).isUnlisted()) {
+                    Terminal.println("Error:  Insufficient Permissions");
+                    return;
+                }
             }
             currentObj = fso;
             wasLastNodePopOperator = false;
