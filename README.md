@@ -19,10 +19,12 @@ BLOTE is still a work-in-progress, although it is nearly complete. It currently 
 The compiled sources will be output to `dist/BLOTE.jar`.
 
 ### Running
-To run BLOTE, simply double-click `BLOTE.jar`, but **be sure the `data` folder is in the same directory as `BLOTE.jar`**.
+Launch a shell and navigate to the repo directory. Launch BLOTE by running  
+`java -jar dist/BLOTE.jar`
 
-You may specifiy an alternative data directory by running BLOTE from the command-line like so:  
-`java -jar BLOTE.jar --data-dir=PATH`
+If using NetBeans, simply click the "Run" button.
+
+You may run BLOTE from anywhere on your computer if you'd like, but **be sure the `data` and `res` folders are in the working directory** or else BLOTE will not run correctly.
 
 ## To-Do
 * Finish adding text, image, and sound files.
